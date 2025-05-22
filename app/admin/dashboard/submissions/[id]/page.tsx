@@ -64,7 +64,7 @@ export default async function SubmissionDetailPage({
                         priority
                       />
                       <div className="absolute bottom-4 right-4">
-                        <DownloadButton url={submission.files[0].file_url} />
+                        <DownloadButton url={submission.files[0].file_url} fileName={submission.files[0].file_name} />
                       </div>
                     </>
                   ) : (
