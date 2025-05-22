@@ -1,132 +1,298 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { Eye, Award } from "lucide-react"
-import { format } from "date-fns"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/components/ui/use-toast"
-import { getAllSubmissions } from "@/app/actions/submissions"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Search, ChevronLeft, ChevronRight, Eye, Download, Image as ImageIcon, Star } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getAllTournaments, getSubmissionsByTournament, getDownloadUrl } from "@/app/actions/submissions"
+import type { Submission } from "@/app/actions/submissions"
+import Link from "next/link"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import Image from "next/image"
+import { toast } from 'sonner'
+
+interface Tournament {
+  id: string
+  title: string
+  registration_start: string | null
+  registration_end: string | null
+  submission_deadline: string | null
+  created_at: string | null
+  updated_at: string | null
+}
 
 export default function AdminSubmissionsPage() {
-  const [submissions, setSubmissions] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const { toast } = useToast()
+  const [tournaments, setTournaments] = useState<Tournament[]>([])
+  const [selectedTournament, setSelectedTournament] = useState("")
+  const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [totalSubmissions, setTotalSubmissions] = useState(0)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState(true)
+  const [previewImage, setPreviewImage] = useState(null)
+  const [downloading, setDownloading] = useState(false)
+  const itemsPerPage = 10
 
   useEffect(() => {
-    const loadSubmissions = async () => {
-      setIsLoading(true)
+    const fetchTournaments = async () => {
       try {
-        const data = await getAllSubmissions()
-        setSubmissions(data)
+        const data = await getAllTournaments()
+        // Ensure each tournament has a title
+        const validTournaments = data.filter(t => t.title) as Tournament[]
+        setTournaments(validTournaments)
+        setLoading(false)
       } catch (error) {
-        console.error("Error fetching submissions:", error)
-        toast({
-          title: "Error",
-          description: "Failed to fetch submissions",
-          variant: "destructive",
-        })
-      } finally {
-        setIsLoading(false)
+        console.error("Error fetching tournaments:", error)
+        setLoading(false)
       }
     }
-
-    loadSubmissions()
+    fetchTournaments()
   }, [])
 
-  const getStatusColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-      case "pending_review":
-        return "bg-yellow-500"
-      case "approved":
-        return "bg-green-500"
-      case "rejected":
-        return "bg-red-500"
-      case "scored":
-        return "bg-blue-500"
-      default:
-        return "bg-gray-500"
+  useEffect(() => {
+    if (selectedTournament) {
+      const fetchSubmissions = async () => {
+        setLoading(true)
+        try {
+          const { submissions, total } = await getSubmissionsByTournament(
+            selectedTournament,
+            currentPage,
+            itemsPerPage,
+            searchQuery
+          )
+          console.log("submissions", submissions);
+          setSubmissions(submissions)
+          setTotalSubmissions(total)
+          setLoading(false)
+        } catch (error) {
+          console.error("Error fetching submissions:", error)
+          setLoading(false)
+        }
+      }
+      fetchSubmissions()
+    }
+  }, [selectedTournament, currentPage, searchQuery])
+
+  const totalPages = Math.ceil(totalSubmissions / itemsPerPage)
+
+  const handleTournamentChange = (value: string) => {
+    setSelectedTournament(value)
+    setCurrentPage(1)
+  }
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    setCurrentPage(1)
+  }
+
+  const handleDownload = async (filePath: string, fileName: string) => {
+    setDownloading(true)
+    try {
+      // Get the proper download URL from Firebase
+      const downloadUrl = await getDownloadUrl(filePath)
+      if (!downloadUrl) throw new Error("Could not generate download URL")
+      
+      const response = await fetch(downloadUrl)
+      const blob = await response.blob()
+      const downloadUrlObject = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = downloadUrlObject
+      link.download = fileName || 'submission-file'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(downloadUrlObject)
+    } catch (error) {
+      console.error("Download failed:", error)
+      toast.error("Failed to download file")
+    } finally {
+      setDownloading(false)
     }
   }
 
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h2 className="text-3xl font-bold tracking-tight">Submissions</h2>
+        
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+          <Select onValueChange={handleTournamentChange} value={selectedTournament}>
+            <SelectTrigger className="w-full md:w-[300px]">
+              <SelectValue placeholder="Select a tournament" />
+            </SelectTrigger>
+            <SelectContent>
+              {tournaments.map((tournament) => (
+                <SelectItem key={tournament.id} value={tournament.id}>
+                  {tournament.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div className="relative w-full md:w-[300px]">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search submissions..."
+              value={searchQuery}
+              onChange={handleSearch}
+              className="pl-10"
+              disabled={!selectedTournament}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-4">
-        {isLoading ? (
-          <p>Loading submissions...</p>
-        ) : submissions.length === 0 ? (
-          <p>No submissions found.</p>
-        ) : (
-          submissions.map((submission) => (
-            <Card key={submission.id}>
-              <CardHeader className="flex flex-row items-start justify-between space-y-0">
-                <div>
-                  <CardTitle>{submission.title}</CardTitle>
-                  <CardDescription>
-                    By {submission.users?.name || "Unknown"} for {submission.tournaments?.title || "Unknown Tournament"}
-                  </CardDescription>
+      <Card>
+        <CardHeader>
+          <CardTitle>Submissions List</CardTitle>
+          <CardDescription>
+            {selectedTournament 
+              ? `${totalSubmissions} submissions found. Showing ${Math.min((currentPage - 1) * itemsPerPage + 1, totalSubmissions)} to ${Math.min(currentPage * itemsPerPage, totalSubmissions)}.`
+              : "Please select a tournament to view submissions."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex items-center justify-center h-40">
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          ) : selectedTournament && submissions.length > 0 ? (
+            <div className="space-y-4">
+              <div className="rounded-md border overflow-x-auto">
+                <div className="min-w-[1000px]">
+                  {/* Header row */}
+                  <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted/50">
+                    <div className="col-span-2">User</div>
+                    <div className="col-span-2">Email</div>
+                    <div className="col-span-2">Submission Title</div>
+                    <div className="col-span-2">Files</div>
+                    <div className="col-span-2">Date</div>
+                    <div className="col-span-2">Actions</div>
+                  </div>
+                  
+                  {/* Data rows */}
+                  <div className="divide-y">
+                    {submissions.map((submission) => (
+                      <div key={submission.id} className="grid grid-cols-12 items-center p-4 hover:bg-muted/50">
+                        <div className="col-span-2 font-medium">{submission.user?.name || "N/A"}</div>
+                        <div className="col-span-2 truncate text-sm">{submission.user?.email || "N/A"}</div>
+                        <div className="col-span-2 truncate">{submission.title || "N/A"}</div>
+                        <div className="col-span-2">
+                          {submission.files?.length > 0 ? (
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => setPreviewImage(submission.imageUrl)}
+                              >
+                                <ImageIcon className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => handleDownload(submission.files[0].file_path, submission.files[0].file_name)}
+                                disabled={downloading}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">No files</span>
+                          )}
+                        </div>
+                        <div className="col-span-2 text-sm">
+                          {submission.created_at ? new Date(submission.created_at).toLocaleDateString() : "N/A"}
+                        </div>
+                        <div className="col-span-2 flex gap-2">
+                          <Link href={`/admin/dashboard/submissions/${submission.id}`}>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-2" />
+                              View
+                            </Button>
+                          </Link>
+                          <Button variant="outline" size="sm">
+                            <Star className="h-4 w-4 mr-2" />
+                            Score
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Pagination */}
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
                 </div>
                 <div className="flex space-x-2">
-                  <Badge className={getStatusColor(submission.status)}>{submission.status}</Badge>
+                  <Button
+                    variant="outline"
+                    disabled={currentPage <= 1}
+                    onClick={() => paginate(currentPage - 1)}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    disabled={currentPage >= totalPages}
+                    onClick={() => paginate(currentPage + 1)}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium">Description</p>
-                    <p className="text-sm text-muted-foreground">{submission.description || "No description"}</p>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Submitted</p>
-                      <p className="text-sm text-muted-foreground">
-                        {submission.created_at
-                          ? format(new Date(submission.created_at), "MMM d, yyyy")
-                          : "Unknown"}
-                      </p>
-                    </div>
-                    {submission.score !== undefined && (
-                      <div className="flex justify-between">
-                        <p className="text-sm font-medium">Score</p>
-                        <p className="text-sm text-muted-foreground">{submission.score}/100</p>
-                      </div>
-                    )}
-                    {submission.rank !== undefined && (
-                      <div className="flex justify-between">
-                        <p className="text-sm font-medium">Rank</p>
-                        <p className="text-sm text-muted-foreground">#{submission.rank}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex justify-end space-x-2 mt-4">
-                  <Link href={`/admin/submissions/${submission.id}`}>
-                    <Button variant="outline" size="sm">
-                      <Eye className="mr-2 h-4 w-4" />
-                      View Details
-                    </Button>
-                  </Link>
-                  {submission.status === "scored" && (
-                    <Link href={`/admin/certificates/generate/${submission.id}`}>
-                      <Button size="sm">
-                        <Award className="mr-2 h-4 w-4" />
-                        Generate Certificate
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+              </div>
+            </div>
+          ) : selectedTournament ? (
+            <div className="flex flex-col items-center justify-center h-40 gap-2">
+              <p className="text-muted-foreground">
+                {searchQuery ? "No matching submissions found." : "No submissions found for this tournament."}
+              </p>
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  onClick={() => setSearchQuery("")}
+                >
+                  Clear search
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-40">
+              <p className="text-muted-foreground">Please select a tournament to view submissions.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Image Preview Dialog */}
+      <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
+        <DialogContent className="sm:max-w-[80vw]">
+          <DialogHeader>
+            <DialogTitle>Submission Image Preview</DialogTitle>
+          </DialogHeader>
+          <div className="relative h-[70vh]">
+            {previewImage && (
+              <Image
+                src={previewImage}
+                alt="Submission preview"
+                fill
+                className="object-contain"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -1,10 +1,25 @@
 // app/actions/submissions.ts
 "use server"
 
-import { db } from "@/lib/firebase/server"
+import { db, storage } from "@/lib/firebase/server"
 import { revalidatePath } from "next/cache"
 import { Timestamp } from "firebase-admin/firestore"
-import { doc, getDoc } from "firebase/firestore"
+import { getDownloadURL } from "firebase/storage"
+import { ref } from "firebase/storage"
+
+export interface Submission {
+  id: string
+  title?: string
+  user: any | null
+  files: {
+    id: string
+    uploaded_at: string | null
+    [key: string]: any
+  }[]
+  created_at: string | null
+  updated_at: string | null
+  [key: string]: any
+}
 
 export async function getUserSubmissions(userId: string) {
   try {
@@ -203,4 +218,114 @@ export async function getAllSubmissions() {
   }
 }
 
+export const getAllTournaments = async () => {
+  const snapshot = await db.collection("tournaments").get()
+  return snapshot.docs.map(doc => {
+    const data = doc.data()
+    return {
+      id: doc.id,
+      title: data.title || "",
+      registration_start: data.registration_start?.toDate?.().toISOString() || null,
+      registration_end: data.registration_end?.toDate?.().toISOString() || null,
+      submission_deadline: data.submission_deadline?.toDate?.().toISOString() || null,
+      created_at: data.created_at?.toDate?.().toISOString() || null,
+      updated_at: data.updated_at?.toDate?.().toISOString() || null
+    }
+  })
+}
 
+export async function getSubmissionsByTournament(tournamentId: string, page: number = 1, limit: number = 10, search: string = "") {
+  try {
+    const toISOString = (timestamp: any) => {
+      if (!timestamp) return null
+      if (timestamp.toDate) return timestamp.toDate().toISOString()
+      if (timestamp._seconds) return new Date(timestamp._seconds * 1000).toISOString()
+      if (typeof timestamp === 'string') return timestamp
+      return null
+    }
+
+    let submissionsQuery = db.collection("submissions")
+      .where("tournament_id", "==", tournamentId)
+      .orderBy("created_at", "desc")
+
+    const snapshot = await submissionsQuery.get()
+    let submissions = await Promise.all(snapshot.docs.map(async doc => {
+      const submission = doc.data()
+      let user = null
+      let files = []
+
+      if (submission.user_id) {
+        const userRef = db.collection("users").doc(submission.user_id)
+        const userSnap = await userRef.get()
+        if (userSnap.exists) {
+          const userData = userSnap.data()
+          user = {
+            id: userSnap.id,
+            name: userData?.name || null,
+            email: userData?.email || null,
+            image: userData?.image || null,
+            createdAt: toISOString(userData?.createdAt)
+          }
+        }
+      }
+
+      const filesRef = db.collection("submission_files").where("submission_id", "==", doc.id)
+      const filesSnap = await filesRef.get()
+      files = filesSnap.docs.map(f => {
+        const data = f.data()
+        return {
+          id: f.id,
+          ...data,
+          uploaded_at: toISOString(data.uploaded_at)
+        }
+      })
+      
+      return {
+        id: doc.id,
+        ...submission,
+        user,
+        files,
+        created_at: toISOString(submission.created_at),
+        updated_at: toISOString(submission.updated_at),
+      } as Submission
+    }))
+
+    // Apply search filter
+    if (search) {
+      submissions = submissions.filter(sub => 
+        sub.user?.name?.toLowerCase().includes(search.toLowerCase()) ||
+        sub.user?.email?.toLowerCase().includes(search.toLowerCase()) ||
+        sub.title?.toLowerCase().includes(search.toLowerCase())
+      )
+    }
+
+    // Apply pagination
+    const total = submissions.length
+    const startIndex = (page - 1) * limit
+    const paginatedSubmissions = submissions.slice(startIndex, startIndex + limit)
+
+    return {
+      submissions: paginatedSubmissions,
+      total
+    }
+  } catch (error) {
+    console.error("Error in getSubmissionsByTournament:", error)
+    return { submissions: [], total: 0 }
+  }
+}
+
+// app/actions/submissions.ts
+export async function getDownloadUrl(filePath: string) {
+  try {
+    const bucket = storage.bucket()
+    const file = bucket.file(filePath)
+    const [url] = await file.getSignedUrl({
+      action: 'read',
+      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+    })
+    return url
+  } catch (error) {
+    console.error("Error generating download URL:", error)
+    return null
+  }
+}
