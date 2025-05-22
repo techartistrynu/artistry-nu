@@ -9,36 +9,12 @@ export const metadata: Metadata = {
 }
 
 const navItems = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: "layout-dashboard",
-  },
-  {
-    title: "Tournaments",
-    href: "/dashboard/tournaments",
-    icon: "trophy",
-  },
-  {
-    title: "My Submissions",
-    href: "/dashboard/submissions",
-    icon: "image",
-  },
-  {
-    title: "Payments",
-    href: "/dashboard/payments",
-    icon: "credit-card",
-  },
-  {
-    title: "Certificates",
-    href: "/dashboard/certificates",
-    icon: "award",
-  },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: "settings",
-  },
+  { title: "Dashboard", href: "/dashboard", icon: "layout-dashboard" },
+  { title: "Tournaments", href: "/dashboard/tournaments", icon: "trophy" },
+  { title: "My Submissions", href: "/dashboard/submissions", icon: "image" },
+  { title: "Payments", href: "/dashboard/payments", icon: "credit-card" },
+  { title: "Certificates", href: "/dashboard/certificates", icon: "award" },
+  { title: "Settings", href: "/dashboard/settings", icon: "settings" },
 ]
 
 export default function DashboardLayout({
@@ -49,10 +25,13 @@ export default function DashboardLayout({
   return (
     <ProtectedRoute>
       <div className="container grid flex-1 gap-12 md:grid-cols-[200px_1fr] px-4 sm:px-6 md:px-8 py-6">
-        <aside className="hidden w-[200px] flex-col md:flex">
+        <aside className="hidden md:flex flex-col w-[200px]">
           <DashboardNav items={navItems} />
         </aside>
         <main className="flex w-full flex-1 flex-col overflow-hidden">{children}</main>
+        <div className="md:hidden">
+          <DashboardNav items={navItems} />
+        </div>
       </div>
     </ProtectedRoute>
   )
