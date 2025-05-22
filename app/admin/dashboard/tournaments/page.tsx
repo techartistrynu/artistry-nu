@@ -2,13 +2,29 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Plus, Edit, Trash, Eye } from "lucide-react"
+import { Plus, Edit, Trash, Eye, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { format } from "date-fns"
 import { deleteTournament, getAllTournaments } from "@/app/actions/tournaments"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { MoreHorizontal } from "lucide-react"
 
 export default function AdminTournamentsPage() {
   const [tournaments, setTournaments] = useState<any[]>([])
@@ -22,7 +38,7 @@ export default function AdminTournamentsPage() {
   const fetchTournaments = async () => {
     setIsLoading(true)
     try {
-      const data = await getAllTournaments();
+      const data = await getAllTournaments()
       setTournaments(data || [])
     } catch (error) {
       console.error("Error fetching tournaments:", error)
@@ -38,40 +54,34 @@ export default function AdminTournamentsPage() {
 
   const getStatusBadge = (tournament: any) => {
     const now = new Date()
-    // Parse ISO strings to Date objects
     const registrationStart = tournament.registration_start ? new Date(tournament.registration_start) : null
     const registrationEnd = tournament.registration_end ? new Date(tournament.registration_end) : null
     const submissionEnd = tournament.submission_deadline ? new Date(tournament.submission_deadline) : null
 
     if (!registrationStart || !registrationEnd || !submissionEnd) {
-      return <Badge className="bg-gray-500">Invalid Dates</Badge>
+      return <Badge variant="secondary">Invalid Dates</Badge>
     }
 
     if (now < registrationStart) {
-      return <Badge className="bg-gray-500">Coming Soon</Badge>
+      return <Badge variant="secondary">Coming Soon</Badge>
     } else if (now >= registrationStart && now <= registrationEnd) {
-      return <Badge className="bg-green-500">Open</Badge>
+      return <Badge className="bg-green-500 hover:bg-green-600">Open</Badge>
     } else if (now > registrationEnd && now <= submissionEnd) {
-      return <Badge className="bg-yellow-500">Submission Period</Badge>
+      return <Badge className="bg-yellow-500 hover:bg-yellow-600">Submission Period</Badge>
     } else {
-      return <Badge className="bg-red-500">Closed</Badge>
+      return <Badge variant="destructive">Closed</Badge>
     }
   }
 
   const handleDeleteTournament = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this tournament?")) {
-      return
-    }
+    if (!confirm("Are you sure you want to delete this tournament?")) return
 
     try {
       await deleteTournament(id)
-
       toast({
         title: "Success",
         description: "Tournament deleted successfully",
       })
-
-      // Refresh the tournaments list
       fetchTournaments()
     } catch (error) {
       console.error("Error deleting tournament:", error)
@@ -86,19 +96,8 @@ export default function AdminTournamentsPage() {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'TBD'
     try {
-      // Debug log to see what we're receiving
-      // console.log('Formatting date:', dateString)
-      
-      // Parse the date string
       const date = new Date(dateString)
-      
-      // Check if date is valid
-      if (isNaN(date.getTime())) {
-        console.error('Invalid date:', dateString)
-        return 'Invalid Date'
-      }
-      
-      return format(date, "MMM d, yyyy")
+      return isNaN(date.getTime()) ? 'Invalid Date' : format(date, "PP")
     } catch (error) {
       console.error('Error formatting date:', error, dateString)
       return 'Invalid Date'
@@ -106,82 +105,110 @@ export default function AdminTournamentsPage() {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Tournaments</h2>
+    <div className="flex-1 space-y-6 p-4 md:p-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Tournaments</h1>
+          <p className="text-muted-foreground">Manage all tournaments in your system</p>
+        </div>
         <Link href="/admin/dashboard/tournaments/new">
-          <Button>
+          <Button className="w-full md:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             New Tournament
           </Button>
         </Link>
       </div>
 
-      <div className="grid gap-4">
-        {isLoading ? (
-          <p>Loading tournaments...</p>
-        ) : tournaments.length === 0 ? (
-          <p>No tournaments found.</p>
-        ) : (
-          tournaments.map((tournament) => (
-            <Card key={tournament.id}>
-              <CardHeader className="flex flex-row items-start justify-between space-y-0">
-                <div>
-                  <CardTitle>{tournament.title}</CardTitle>
-                  <CardDescription>{tournament.description}</CardDescription>
-                </div>
-                <div className="flex space-x-2">{getStatusBadge(tournament)}</div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Registration Period</p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatDate(tournament.registration_start)} - {formatDate(tournament.registration_end)}
-                      </p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Submission Deadline</p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatDate(tournament.submission_deadline)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Entry Fee</p>
-                      <p className="text-sm text-muted-foreground">₹{tournament.entry_fee}</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Category</p>
-                      <p className="text-sm text-muted-foreground">{tournament.category}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-end space-x-2 mt-4">
-                  <Link href={`/admin/dashboard/tournaments/${tournament.id}`}>
-                    <Button variant="outline" size="sm">
-                      <Eye className="mr-2 h-4 w-4" />
-                      View
-                    </Button>
-                  </Link>
-                  <Link href={`/admin/dashboard/tournaments/new?tournamentId=${tournament.id}`}>
-                    <Button variant="outline" size="sm">
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                  </Link>
-                  <Button variant="outline" size="sm" onClick={() => handleDeleteTournament(tournament.id)}>
-                    <Trash className="mr-2 h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+      <Card>
+        <CardHeader>
+          {/* <CardTitle>Tournament List</CardTitle> */}
+          <CardDescription>All active and upcoming tournaments</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          ) : tournaments.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <p className="text-muted-foreground mb-4">No tournaments found</p>
+              <Link href="/admin/dashboard/tournaments/new">
+                <Button variant="outline">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create your first tournament
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="hidden md:table-cell">Registration</TableHead>
+                  <TableHead className="hidden md:table-cell">Submission</TableHead>
+                  <TableHead className="hidden md:table-cell">Entry Fee</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tournaments.map((tournament) => (
+                  <TableRow key={tournament.id}>
+                    <TableCell>
+                      <div className="font-medium">{tournament.title}</div>
+                      <div className="text-sm text-muted-foreground line-clamp-1">
+                        {tournament.description}
+                      </div>
+                    </TableCell>
+                    <TableCell>{getStatusBadge(tournament)}</TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {formatDate(tournament.registration_start)} - {formatDate(tournament.registration_end)}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {formatDate(tournament.submission_deadline)}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      ₹{tournament.entry_fee}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/admin/dashboard/tournaments/${tournament.id}`}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/admin/dashboard/tournaments/new?tournamentId=${tournament.id}`}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onClick={() => handleDeleteTournament(tournament.id)}
+                          >
+                            <Trash className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

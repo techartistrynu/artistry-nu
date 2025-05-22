@@ -100,7 +100,28 @@ export async function fetchTournamentById(tournamentId: string) {
 
     if (!docSnap.exists) return null
     const data = docSnap.data()
-    return JSON.parse(JSON.stringify(data))
+    
+    // Helper function to safely convert Firestore Timestamp to ISO string
+    const toISOString = (timestamp: any) => {
+      if (!timestamp) return null
+      if (timestamp.toDate) return timestamp.toDate().toISOString()
+      if (timestamp._seconds) return new Date(timestamp._seconds * 1000).toISOString()
+      if (typeof timestamp === 'string') return timestamp
+      return null
+    }
+    
+    // Convert all date fields to ISO strings
+    const serializedData = {
+      id: docSnap.id,
+      ...data,
+      registration_start: toISOString(data?.registration_start),
+      registration_end: toISOString(data?.registration_end),
+      submission_deadline: toISOString(data?.submission_deadline),
+      created_at: toISOString(data?.created_at),
+      updated_at: toISOString(data?.updated_at),
+    }
+
+    return serializedData
   } catch (error) {
     console.error("Failed to fetch tournament:", error)
     return null
@@ -229,6 +250,7 @@ export async function createTournament(formData: FormData) {
   const submissionEndDate = formData.get('submissionEndDate') as string;
   const entryFee = parseFloat(formData.get('entryFee') as string);
   const files = formData.getAll('files') as File[];
+  const status = registrationStartDate > new Date().toISOString() ? "coming_soon" : "open";
 
   if (!title || !description || !category || !registrationStartDate || !registrationEndDate || !submissionEndDate || !entryFee || files.length === 0) {
     throw new Error('Missing required fields');
@@ -245,7 +267,7 @@ export async function createTournament(formData: FormData) {
     entry_fee: entryFee,
     created_at: Timestamp.now(),
     updated_at: Timestamp.now(),
-    status: "coming_soon",
+    status: status,
   });
 
   const tournamentId = tournamentRef.id;

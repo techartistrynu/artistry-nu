@@ -1,63 +1,87 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { useSession } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
-import { Upload, Loader2, Link } from "lucide-react"
-import { DatePicker } from "@/components/ui/date-picker"
-import { submitArtwork, updatePaymentDetails } from "@/app/actions/create-submission"
-import { getTournamentById, getUserSubmissionForTournament } from "@/app/actions/tournaments"
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { Upload, Loader2, Link } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
+import {
+  submitArtwork,
+  updatePaymentDetails,
+} from "@/app/actions/create-submission";
+import {
+  getTournamentById,
+  getUserSubmissionForTournament,
+} from "@/app/actions/tournaments";
+import {
+  Select,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 export default function SubmitToTournamentPage() {
-  const router = useRouter()
-  const params = useParams()
-  const tournamentId = params?.id as string
-  const { data: session } = useSession()
-  const userId = session?.user?.id 
-  const { toast } = useToast()
+  const router = useRouter();
+  const params = useParams();
+  const tournamentId = params?.id as string;
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
+  const { toast } = useToast();
 
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [applicantName, setApplicantName] = useState("")
-  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>()
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [files, setFiles] = useState<FileList | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [applicantName, setApplicantName] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>();
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [files, setFiles] = useState<FileList | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [source, setSource] = useState("");
 
-  const [tournament, setTournament] = useState<any>(null)
-  const [existingSubmission, setExistingSubmission] = useState<any>(null)
+  const [tournament, setTournament] = useState<any>(null);
+  const [existingSubmission, setExistingSubmission] = useState<any>(null);
   useEffect(() => {
     const fetchData = async () => {
       if (!tournamentId || !userId) {
-        router.push("/dashboard")
-        return
+        router.push("/dashboard");
+        return;
       }
 
+      const tournamentData = await getTournamentById(tournamentId as string);
+      const existingSubmission = await getUserSubmissionForTournament(
+        userId,
+        tournamentId
+      );
+      setTournament(tournamentData);
+      setExistingSubmission(existingSubmission);
+    };
 
-      const tournamentData = await getTournamentById(tournamentId as string)
-      const existingSubmission = await getUserSubmissionForTournament(userId, tournamentId)
-      setTournament(tournamentData)
-      setExistingSubmission(existingSubmission)
-    }
+    fetchData();
+  }, [tournamentId, router]);
 
-    fetchData()
-  }, [tournamentId, router])
-
-  
   if (!tournament) {
     return (
       <div className="container mx-auto py-8">
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
             <CardTitle>Tournament Not Found</CardTitle>
-            <CardDescription>The tournament you are looking for does not exist.</CardDescription>
+            <CardDescription>
+              The tournament you are looking for does not exist.
+            </CardDescription>
           </CardHeader>
           <CardFooter>
             <Link href="/dashboard/tournaments">
@@ -66,7 +90,7 @@ export default function SubmitToTournamentPage() {
           </CardFooter>
         </Card>
       </div>
-    )
+    );
   }
 
   if (existingSubmission) {
@@ -75,43 +99,56 @@ export default function SubmitToTournamentPage() {
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
             <CardTitle>Submission Already Exists</CardTitle>
-            <CardDescription>You have already submitted an artwork for this tournament. Please check your submissions.</CardDescription>
+            <CardDescription>
+              You have already submitted an artwork for this tournament. Please
+              check your submissions.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {/* <Link href={`/dashboard/submissions/${existingSubmission.id}`}> */}
-              <Button variant="outline" onClick={() => router.push(`/dashboard/submissions/${existingSubmission.id}`)}>Back to Submissions</Button>
+            <Button
+              variant="outline"
+              onClick={() =>
+                router.push(`/dashboard/submissions/${existingSubmission.id}`)
+              }
+            >
+              Back to Submissions
+            </Button>
             {/* </Link> */}
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   const loadRazorpay = () =>
     new Promise((resolve) => {
-      const script = document.createElement("script")
-      script.src = "https://checkout.razorpay.com/v1/checkout.js"
-      script.onload = () => resolve(true)
-      script.onerror = () => resolve(false)
-      document.body.appendChild(script)
-    })
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
 
   const triggerPayment = async (submissionId: string) => {
     const res = await fetch("/api/payment/order", {
       method: "POST",
-      body: JSON.stringify({ amount: tournament?.entry_fee || 1000, submissionId }), // ₹100
-    })
+      body: JSON.stringify({
+        amount: tournament?.entry_fee || 1000,
+        submissionId,
+      }), // ₹100
+    });
 
-    const data = await res.json()
-    const isScriptLoaded = await loadRazorpay()
+    const data = await res.json();
+    const isScriptLoaded = await loadRazorpay();
 
     if (!isScriptLoaded || !data.id) {
       toast({
         title: "Payment failed",
         description: "Razorpay script load or order creation failed.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     const options = {
@@ -122,7 +159,11 @@ export default function SubmitToTournamentPage() {
       description: "Entry Fee",
       order_id: data.id,
       handler: async function (response: any) {
-        toast({ title: "Payment Successful", description: "Don't refresh the page, it will redirect you to the success page." })
+        toast({
+          title: "Payment Successful",
+          description:
+            "Don't refresh the page, it will redirect you to the success page.",
+        });
         const result = await updatePaymentDetails({
           submissionId,
           paymentData: {
@@ -133,19 +174,21 @@ export default function SubmitToTournamentPage() {
           },
           tournamentId: tournamentId,
           userId: session?.user?.id ?? "",
-        })
-      
+        });
+
         if (!result.success) {
           toast({
             title: "Payment Recorded Failed",
             description: result.error,
             variant: "destructive",
-          })
-          return
+          });
+          return;
         }
-      
-        toast({ title: "Payment Successful", description: "Thank you!" })
-        router.push(`/dashboard/tournaments/${tournamentId}/payment/success?submissionId=${submissionId}`)
+
+        toast({ title: "Payment Successful", description: "Thank you!" });
+        router.push(
+          `/dashboard/tournaments/${tournamentId}/payment/success?submissionId=${submissionId}`
+        );
       },
       prefill: {
         name: applicantName,
@@ -154,70 +197,77 @@ export default function SubmitToTournamentPage() {
       theme: {
         color: "#6366f1",
       },
-    }
+    };
 
-    const razorpay = new (window as any).Razorpay(options)
-    razorpay.open()
-  }
+    const razorpay = new (window as any).Razorpay(options);
+    razorpay.open();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!files || !dateOfBirth) {
       toast({
         title: "Missing Fields",
         description: "Please upload files and select your date of birth.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsUploading(true)
-    setIsSubmitting(true)
+    setIsUploading(true);
+    setIsSubmitting(true);
 
     try {
-      const formData = new FormData()
-      formData.append("title", title)
-      formData.append("description", description)
-      formData.append("applicantName", applicantName)
-      formData.append("dateOfBirth", dateOfBirth.toISOString())
-      formData.append("phoneNumber", phoneNumber)
-      formData.append("tournamentId", tournamentId)
-      formData.append("userId", session?.user?.id ?? "")
-      Array.from(files).forEach((file) => formData.append("files", file))
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("applicantName", applicantName);
+      formData.append("dateOfBirth", dateOfBirth.toISOString());
+      formData.append("phoneNumber", phoneNumber);
+      formData.append("tournamentId", tournamentId);
+      formData.append("userId", session?.user?.id ?? "");
+      formData.append("source", source);
+      Array.from(files).forEach((file) => formData.append("files", file));
 
-      const result = await submitArtwork(formData)
+      const result = await submitArtwork(formData);
 
       if (!result) {
         toast({
           title: "Submission Failed",
           description: "Failed to submit artwork",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
-      toast({ title: "Submission Received", description: "Proceeding to payment..." })
-      await triggerPayment(result.submissionId)
+      toast({
+        title: "Submission Received",
+        description: "Proceeding to payment...",
+      });
+      await triggerPayment(result.submissionId);
     } catch (error) {
-      console.error(error)
+      console.error(error);
       toast({
         title: "Submission Failed",
-        description: error instanceof Error ? error.message : "Unexpected error",
+        description:
+          error instanceof Error ? error.message : "Unexpected error",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
-      setIsUploading(false)
+      setIsSubmitting(false);
+      setIsUploading(false);
     }
-  }
+  };
 
   return (
     <div className="container max-w-3xl py-8">
       <Card>
         <CardHeader>
           <CardTitle>Submit Your Artwork</CardTitle>
-          <CardDescription>Complete this form to submit your artwork to the tournament.</CardDescription>
+          <CardDescription>
+            Complete this form to submit your artwork to the tournament.
+          </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -233,9 +283,13 @@ export default function SubmitToTournamentPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="dateOfBirth">Date of Birth*</Label>
-                <Input id="dateOfBirth" name="dateOfBirth" type="date"
-                onChange={(e) => setDateOfBirth(new Date(e.target.value))}
-                 required />
+                <Input
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  type="date"
+                  onChange={(e) => setDateOfBirth(new Date(e.target.value))}
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phoneNumber">Phone Number</Label>
@@ -252,7 +306,12 @@ export default function SubmitToTournamentPage() {
 
             <div className="space-y-2">
               <Label htmlFor="title">Title of Your Work*</Label>
-              <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
             </div>
 
             <div className="space-y-2">
@@ -265,12 +324,36 @@ export default function SubmitToTournamentPage() {
                 required
               />
             </div>
-
+            <div className="space-y-2">
+              <Label htmlFor="source">Where you heard about us</Label>
+              <Select
+                name="source"
+                value={source}
+                onValueChange={(value) => {
+                  setSource(value); 
+                  console.log("Selected source:", value);
+                }}
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select source" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="social-media">Social Media</SelectItem>
+                  <SelectItem value="friend">Friend or Colleague</SelectItem>
+                  <SelectItem value="search-engine">Search Engine</SelectItem>
+                  <SelectItem value="advertisement">Advertisement</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="files">Upload Files*</Label>
               <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center">
                 <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                <p className="text-sm text-gray-500 mb-2">Drag and drop or click to upload</p>
+                <p className="text-sm text-gray-500 mb-2">
+                  Drag and drop or click to upload
+                </p>
                 <Input
                   id="files"
                   type="file"
@@ -280,7 +363,11 @@ export default function SubmitToTournamentPage() {
                   accept=".jpg,.jpeg,.png,.pdf,.svg"
                   required
                 />
-                <Button type="button" variant="outline" onClick={() => document.getElementById("files")?.click()}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById("files")?.click()}
+                >
                   Select Files
                 </Button>
               </div>
@@ -296,7 +383,11 @@ export default function SubmitToTournamentPage() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSubmitting || isUploading} className="w-full">
+            <Button
+              type="submit"
+              disabled={isSubmitting || isUploading}
+              className="w-full"
+            >
               {isUploading || isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -310,5 +401,5 @@ export default function SubmitToTournamentPage() {
         </form>
       </Card>
     </div>
-  )
+  );
 }

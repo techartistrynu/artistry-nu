@@ -311,7 +311,7 @@ export default function AdminSubmissionsPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() =>
-                                  setPreviewImage(submission.imageUrl)
+                                  setPreviewImage(submission.image_url || submission.files[0].file_url)
                                 }
                               >
                                 <ImageIcon className="h-4 w-4" />

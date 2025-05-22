@@ -54,7 +54,7 @@ export async function submitArtwork(formData: FormData) {
   const tournamentId = formData.get('tournamentId') as string;
   const userId = formData.get('userId') as string;
   const files = formData.getAll('files') as File[];
-
+  const source = formData.get('source') as string;
   // Validate required fields
   if (!title || !description || !applicantName || !dateOfBirth || !tournamentId || files.length === 0 || !userId) {
     throw new Error('Missing required fields');
@@ -71,6 +71,7 @@ export async function submitArtwork(formData: FormData) {
     status: 'pending',
     payment_status: 'unpaid',
     user_id: userId,
+    source: source,
     created_at: new Date(),
   });
 
