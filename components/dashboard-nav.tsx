@@ -55,8 +55,8 @@ export function DashboardNav({ items }: DashboardNavProps) {
         return CreditCard
       case "award":
         return Award
-      case "settings":
-        return Settings
+      // case "settings":
+      //   return Settings
       default:
         return null
     }

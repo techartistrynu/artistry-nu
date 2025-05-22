@@ -124,7 +124,7 @@ export async function submitArtwork(formData: FormData) {
   // Update submission with primary image URL (first file)
   if (fileUrls.length > 0) {
     await submissionRef.update({
-      imageUrl: fileUrls[0]
+      image_url: fileUrls[0]
     });
   }
 

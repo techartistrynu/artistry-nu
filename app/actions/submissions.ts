@@ -65,14 +65,41 @@ export async function getSubmissionById(id: string) {
     if (!submission) return null
 
     const tournamentSnap = await db.collection("tournaments").doc(submission.tournament_id).get()
-    const submissionFilesSnap = await db.collection("submissions").doc(id).collection("submission_files").get()
+    const submissionFilesSnap = await db.collection("submission_files").where("submission_id", "==", id).get()
+    
+    // Get user data
+    const userSnap = await db.collection("users").doc(submission.user_id).get()
+    const user = userSnap.exists ? {
+      id: userSnap.id,
+      name: userSnap.data()?.name || null,
+      email: userSnap.data()?.email || null,
+      image: userSnap.data()?.image || null
+    } : null
+
+    const toISOString = (timestamp: any) => {
+      if (!timestamp) return null
+      if (timestamp.toDate) return timestamp.toDate().toISOString()
+      if (timestamp._seconds) return new Date(timestamp._seconds * 1000).toISOString()
+      if (typeof timestamp === 'string') return timestamp
+      return null
+    }
 
     return {
       ...submission,
       id: doc.id,
-      tournaments: tournamentSnap.exists ? tournamentSnap.data() : null,
-      submission_files: submissionFilesSnap.docs.map(d => ({ id: d.id, ...d.data() })),
-    }
+      user,
+      tournament: tournamentSnap.exists ? tournamentSnap.data() : null,
+      files: submissionFilesSnap.docs.map(d => {
+        const data = d.data()
+        return {
+          id: d.id,
+          ...data,
+          uploaded_at: toISOString(data.uploaded_at)
+        }
+      }),
+      created_at: toISOString(submission.created_at),
+      updated_at: toISOString(submission.updated_at)
+    } as Submission
   } catch (error) {
     console.error("Error in getSubmissionById:", error)
     return null
@@ -327,5 +354,29 @@ export async function getDownloadUrl(filePath: string) {
   } catch (error) {
     console.error("Error generating download URL:", error)
     return null
+  }
+}
+
+export async function updateSubmissionScore(
+  submissionId: string,
+  score: number,
+  status: "approved" | "rejected"
+) {
+  try {
+    if (score < 0 || score > 10) {
+      return { success: false, message: "Score must be between 0 and 10" }
+    }
+
+    await db.collection("submissions").doc(submissionId).update({
+      score: parseFloat(score.toFixed(2)),
+      status,
+      reviewed_at: Timestamp.now()
+    })
+
+    revalidatePath("/admin/dashboard/submissions")
+    return { success: true, message: "Submission updated successfully" }
+  } catch (error) {
+    console.error("Error updating submission:", error)
+    return { success: false, message: "Failed to update submission" }
   }
 }
