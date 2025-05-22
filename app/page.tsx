@@ -18,7 +18,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/register">
+                <Link href="/login">
                   <Button size="lg">Get Started</Button>
                 </Link>
                 <Link href="/tournaments">
