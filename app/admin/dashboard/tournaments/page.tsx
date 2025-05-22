@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { createBrowserClient } from "@/lib/supabase/client"
 import { format } from "date-fns"
 import { deleteTournament, getAllTournaments } from "@/app/actions/tournaments"
 
@@ -15,7 +14,6 @@ export default function AdminTournamentsPage() {
   const [tournaments, setTournaments] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
-  const supabase = createBrowserClient()
 
   useEffect(() => {
     fetchTournaments()
@@ -89,7 +87,7 @@ export default function AdminTournamentsPage() {
     if (!dateString) return 'TBD'
     try {
       // Debug log to see what we're receiving
-      console.log('Formatting date:', dateString)
+      // console.log('Formatting date:', dateString)
       
       // Parse the date string
       const date = new Date(dateString)

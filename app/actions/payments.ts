@@ -117,3 +117,66 @@ export async function getUserPayments(userId: string) {
 }
 
 export const getPaymentsByUserId = getUserPayments
+
+export async function getAllPayments() {
+  try {
+    const paymentsSnap = await db.collection("payments")
+      .where("payment_status", "==", "paid")
+      .get()
+
+    const payments = await Promise.all(
+      paymentsSnap.docs.map(async (docSnap) => {
+        const payment = docSnap.data()
+        const paymentId = docSnap.id
+
+        // 1. Get user info
+        let userData: any = {}
+        if (payment.user_id) {
+          const userSnap = await db.collection("users").doc(payment.user_id).get()
+          if (userSnap.exists) {
+            userData = userSnap.data()
+          }
+        }
+
+        // 2. Get submission info
+        let submissionData: any = {}
+        if (payment.submission_id) {
+          const submissionSnap = await db.collection("submissions").doc(payment.submission_id).get()
+          if (submissionSnap.exists) {
+            submissionData = submissionSnap.data()
+          }
+        }
+
+        // 3. Get tournament info
+        let tournamentData: any = {}
+        if (payment.tournament_id) {
+          const tournamentSnap = await db.collection("tournaments").doc(payment.tournament_id).get()
+          if (tournamentSnap.exists) {
+            tournamentData = tournamentSnap.data()
+          }
+        }
+
+        return {
+          id: payment.razorpay_payment_id || paymentId,
+          amount: (payment.paid_amount / 100).toFixed(2),
+          date: payment.payment_date?.toDate?.() || new Date(),
+          status: payment.payment_status,
+          paymentMethod: payment.payment_method,
+          submissionId: payment.submission_id,
+          tournamentId: payment.tournament_id,
+          tournamentTitle: tournamentData.title || "N/A",
+          userId: payment.user_id,
+          userName: submissionData.applicant_name || userData.name || "N/A",
+          userEmail: userData.email || "N/A",
+        }
+      })
+    )
+
+    return payments
+  } catch (error) {
+    console.error("Error in getAllPayments:", error)
+    return []
+  }
+}
+
+

@@ -13,7 +13,6 @@ export default async function DashboardPaymentsPage() {
   }
 
   const payments: any[] = await getPaymentsByUserId(session.user.id)
-  console.log(payments)
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -28,36 +27,45 @@ export default async function DashboardPaymentsPage() {
         </CardHeader>
         <CardContent>
           {payments.length > 0 ? (
-            <div className="rounded-md border">
-              <div className="grid grid-cols-5 p-4 text-sm font-medium">
-                <div>Tournament</div>
-                <div>Amount</div>
-                <div>Date</div>
-                <div>Payment Method</div>
-                <div>Status</div>
-              </div>
-              <div className="divide-y">
-                {payments.map((payment) => (
-                  <div key={payment.id} className="grid grid-cols-5 items-center p-4">
-                    <div className="font-medium">{payment.tournament?.title}</div>
-                    <div>₹{(payment.paid_amount / 100).toFixed(2)}</div>
-                    <div>{new Date(payment.payment_date._seconds * 1000).toLocaleString()}</div>
-                    <div className="capitalize">{payment.payment_method.replace("_", " ")}</div>
-                    <div>
-                      <Badge
-                        variant={
-                          payment.payment_status === "paid"
-                            ? "default"
-                            : payment.payment_status === "pending"
-                              ? "outline"
-                              : "destructive"
-                        }
-                      >
-                        {payment.payment_status ? payment.payment_status.charAt(0).toUpperCase() + payment.payment_status.slice(1) : "Unpaid"}
-                      </Badge>
+            <div className="rounded-md border overflow-x-auto">
+              <div className="min-w-[800px]">
+                {/* Header row */}
+                <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted/50">
+                  <div className="col-span-4">Tournament</div>
+                  <div className="col-span-2">Amount</div>
+                  <div className="col-span-3">Date</div>
+                  <div className="col-span-2">Payment Method</div>
+                  <div className="col-span-1">Status</div>
+                </div>
+                
+                {/* Data rows */}
+                <div className="divide-y">
+                  {payments.map((payment) => (
+                    <div key={payment.id} className="grid grid-cols-12 items-center p-4 hover:bg-muted/50">
+                      <div className="col-span-4 truncate font-medium">{payment.tournament?.title}</div>
+                      <div className="col-span-2">₹{(payment.paid_amount / 100).toFixed(2)}</div>
+                      <div className="col-span-3 truncate text-sm">
+                        {new Date(payment.payment_date._seconds * 1000).toLocaleString()}
+                      </div>
+                      <div className="col-span-2 capitalize truncate">
+                        {payment.payment_method.replace("_", " ")}
+                      </div>
+                      <div className="col-span-1">
+                        <Badge
+                          variant={
+                            payment.payment_status === "paid"
+                              ? "default"
+                              : payment.payment_status === "pending"
+                                ? "outline"
+                                : "destructive"
+                          }
+                        >
+                          {payment.payment_status ? payment.payment_status.charAt(0).toUpperCase() + payment.payment_status.slice(1) : "Unpaid"}
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           ) : (
