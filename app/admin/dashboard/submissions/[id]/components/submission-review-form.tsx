@@ -51,6 +51,7 @@ export function SubmissionReviewForm({ submissionId, initialScore }: { submissio
           defaultValue={initialScore || ""}
           placeholder="Enter score"
           required
+          disabled={!!initialScore}
         />
       </div>
       
@@ -61,6 +62,7 @@ export function SubmissionReviewForm({ submissionId, initialScore }: { submissio
           value="rejected"
           variant="destructive"
           className="flex-1 gap-2"
+          disabled={!!initialScore}
         >
           <XCircle className="h-4 w-4" />
           Reject
@@ -70,6 +72,7 @@ export function SubmissionReviewForm({ submissionId, initialScore }: { submissio
           name="status"
           value="approved"
           className="flex-1 gap-2"
+          disabled={!!initialScore}
         >
           <CheckCircle2 className="h-4 w-4" />
           Approve

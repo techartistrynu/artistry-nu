@@ -18,6 +18,7 @@ export interface Submission {
   }[]
   created_at: string | null
   updated_at: string | null
+  reviewed_at: string | null
   [key: string]: any
 }
 
@@ -98,7 +99,8 @@ export async function getSubmissionById(id: string) {
         }
       }),
       created_at: toISOString(submission.created_at),
-      updated_at: toISOString(submission.updated_at)
+      updated_at: toISOString(submission.updated_at),
+      reviewed_at: toISOString(submission.reviewed_at)
     } as Submission
   } catch (error) {
     console.error("Error in getSubmissionById:", error)
@@ -314,6 +316,7 @@ export async function getSubmissionsByTournament(tournamentId: string, page: num
         files,
         created_at: toISOString(submission.created_at),
         updated_at: toISOString(submission.updated_at),
+        reviewed_at: toISOString(submission.reviewed_at)
       } as Submission
     }))
 

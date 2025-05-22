@@ -44,6 +44,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { ButtonScore } from "@/components/ui/button-score";
+import ImagePreview from "@/components/ui/previewer";
 interface Tournament {
   id: string;
   title: string;
@@ -277,12 +278,13 @@ export default function AdminSubmissionsPage() {
               <div className="rounded-md border overflow-x-auto">
                 <div className="min-w-[1000px]">
                   {/* Header row */}
-                  <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted/50">
+                  <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted/50 text-center">
                     <div className="col-span-2">User</div>
                     <div className="col-span-2">Email</div>
                     <div className="col-span-2">Submission Title</div>
                     <div className="col-span-2">Files</div>
                     <div className="col-span-2">Date</div>
+                    <div className="col-span-2">Scored </div>
                     <div className="col-span-2">Actions</div>
                   </div>
 
@@ -291,10 +293,10 @@ export default function AdminSubmissionsPage() {
                     {submissions.map((submission) => (
                       <div
                         key={submission.id}
-                        className="grid grid-cols-12 items-center p-4 hover:bg-muted/50"
+                        className="grid grid-cols-12 items-center p-4 hover:bg-muted/50 text-center"
                       >
                         <div className="col-span-2 font-medium">
-                          {submission.user?.name || "N/A"}
+                          {submission.applicant_name || "N/A"}
                         </div>
                         <div className="col-span-2 truncate text-sm">
                           {submission.user?.email || "N/A"}
@@ -314,7 +316,7 @@ export default function AdminSubmissionsPage() {
                               >
                                 <ImageIcon className="h-4 w-4" />
                               </Button>
-                              <Button
+                              {/* <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() =>
@@ -326,7 +328,7 @@ export default function AdminSubmissionsPage() {
                                 disabled={downloading}
                               >
                                 <Download className="h-4 w-4" />
-                              </Button>
+                              </Button> */}
                             </div>
                           ) : (
                             <span className="text-muted-foreground">
@@ -341,6 +343,11 @@ export default function AdminSubmissionsPage() {
                               ).toLocaleDateString()
                             : "N/A"}
                         </div>
+                        <div className="col-span-2 text-sm">
+                          {submission.score
+                            ? submission.score.toFixed(2)
+                            : "N/A"}
+                        </div>
                         <div className="col-span-2 flex gap-2">
                           <Link
                             href={`/admin/dashboard/submissions/${submission.id}`}
@@ -350,10 +357,10 @@ export default function AdminSubmissionsPage() {
                               View
                             </Button>
                           </Link>
-                          <Button variant="outline" size="sm">
+                          {/* <Button variant="outline" size="sm">
                             <Star className="h-4 w-4 mr-2" />
                             Score
-                          </Button>
+                          </Button> */}
                         </div>
                       </div>
                     ))}
@@ -408,70 +415,16 @@ export default function AdminSubmissionsPage() {
       </Card>
 
       {/* Image Preview Dialog */}
-      <Dialog
-        open={!!previewImage}
-        onOpenChange={(open) => {
-          if (!open) setPreviewImage(null);
-        }}
-      >
-        <DialogContent className="sm:max-w-[80vw] max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Submission Review</DialogTitle>
-            <div className="text-sm text-muted-foreground">
-              {currentSubmission?.user?.name} - {currentSubmission?.title}
-            </div>
-          </DialogHeader>
-
-          <div className="relative flex-1 min-h-[50vh]">
-            {previewImage && (
-              <Image
-                src={previewImage}
-                alt="Submission preview"
-                fill
-                className="object-contain"
-                priority
-              />
-            )}
-          </div>
-
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="score" className="text-right">
-                Score (0-10)
-              </Label>
-              <Input
-                id="score"
-                type="number"
-                min="0"
-                max="10"
-                step="0.01"
-                value={score}
-                onChange={(e) => setScore(e.target.value)}
-                className="col-span-3"
-                placeholder="Enter score (e.g. 8.75)"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <ButtonScore
-                variant="destructive"
-                onClick={() => handleScoreSubmit("rejected")}
-                disabled={!score || isUpdating}
-                loading={isUpdating}
-              >
-                Reject
-              </ButtonScore>
-              <ButtonScore
-                onClick={() => handleScoreSubmit("approved")}
-                disabled={!score || isUpdating}
-                loading={isUpdating}
-              >
-                Approve
-              </ButtonScore>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {previewImage && (
+        <ImagePreview 
+          imageUrl={previewImage}
+          alt="Submission preview"
+          className="rounded-lg shadow-md"
+          width={300}
+          height={200}
+          onClose={() => setPreviewImage(null)}
+        />
+      )}
     </div>
   );
 }
