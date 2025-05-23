@@ -64,7 +64,7 @@ export default function Home() {
                   size="lg"
                   className="text-lg font-medium"
                 >
-                  View Tournaments
+                  View Competition Enrolment
                 </Button>
               </Link>
             </motion.div>
@@ -285,7 +285,7 @@ export default function Home() {
               Ready to showcase your talent to the world? Create your profile
               and become part of a vibrant creative community.
             </p>
-            <Link href="/register">
+            <Link href="/login">
               <Button
                 size="lg"
                 variant="secondary"

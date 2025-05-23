@@ -2,34 +2,32 @@
 
 "use server"
 
-import { collection, doc, getDoc, getDocs, query, where, orderBy } from "firebase/firestore"
-import { db } from "@/lib/firebase/client"
+import { db } from "@/lib/firebase/server"
 
 // Helper to fetch related documents
 async function enrichCertificate(cert: any) {
   const [tournamentSnap, submissionSnap, userSnap] = await Promise.all([
-    cert.tournament_id ? getDoc(doc(db, "tournaments", cert.tournament_id)) : null,
-    cert.submission_id ? getDoc(doc(db, "submissions", cert.submission_id)) : null,
-    cert.user_id ? getDoc(doc(db, "users", cert.user_id)) : null,
+    cert.tournament_id ? db.collection("tournaments").doc(cert.tournament_id).get() : null,
+    cert.submission_id ? db.collection("submissions").doc(cert.submission_id).get() : null,
+    cert.user_id ? db.collection("users").doc(cert.user_id).get() : null,
   ])
 
   return {
     ...cert,
-    tournaments: tournamentSnap?.exists() ? tournamentSnap.data() : null,
-    submissions: submissionSnap?.exists() ? submissionSnap.data() : null,
-    users: userSnap?.exists() ? userSnap.data() : null,
+    tournaments: tournamentSnap?.exists ? tournamentSnap.data() : null,
+    submissions: submissionSnap?.exists ? submissionSnap.data() : null,
+    users: userSnap?.exists ? userSnap.data() : null,
   }
 }
 
 export async function getUserCertificates(userId: string) {
   try {
-    const q = query(
-      collection(db, "certificates"),
-      where("user_id", "==", userId),
-      orderBy("issue_date", "desc")
-    )
+    const snapshot = await db
+      .collection("certificates")
+      .where("user_id", "==", userId)
+      .orderBy("issue_date", "desc")
+      .get()
 
-    const snapshot = await getDocs(q)
     const rawCerts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     const certsWithDetails = await Promise.all(rawCerts.map(enrichCertificate))
 
@@ -44,9 +42,9 @@ export const getCertificatesByUserId = getUserCertificates
 
 export async function getCertificateById(id: string) {
   try {
-    const certSnap = await getDoc(doc(db, "certificates", id))
+    const certSnap = await db.collection("certificates").doc(id).get()
 
-    if (!certSnap.exists()) {
+    if (!certSnap.exists) {
       return null
     }
 

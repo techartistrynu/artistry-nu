@@ -10,11 +10,10 @@ export const metadata: Metadata = {
 
 const navItems = [
   { title: "Dashboard", href: "/dashboard", icon: "layout-dashboard" },
-  { title: "Tournaments", href: "/dashboard/tournaments", icon: "trophy" },
+  { title: "Competition", href: "/dashboard/tournaments", icon: "trophy" },
   { title: "My Submissions", href: "/dashboard/submissions", icon: "image" },
   { title: "Payments", href: "/dashboard/payments", icon: "credit-card" },
   { title: "Certificates", href: "/dashboard/certificates", icon: "award" },
-  { title: "Settings", href: "/dashboard/settings", icon: "settings" },
 ]
 
 export default function DashboardLayout({

@@ -9,7 +9,7 @@ import {
   ImageIcon,
   CreditCard,
   Award,
-  Settings,
+  // Settings,
   ChevronsRight,
   type LucideIcon,
 } from "lucide-react"

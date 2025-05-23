@@ -9,7 +9,7 @@ import {
   FileText,
   Award,
   CreditCard,
-  Settings,
+  // Settings,
   Users,
   ChevronsRight,
 } from "lucide-react"
@@ -25,12 +25,12 @@ import {
 
 const adminNavItems = [
   { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { title: "Tournaments", href: "/admin/dashboard/tournaments", icon: Trophy },
+  { title: "Competition", href: "/admin/dashboard/tournaments", icon: Trophy },
   { title: "Submissions", href: "/admin/dashboard/submissions", icon: FileText },
   { title: "Certificates", href: "/admin/dashboard/certificates", icon: Award },
   { title: "Payments", href: "/admin/dashboard/payments", icon: CreditCard },
   { title: "Users", href: "/admin/dashboard/users", icon: Users },
-  { title: "Settings", href: "/admin/dashboard/settings", icon: Settings },
+  // { title: "Settings", href: "/admin/dashboard/settings", icon: Settings },
 ]
 
 export function AdminNav() {

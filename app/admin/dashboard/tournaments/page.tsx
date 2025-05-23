@@ -108,13 +108,13 @@ export default function AdminTournamentsPage() {
     <div className="flex-1 space-y-6 p-4 md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tournaments</h1>
-          <p className="text-muted-foreground">Manage all tournaments in your system</p>
+          <h1 className="text-3xl font-bold tracking-tight">Competition Enrolment</h1>
+          <p className="text-muted-foreground">Manage all Competition Enrolment in your system</p>
         </div>
         <Link href="/admin/dashboard/tournaments/new">
           <Button className="w-full md:w-auto">
             <Plus className="mr-2 h-4 w-4" />
-            New Tournament
+            New Competition Enrolment
           </Button>
         </Link>
       </div>
@@ -122,7 +122,7 @@ export default function AdminTournamentsPage() {
       <Card>
         <CardHeader>
           {/* <CardTitle>Tournament List</CardTitle> */}
-          <CardDescription>All active and upcoming tournaments</CardDescription>
+          <CardDescription>All active and upcoming Competition Enrolment</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -133,11 +133,11 @@ export default function AdminTournamentsPage() {
             </div>
           ) : tournaments.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <p className="text-muted-foreground mb-4">No tournaments found</p>
+              <p className="text-muted-foreground mb-4">No Competition Enrolment found</p>
               <Link href="/admin/dashboard/tournaments/new">
                 <Button variant="outline">
                   <Plus className="mr-2 h-4 w-4" />
-                  Create your first tournament
+                  Create your first Competition
                 </Button>
               </Link>
             </div>

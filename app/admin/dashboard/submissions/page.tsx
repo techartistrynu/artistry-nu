@@ -407,7 +407,7 @@ export default function AdminSubmissionsPage() {
           ) : (
             <div className="flex items-center justify-center h-40">
               <p className="text-muted-foreground">
-                Please select a tournament to view submissions.
+                Please select a Competition Enrolment to view submissions.
               </p>
             </div>
           )}

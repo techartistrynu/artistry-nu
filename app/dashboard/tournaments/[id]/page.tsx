@@ -96,7 +96,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
         </CardContent>
         <CardFooter className="flex justify-between">
           <Link href="/dashboard/tournaments">
-            <Button variant="outline">Back to Tournaments</Button>
+            <Button variant="outline">Back to Competition Enrolment</Button>
           </Link>
 
           {existingSubmission ? (

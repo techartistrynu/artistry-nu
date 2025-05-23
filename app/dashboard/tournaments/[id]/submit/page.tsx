@@ -266,7 +266,7 @@ export default function SubmitToTournamentPage() {
         <CardHeader>
           <CardTitle>Submit Your Artwork</CardTitle>
           <CardDescription>
-            Complete this form to submit your artwork to the tournament.
+            Complete this form to submit your artwork to the Competition Enrolment.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
