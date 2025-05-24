@@ -1,90 +1,80 @@
 import Link from "next/link"
-import { Palette } from "lucide-react"
+import { Facebook, Instagram, Youtube, Linkedin, X } from "lucide-react"
 
 export function SiteFooter() {
   return (
-    <footer className="border-t bg-background">
-      <div className="container px-4 sm:px-6 md:px-8 py-8 md:py-12">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-          <div className="flex flex-col gap-2">
-            <Link href="/" className="flex items-center gap-2">
-              <Palette className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">ArtistryNu</span>
-            </Link>
-            <p className="text-sm text-muted-foreground mt-2">
-              A platform for creative design and art students to showcase their talent and participate in competitions.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-lg font-medium mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/tournaments" className="text-sm text-muted-foreground hover:text-foreground">
-                  Tournaments
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground">
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-lg font-medium mb-4">Resources</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/faq" className="text-sm text-muted-foreground hover:text-foreground">
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">
-                  Privacy Policy
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-lg font-medium mb-4">Contact</h3>
-            <ul className="space-y-2">
-              <li className="text-sm text-muted-foreground">Email: info@artistrynu.com</li>
-              <li className="text-sm text-muted-foreground">Phone: +1 (555) 123-4567</li>
-              <li className="text-sm text-muted-foreground">Address: 123 Art Street, Creative City, 12345</li>
-            </ul>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-t pt-8 mt-8">
-          <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} ArtistryNu. All rights reserved.
+    <footer className="bg-[#2B2D31] text-white font-sans py-16">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 py-10 px-6 md:px-12">
+        {/* Social Section */}
+        <div>
+          <h3 className="text-xl font-semibold mb-2">Connect our socials</h3>
+          <p className="text-sm text-gray-300 mb-4">
+            Fostering creativity through art and design services.
           </p>
-          <div className="flex items-center gap-4">
-            <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">
-              Terms
+          <div className="flex gap-4">
+            <Link href="https://www.facebook.com/profile.php?id=61575928265606" target="_blank" aria-label="Facebook">
+              <Facebook className="h-6 w-6 hover:text-pink-400" />
             </Link>
-            <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">
-              Privacy
+            <Link href="https://www.instagram.com/artistrynu.official/" target="_blank" aria-label="Instagram">
+              <Instagram className="h-6 w-6 hover:text-pink-400" />
             </Link>
-            <Link href="/cookies" className="text-sm text-muted-foreground hover:text-foreground">
-              Cookies
+            <Link href="https://x.com/artistrynu" target="_blank" aria-label="X">
+              <X className="h-6 w-6 hover:text-pink-400" />
+            </Link>
+            <Link href="https://www.youtube.com/@ArtistrynuPvtLtd" target="_blank" aria-label="YouTube">
+              <Youtube className="h-6 w-6 hover:text-pink-400" />
+            </Link>
+            <Link
+              href="https://www.linkedin.com/company/artistrynu-pvt-ltd/about/?viewAsMember=true"
+              target="_blank"
+              aria-label="LinkedIn"
+            >
+              <Linkedin className="h-6 w-6 hover:text-pink-400" />
             </Link>
           </div>
         </div>
+
+        {/* Contact Section */}
+        <div>
+          <h3 className="text-xl font-semibold mb-2">Contact us</h3>
+          <ul className="text-sm text-gray-300 space-y-1">
+            <li>Phone - +91-8527339721</li>
+            <li>Whatsapp - +91-8527339721</li>
+            <li>support@artistrynu.com</li>
+            <li>support@artistrynu.in</li>
+            <li>artistrynu@gmail.com</li>
+          </ul>
+        </div>
+
+        {/* Subscribe Section */}
+        <div>
+          <h3 className="text-xl font-semibold mb-2">Subscribe</h3>
+          <p className="text-sm text-gray-300 mb-2">Enter your email address</p>
+          <form className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="email"
+              placeholder="Your email for updates"
+              className="px-4 py-2 rounded-md text-black w-full sm:w-auto flex-grow"
+              required
+            />
+            <button
+              type="submit"
+              className="bg-pink-600 hover:bg-pink-700 text-white font-semibold px-6 py-2 rounded-md"
+            >
+              Submit now
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Copyright */}
+      <div className="container mx-auto px-4 mt-10 border-t border-gray-700 pt-4 text-sm text-gray-400">
+        <p>
+          Copyright © 2025, ArtistryNU Pvt Ltd. All rights reserved.
+          <br />
+          No part of this website may be reproduced, distributed, or transmitted in any form without prior written
+          permission.
+        </p>
       </div>
     </footer>
   )

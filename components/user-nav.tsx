@@ -38,7 +38,7 @@ export function UserNav({ user }: UserNavProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={user.image || "/placeholder.svg"} alt={user.name || user.email || ""} />
+            <AvatarImage src={user.image || "/placeholder.svg"} alt={user.name || user.email || "Admin"} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
         </Button>
@@ -61,9 +61,9 @@ export function UserNav({ user }: UserNavProps) {
               <DropdownMenuItem>Dashboard</DropdownMenuItem>
             </Link>
           )}
-          <Link href="/dashboard/settings">
+          {/* <Link href="/dashboard/settings">
             <DropdownMenuItem>Settings</DropdownMenuItem>
-          </Link>
+          </Link> */}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()}>Log out</DropdownMenuItem>

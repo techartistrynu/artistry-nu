@@ -64,7 +64,7 @@ export default function Home() {
                   size="lg"
                   className="text-lg font-medium"
                 >
-                  View Competition Enrolment
+                  View Competition Enrollment
                 </Button>
               </Link>
             </motion.div>
@@ -276,7 +276,7 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-12 bg-primary text-white">
+        {/* <section className="py-12 bg-gray text-white">
           <div className="container px-4 sm:px-6 md:px-8 text-center">
             <h2 className="text-2xl md:text-3xl font-semibold mb-4">
               Join Artistry Today
@@ -295,7 +295,7 @@ export default function Home() {
               </Button>
             </Link>
           </div>
-        </section>
+        </section> */}
       </main>
     </div>
   );

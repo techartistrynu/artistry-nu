@@ -224,7 +224,7 @@ export default function AdminSubmissionsPage() {
             value={selectedTournament}
           >
             <SelectTrigger className="w-full md:w-[300px]">
-              <SelectValue placeholder="Select a tournament" />
+              <SelectValue placeholder="Select a Competition" />
             </SelectTrigger>
             <SelectContent>
               {tournaments.map((tournament) => (
@@ -265,7 +265,7 @@ export default function AdminSubmissionsPage() {
                   currentPage * itemsPerPage,
                   totalSubmissions
                 )}.`
-              : "Please select a tournament to view submissions."}
+              : "Please select a Competition to view submissions."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -407,7 +407,7 @@ export default function AdminSubmissionsPage() {
           ) : (
             <div className="flex items-center justify-center h-40">
               <p className="text-muted-foreground">
-                Please select a Competition Enrolment to view submissions.
+                Please select a Competition Enrollment to view submissions.
               </p>
             </div>
           )}

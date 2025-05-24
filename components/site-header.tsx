@@ -1,13 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { Palette, Menu, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Facebook,
+  Instagram,
+  Youtube,
+  Linkedin,
+  ChevronDown,
+  Menu,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserNav } from "@/components/user-nav";
-import { ThemeToggle } from "@/components/theme-toggle";
+// import { ThemeToggle } from "@/components/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,17 +33,25 @@ export function SiteHeader() {
   const isAdmin = user?.role === "admin";
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
-      <div className="container flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
+    <header className="sticky top-0 z-40 w-full border-b bg-white py-2">
+      <div className="container flex h-20 items-center justify-between px-4 sm:px-6 md:px-8">
+        {/* Logo */}
         <div className="flex items-center gap-2">
-          <Link href="https://www.artistrynu.com/" className="flex items-center gap-2">
-            <Palette className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">ArtistryNu</span>
+          <Link href="https://www.artistrynu.com/">
+            <img
+              src="/logo-artistrynu.png"
+              alt="ArtistryNU Logo"
+              className="h-40 w-auto"
+            />
           </Link>
         </div>
 
+        {/* Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link href="https://www.artistrynu.com/" className="text-sm font-medium">
+          <Link
+            href="https://www.artistrynu.com/"
+            className="text-sm font-medium border-b-2 border-black pb-1"
+          >
             Home
           </Link>
 
@@ -43,7 +59,7 @@ export function SiteHeader() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="text-sm font-medium p-0 h-auto data-[state=open]:bg-accent"
+                className="text-sm font-medium p-0 h-auto"
               >
                 <div className="flex items-center gap-1">
                   Services
@@ -58,37 +74,84 @@ export function SiteHeader() {
             <DropdownMenuContent align="start" className="w-48">
               <DropdownMenuItem asChild>
                 <Link href="/tournaments" className="w-full">
-                Competition Enrolment
+                  Competition Enrollment
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="https://www.artistrynu.com/artistrynucomservices-artsale-art-painting" className="w-full">
-                Sell/Purchase Art
+                <Link
+                  href="https://www.artistrynu.com/artistrynucomservices-artsale-art-painting"
+                  className="w-full"
+                >
+                  Sell/Purchase Art
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="https://www.artistrynu.com/artistrynucomsolo-group-art-exhibitions" className="w-full">
-                Solo/Group Exhibtions
+                <Link
+                  href="https://www.artistrynu.com/artistrynucomsolo-group-art-exhibitions"
+                  className="w-full"
+                >
+                  Solo/Group Exhibitions
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="https://www.artistrynu.com/artistrynucomart-seminars-lectures-art-education" className="w-full">
-                Seminars/Lectures
+                <Link
+                  href="https://www.artistrynu.com/artistrynucomart-seminars-lectures-art-education"
+                  className="w-full"
+                >
+                  Seminars/Lectures
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link href="https://www.artistrynu.com/artistrynucomabout-artistrynu-artists-empowerment-and-networking" className="text-sm font-medium">
+          <Link
+            href="https://www.artistrynu.com/artistrynucomabout-artistrynu-artists-empowerment-and-networking"
+            className="text-sm font-medium"
+          >
             About
           </Link>
-          <Link href="https://www.artistrynu.com/artistrynucomcontact-artistrynu-pvt-ltd-enquiries-about-competitions-exhibitions-art-transactions-and-seminars-lectures-educations" className="text-sm font-medium">
+          <Link
+            href="https://www.artistrynu.com/artistrynucomcontact-artistrynu-pvt-ltd-enquiries-about-competitions-exhibitions-art-transactions-and-seminars-lectures-educations"
+            className="text-sm font-medium"
+          >
             Contact
           </Link>
+
+          {/* Social Icons */}
+          <div className="flex items-center gap-4 ml-4">
+            <Link
+              href="https://www.facebook.com/profile.php?id=61575928265606"
+              target="_blank"
+            >
+              <Facebook className="h-5 w-5" />
+            </Link>
+            <Link
+              href="https://www.instagram.com/artistrynu.official/"
+              target="_blank"
+            >
+              <Instagram className="h-5 w-5" />
+            </Link>
+            <Link href="https://x.com/artistrynu" target="_blank">
+              <X className="h-5 w-5" />
+            </Link>
+            <Link
+              href="https://www.youtube.com/@ArtistrynuPvtLtd"
+              target="_blank"
+            >
+              <Youtube className="h-5 w-5" />
+            </Link>
+            <Link
+              href="https://www.linkedin.com/company/artistrynu-pvt-ltd/about/?viewAsMember=true"
+              target="_blank"
+            >
+              <Linkedin className="h-5 w-5" />
+            </Link>
+          </div>
         </nav>
 
+        {/* Auth + Theme + Mobile Nav */}
         <div className="flex items-center gap-4">
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
 
           {!isLoading && (
             <>
@@ -106,29 +169,28 @@ export function SiteHeader() {
                   <UserNav user={user} />
                 </>
               ) : (
-                <>
-                  <div className="hidden md:flex items-center gap-4">
-                    <Link href="/login">
-                      <Button variant="outline">Log in</Button>
-                    </Link>
-                  </div>
-                </>
+                <div className="hidden md:flex items-center gap-4">
+                  <Link href="/login">
+                    <Button variant="outline">Log in</Button>
+                  </Link>
+                </div>
               )}
             </>
           )}
 
+          {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="outline" size="icon">
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
               <div className="flex flex-col gap-4 py-4">
-                <div className="flex justify-end">
+                {/* <div className="flex justify-end">
                   <ThemeToggle />
-                </div>
+                </div> */}
+
                 <Link
                   href="https://www.artistrynu.com/"
                   onClick={() => setIsOpen(false)}
@@ -156,7 +218,7 @@ export function SiteHeader() {
                         onClick={() => setIsOpen(false)}
                         className="text-sm"
                       >
-                        Competition Enrolment
+                        Competition Enrollment
                       </Link>
                       <Link
                         href="https://www.artistrynu.com/artistrynucomservices-artsale-art-painting"
@@ -170,7 +232,7 @@ export function SiteHeader() {
                         onClick={() => setIsOpen(false)}
                         className="text-sm"
                       >
-                        Solo/Group Exhibtions
+                        Solo/Group Exhibitions
                       </Link>
                       <Link
                         href="https://www.artistrynu.com/artistrynucomart-seminars-lectures-art-education"
@@ -230,13 +292,11 @@ export function SiteHeader() {
                         </Button>
                       </>
                     ) : (
-                      <>
-                        <Link href="/login" onClick={() => setIsOpen(false)}>
-                          <Button variant="outline" className="w-full">
-                            Log in
-                          </Button>
-                        </Link>
-                      </>
+                      <Link href="/login" onClick={() => setIsOpen(false)}>
+                        <Button variant="outline" className="w-full">
+                          Log in
+                        </Button>
+                      </Link>
                     )}
                   </>
                 )}

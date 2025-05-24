@@ -257,7 +257,7 @@ export default async function DashboardSubmissionsPage({
                     <thead>
                       <tr className="border-b">
                         <th className="p-4 text-left text-sm font-medium">Title</th>
-                        <th className="p-4 text-left text-sm font-medium hidden sm:table-cell">Competition Enrolment</th>
+                        <th className="p-4 text-left text-sm font-medium hidden sm:table-cell">Competition Enrollment</th>
                         <th className="p-4 text-left text-sm font-medium">Score</th>
                         <th className="p-4 text-left text-sm font-medium hidden md:table-cell">Rank</th>
                         <th className="p-4 text-right text-sm font-medium">Actions</th>
