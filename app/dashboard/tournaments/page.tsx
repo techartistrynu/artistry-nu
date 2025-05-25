@@ -39,7 +39,7 @@ export default async function DashboardTournamentsPage() {
               <CardContent className="flex-1">
                 <div className="aspect-video overflow-hidden rounded-md bg-muted mb-4">
                   <img
-                    src="/placeholder.svg?height=400&width=600"
+                    src={tournament.image_url}
                     alt={tournament.title}
                     className="h-full w-full object-cover"
                   />

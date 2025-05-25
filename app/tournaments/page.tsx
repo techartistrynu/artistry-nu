@@ -24,6 +24,7 @@ export default async function TournamentsPage() {
   try {
     const snapshot = await db
       .collection("tournaments")
+      .where("status", "!=", "closed")
       .orderBy("registration_start", "desc")
       .get();
 

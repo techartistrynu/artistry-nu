@@ -17,7 +17,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Upload, Loader2, Link } from "lucide-react";
-import { DatePicker } from "@/components/ui/date-picker";
 import {
   submitArtwork,
   updatePaymentDetails,
@@ -50,6 +49,8 @@ export default function SubmitToTournamentPage() {
   const [files, setFiles] = useState<FileList | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [source, setSource] = useState("");
 
   const [tournament, setTournament] = useState<any>(null);
@@ -61,17 +62,43 @@ export default function SubmitToTournamentPage() {
         return;
       }
 
-      const tournamentData = await getTournamentById(tournamentId as string);
-      const existingSubmission = await getUserSubmissionForTournament(
-        userId,
-        tournamentId
-      );
-      setTournament(tournamentData);
-      setExistingSubmission(existingSubmission);
+      try {
+        setIsLoading(true);
+        const tournamentData = await getTournamentById(tournamentId as string);
+        const existingSubmission = await getUserSubmissionForTournament(
+          userId,
+          tournamentId
+        );
+        setTournament(tournamentData);
+        setExistingSubmission(existingSubmission);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load tournament data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchData();
-  }, [tournamentId, router]);
+  }, [tournamentId, router, userId, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8">
+        <Card className="max-w-3xl mx-auto">
+          <CardHeader>
+            <div className="flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="ml-2">Loading tournament data...</span>
+            </div>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
   if (!tournament) {
     return (
@@ -131,76 +158,100 @@ export default function SubmitToTournamentPage() {
     });
 
   const triggerPayment = async (submissionId: string) => {
-    const res = await fetch("/api/payment/order", {
-      method: "POST",
-      body: JSON.stringify({
-        amount: tournament?.entry_fee || 1000,
-        submissionId,
-      }), // ₹100
-    });
+    try {
+      setIsPaymentLoading(true);
+      const res = await fetch("/api/payment/order", {
+        method: "POST",
+        body: JSON.stringify({
+          amount: tournament?.entry_fee || 1000,
+          submissionId,
+        }),
+      });
 
-    const data = await res.json();
-    const isScriptLoaded = await loadRazorpay();
+      const data = await res.json();
+      const isScriptLoaded = await loadRazorpay();
 
-    if (!isScriptLoaded || !data.id) {
+      if (!isScriptLoaded || !data.id) {
+        toast({
+          title: "Payment failed",
+          description: "Razorpay script load or order creation failed.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+        amount: data.amount,
+        currency: data.currency,
+        name: tournament?.title,
+        description: "Entry Fee",
+        order_id: data.id,
+        handler: async function (response: any) {
+          try {
+            setIsPaymentLoading(true);
+            setIsLoading(true);
+            toast({
+              title: "Payment Successful",
+              description:
+                "Don't refresh the page, it will redirect you to the success page.",
+            });
+            const result = await updatePaymentDetails({
+              submissionId,
+              paymentData: {
+                paid_amount: data.amount,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+              },
+              tournamentId: tournamentId,
+              userId: session?.user?.id ?? "",
+            });
+
+            if (!result.success) {
+              toast({
+                title: "Payment Recorded Failed",
+                description: result.error,
+                variant: "destructive",
+              });
+              return;
+            }
+
+            toast({ title: "Payment Successful", description: "Thank you!" });
+            router.push(
+              `/dashboard/tournaments/${tournamentId}/payment/success?submissionId=${submissionId}`
+            );
+          } catch (error) {
+            toast({
+              title: "Payment Failed",
+              description: "Failed to process payment",
+              variant: "destructive",
+            });
+          } finally {
+            setIsLoading(false);
+            setIsPaymentLoading(false);
+          }
+        },
+        prefill: {
+          name: applicantName,
+          email: session?.user?.email ?? "",
+        },
+        theme: {
+          color: "#6366f1",
+        },
+      };
+
+      const razorpay = new (window as any).Razorpay(options);
+      razorpay.open();
+    } catch (error) {
       toast({
-        title: "Payment failed",
-        description: "Razorpay script load or order creation failed.",
+        title: "Payment Failed",
+        description: "Failed to initialize payment",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsPaymentLoading(false);
     }
-
-    const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-      amount: data.amount,
-      currency: data.currency,
-      name: tournament?.title,
-      description: "Entry Fee",
-      order_id: data.id,
-      handler: async function (response: any) {
-        toast({
-          title: "Payment Successful",
-          description:
-            "Don't refresh the page, it will redirect you to the success page.",
-        });
-        const result = await updatePaymentDetails({
-          submissionId,
-          paymentData: {
-            paid_amount: data.amount,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-          },
-          tournamentId: tournamentId,
-          userId: session?.user?.id ?? "",
-        });
-
-        if (!result.success) {
-          toast({
-            title: "Payment Recorded Failed",
-            description: result.error,
-            variant: "destructive",
-          });
-          return;
-        }
-
-        toast({ title: "Payment Successful", description: "Thank you!" });
-        router.push(
-          `/dashboard/tournaments/${tournamentId}/payment/success?submissionId=${submissionId}`
-        );
-      },
-      prefill: {
-        name: applicantName,
-        email: session?.user?.email ?? "",
-      },
-      theme: {
-        color: "#6366f1",
-      },
-    };
-
-    const razorpay = new (window as any).Razorpay(options);
-    razorpay.open();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -385,13 +436,17 @@ export default function SubmitToTournamentPage() {
           <CardFooter>
             <Button
               type="submit"
-              disabled={isSubmitting || isUploading}
+              disabled={isSubmitting || isUploading || isPaymentLoading}
               className="w-full"
             >
-              {isUploading || isSubmitting ? (
+              {isUploading || isSubmitting || isPaymentLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isUploading ? "Uploading Files..." : "Submitting..."}
+                  {isUploading 
+                    ? "Uploading Files..." 
+                    : isPaymentLoading 
+                    ? "Processing Payment..." 
+                    : "Submitting..."}
                 </>
               ) : (
                 `Submit and Pay ₹${tournament?.entry_fee}`

@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Plus, Edit, Trash, Eye, Loader2 } from "lucide-react"
+import { Plus, Edit, Trash, Eye, Loader2, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { format } from "date-fns"
-import { deleteTournament, getAllTournaments } from "@/app/actions/tournaments"
+import { closeTournament, deleteTournament, getAllTournaments } from "@/app/actions/tournaments"
 import {
   Table,
   TableBody,
@@ -73,26 +73,46 @@ export default function AdminTournamentsPage() {
     }
   }
 
-  const handleDeleteTournament = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this tournament?")) return
+    const handleDeleteTournament = async (id: string) => {
+      if (!confirm("Are you sure you want to delete this tournament?")) return
 
-    try {
-      await deleteTournament(id)
-      toast({
-        title: "Success",
-        description: "Tournament deleted successfully",
-      })
-      fetchTournaments()
-    } catch (error) {
-      console.error("Error deleting tournament:", error)
-      toast({
-        title: "Error",
-        description: "Failed to delete tournament",
-        variant: "destructive",
-      })
+      try {
+        await deleteTournament(id)
+        toast({
+          title: "Success",
+          description: "Tournament deleted successfully",
+        })
+        fetchTournaments()
+      } catch (error) {
+        console.error("Error deleting tournament:", error)
+        toast({
+          title: "Error",
+          description: "Failed to delete tournament",
+          variant: "destructive",
+        })
+      }
     }
-  }
 
+    const handleCloseTournament = async (id: string) => {
+      if (!confirm("Are you sure you want to close this tournament?")) return
+
+      try {
+        await closeTournament(id)
+        toast({
+          title: "Success",
+          description: "Tournament closed successfully",
+        })
+      } catch (error) {
+        console.error("Error closing tournament:", error)
+        toast({
+          title: "Error",
+          description: "Failed to close tournament",
+          variant: "destructive",
+        })
+      } finally {
+        fetchTournaments()
+      }
+    }
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'TBD'
     try {
@@ -191,6 +211,13 @@ export default function AdminTournamentsPage() {
                               <Edit className="mr-2 h-4 w-4" />
                               Edit
                             </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onClick={() => handleCloseTournament(tournament.id)}
+                          >
+                            <Lock className="mr-2 h-4 w-4" />
+                            Close
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-red-600"

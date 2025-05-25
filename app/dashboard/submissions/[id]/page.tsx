@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { fetchSubmissionById } from "@/app/actions/submissions"
 import Image from "next/image"
+import { fetchTournamentById } from "@/app/actions/tournaments"
 
 export default function SubmissionDetailPage() {
   const { id: submissionId } = useParams()
@@ -28,8 +29,9 @@ export default function SubmissionDetailPage() {
         return
       }
 
+      const tournamentData = await fetchTournamentById(submissionData.tournament_id)
       setSubmission(submissionData)
-      setTournament(submissionData.tournaments)
+      setTournament(tournamentData)
       setLoading(false)
     }
 
@@ -66,7 +68,7 @@ export default function SubmissionDetailPage() {
       <div ref={receiptRef}>
         <h2 className="text-2xl font-bold mb-4 text-green-600">🎨 Submission Details</h2>
 
-        <div className="line"><strong>Submission ID:</strong> {submission.id}</div>
+        <div className="line"><strong>Submission ID:</strong> {submissionId}</div>
         <div className="line"><strong>Title:</strong> {submission.title}</div>
         <div className="line"><strong>Description:</strong> {submission.description || "N/A"}</div>
         <div className="line"><strong>Status:</strong> {submission.status}</div>

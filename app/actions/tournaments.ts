@@ -405,3 +405,28 @@ export async function deleteTournament(tournamentId: string) {
   }
 }
 
+
+export async function closeTournament(tournamentId: string) {
+  try {
+    const tournamentRef = db.collection("tournaments").doc(tournamentId);
+    const tournamentSnap = await tournamentRef.get();
+
+    if (!tournamentSnap.exists) {
+      return { success: false, message: "Tournament not found." };
+    }
+
+    // Delete Firestore document
+    await tournamentRef.update({
+      registration_end: Timestamp.now(),
+      submission_deadline: Timestamp.now(),
+      status: "closed",
+    });
+
+    revalidatePath("/dashboard/tournaments");
+    return { success: true, message: "Tournament closed successfully." };
+  } catch (error) {
+    console.error("Error closing tournament:", error);
+    return { success: false, message: "Failed to close tournament." };
+  }
+}
+
