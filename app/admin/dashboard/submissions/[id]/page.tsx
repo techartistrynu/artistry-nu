@@ -7,7 +7,7 @@ import { getSubmissionById, updateSubmissionScore } from "@/app/actions/submissi
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import { toast } from "@/components/ui/use-toast"
-import { ArrowLeft, Star, User, Mail, Award, FileText, Calendar, CheckCircle2, XCircle } from "lucide-react"
+import { ArrowLeft, Star, User, Mail, Award, FileText, Calendar, CheckCircle2, XCircle, Phone, Cake, Ear } from "lucide-react"
 import Link from "next/link"
 import { DownloadButton } from "./components/download-button"
 import { SubmissionReviewForm } from "./components/submission-review-form"
@@ -102,7 +102,7 @@ export default async function SubmissionDetailPage({
                       <User className="h-4 w-4" />
                       Submitted by
                     </Label>
-                    <p className="font-medium">{submission.name || "N/A"}</p>
+                    <p className="font-medium">{submission.applicant_name || "N/A"}</p>
                   </div>
                   <div className="flex-1">
                     <Label className="flex items-center gap-2 text-muted-foreground">
@@ -112,7 +112,26 @@ export default async function SubmissionDetailPage({
                     <p className="font-medium">{submission.user?.email || "N/A"}</p>
                   </div>
                 </div>
-
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <Label className="flex items-center gap-2 text-muted-foreground">
+                      <Phone className="h-4 w-4" />
+                      Phone
+                    </Label>
+                    <p className="font-medium">
+                      {submission.phone_number || "N/A"}
+                    </p>
+                  </div>
+                  <div className="flex-1">
+                    <Label className="flex items-center gap-2 text-muted-foreground">
+                      <Cake className="h-4 w-4" />
+                      Date of Birth
+                    </Label>
+                    <p className="font-medium">
+                      {submission.date_of_birth || "N/A"}
+                    </p>
+                  </div>
+                </div>
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
                     <Label className="flex items-center gap-2 text-muted-foreground">
@@ -140,6 +159,17 @@ export default async function SubmissionDetailPage({
                     >
                       {submission.status || "pending"}
                     </Badge>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <Label className="flex items-center gap-2 text-muted-foreground">
+                      <Ear className="h-4 w-4" />
+                      Heard from
+                    </Label>
+                    <p className="font-medium">
+                      {submission.source || "N/A"}
+                    </p>
                   </div>
                 </div>
               </div>

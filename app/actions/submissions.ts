@@ -89,7 +89,12 @@ export async function getSubmissionById(id: string) {
       ...submission,
       id: doc.id,
       user,
-      tournament: tournamentSnap.exists ? tournamentSnap.data() : null,
+      tournament: tournamentSnap.exists ? 
+      { 
+        ...tournamentSnap.data(), 
+        id: tournamentSnap.id,
+        submission_deadline: toISOString(tournamentSnap.data()?.submission_deadline)
+      } : null,
       files: submissionFilesSnap.docs.map(d => {
         const data = d.data()
         return {

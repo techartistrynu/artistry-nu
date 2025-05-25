@@ -15,6 +15,7 @@ export async function fetchDashboardStats() {
     submissionSnap,
     pendingSnap,
     certificateSnap,
+    paymentCountSnap,
     paymentSnap,
   ] = await Promise.all([
     usersRef.count().get(),
@@ -23,7 +24,11 @@ export async function fetchDashboardStats() {
     submissionsRef.where("status", "==", "pending").count().get(),
     certificatesRef.count().get(),
     paymentsRef.count().get(),
+    paymentsRef.get(),
   ])
+
+  const payments = paymentSnap.docs.map(doc => doc.data().paid_amount || 0);
+  const totalPaymentAmount = (payments.reduce((acc: number, amount: number) => acc + amount, 0) / 100).toFixed(2);
 
   return {
     totalUsers: userSnap.data().count,
@@ -31,6 +36,7 @@ export async function fetchDashboardStats() {
     totalSubmissions: submissionSnap.data().count,
     pendingSubmissions: pendingSnap.data().count,
     totalCertificates: certificateSnap.data().count,
-    totalPayments: paymentSnap.data().count,
+    totalPayments: paymentCountSnap.data().count,
+    totalPaymentAmount: totalPaymentAmount
   }
 }

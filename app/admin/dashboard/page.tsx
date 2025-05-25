@@ -20,6 +20,7 @@ export default function AdminDashboardPage() {
     totalSubmissions: 0,
     totalCertificates: 0,
     totalPayments: 0,
+    totalPaymentAmount: 0,
     pendingSubmissions: 0,
   })
   const [isLoading, setIsLoading] = useState(true)
@@ -114,7 +115,7 @@ export default function AdminDashboardPage() {
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{isLoading ? "..." : `₹${stats.totalPayments * 25}`}</div>
+                <div className="text-2xl font-bold">{isLoading ? "..." : `₹${stats.totalPaymentAmount}`}</div>
                 <p className="text-xs text-muted-foreground">From {stats.totalPayments} payments</p>
               </CardContent>
             </Card>

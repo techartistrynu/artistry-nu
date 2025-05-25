@@ -23,7 +23,7 @@ export default function DashboardLayout({
 }) {
   return (
     <ProtectedRoute>
-      <div className="container grid flex-1 gap-12 md:grid-cols-[200px_1fr] px-4 sm:px-6 md:px-8 py-6">
+      <div className="container grid flex-1 gap-12 md:grid-cols-[200px_1fr] px-4 sm:px-6 md:px-8 py-6 min-h-screen">
         <aside className="hidden md:flex flex-col w-[200px]">
           <DashboardNav items={navItems} />
         </aside>
