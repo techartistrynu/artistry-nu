@@ -268,84 +268,50 @@ export const getAllTournaments = async () => {
   })
 }
 
-export async function getSubmissionsByTournament(tournamentId: string, page: number = 1, limit: number = 10, search: string = "") {
+export async function getSubmissionsByTournament(
+  tournamentId: string,
+  page: number = 1,
+  limit: number = 10,
+  searchQuery: string = ""
+) {
   try {
-    const toISOString = (timestamp: any) => {
-      if (!timestamp) return null
-      if (timestamp.toDate) return timestamp.toDate().toISOString()
-      if (timestamp._seconds) return new Date(timestamp._seconds * 1000).toISOString()
-      if (typeof timestamp === 'string') return timestamp
-      return null
+    let query = db.collection("submissions").where("tournament_id", "==", tournamentId);
+
+    if (searchQuery) {
+      query = query.where("applicant_name", ">=", searchQuery)
+        .where("applicant_name", "<=", searchQuery + "\uf8ff");
     }
 
-    let submissionsQuery = db.collection("submissions")
-      .where("tournament_id", "==", tournamentId)
+    const snapshot = await query
       .orderBy("created_at", "desc")
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .get();
 
-    const snapshot = await submissionsQuery.get()
-    let submissions = await Promise.all(snapshot.docs.map(async doc => {
-      const submission = doc.data()
-      let user = null
-      let files = []
+    const totalSnapshot = await query.count().get();
+    const total = totalSnapshot.data().count;
 
-      if (submission.user_id) {
-        const userRef = db.collection("users").doc(submission.user_id)
-        const userSnap = await userRef.get()
-        if (userSnap.exists) {
-          const userData = userSnap.data()
-          user = {
-            id: userSnap.id,
-            name: userData?.name || null,
-            email: userData?.email || null,
-            image: userData?.image || null,
-            createdAt: toISOString(userData?.createdAt)
-          }
+    // Convert timestamps to ISO strings
+    const convertTimestamps = (data: any) => {
+      if (!data) return null;
+      const result = { ...data };
+      for (const key in result) {
+        if (result[key]?.toDate) {
+          result[key] = result[key].toDate().toISOString();
         }
       }
+      return result;
+    };
 
-      const filesRef = db.collection("submission_files").where("submission_id", "==", doc.id)
-      const filesSnap = await filesRef.get()
-      files = filesSnap.docs.map(f => {
-        const data = f.data()
-        return {
-          id: f.id,
-          ...data,
-          uploaded_at: toISOString(data.uploaded_at)
-        }
-      })
-      
-      return {
-        id: doc.id,
-        ...submission,
-        user,
-        files,
-        created_at: toISOString(submission.created_at),
-        updated_at: toISOString(submission.updated_at),
-        reviewed_at: toISOString(submission.reviewed_at)
-      } as Submission
-    }))
+    const submissions = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...convertTimestamps(doc.data())
+    }));
 
-    // Apply search filter
-    if (search) {
-      submissions = submissions.filter(sub => 
-        sub.user?.name?.toLowerCase().includes(search.toLowerCase()) ||
-        sub.user?.email?.toLowerCase().includes(search.toLowerCase()) ||
-        sub.title?.toLowerCase().includes(search.toLowerCase())
-      )
-    }
-
-    // Apply pagination
-    const total = submissions.length
-    const startIndex = (page - 1) * limit
-    const paginatedSubmissions = submissions.slice(startIndex, startIndex + limit)
-
-    return {
-      submissions: paginatedSubmissions,
-      total
-    }
+    return { submissions, total };
   } catch (error) {
-    console.error("Error in getSubmissionsByTournament:", error)
-    return { submissions: [], total: 0 }
+    console.error("Error in getSubmissionsByTournament:", error);
+    return { submissions: [], total: 0 };
   }
 }
 
