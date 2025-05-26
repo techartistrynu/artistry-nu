@@ -113,6 +113,7 @@ export default function AdminCertificatesPage() {
 
   const generateRank = async () => {
     if (!selectedTournament) {
+      console.log("No tournament selected");
       toast.error("Please select a tournament first");
       return;
     }
@@ -364,7 +365,7 @@ export default function AdminCertificatesPage() {
               <p className="text-muted-foreground">
                 {searchQuery
                   ? "No matching submissions found."
-                  : "No submissions found for this tournament."}
+                  : "No submissions found for this competitions."}
               </p>
               {searchQuery && (
                 <Button variant="ghost" onClick={() => setSearchQuery("")}>

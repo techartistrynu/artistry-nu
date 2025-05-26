@@ -86,11 +86,11 @@ export default async function DashboardCertificatesPage() {
             <Award className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium mb-2">No Certificates Yet</h3>
             <p className="text-center text-muted-foreground mb-4">
-              You haven't earned any certificates yet. Participate in tournaments and submit your work to earn
+              You haven't earned any certificates yet. Participate in competitions and submit your work to earn
               certificates.
             </p>
             <Link href="/dashboard/tournaments">
-              <Button>Browse Tournaments</Button>
+              <Button>Browse Competitions</Button>
             </Link>
           </CardContent>
         </Card>

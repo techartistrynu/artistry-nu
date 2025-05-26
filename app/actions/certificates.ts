@@ -2,9 +2,9 @@
 "use server"
 
 import { db, storage } from "@/lib/firebase/server"
-import { ref, getDownloadURL, uploadBytes, FirebaseStorage } from "firebase/storage"
+import { ref, getDownloadURL, FirebaseStorage } from "firebase/storage"
 import { CertificateTemplate } from "@/components/certificate-template"
-import { pdf, Document, Page } from '@react-pdf/renderer'
+import { pdf, Document, } from '@react-pdf/renderer'
 import { FieldValue } from "firebase-admin/firestore";
 import React from 'react'
 import { getStorage } from "firebase-admin/storage"
@@ -199,107 +199,103 @@ export async function generateCertificateForSubmission(submissionId: string) {
 
 export async function generateCertificatesForTournament(tournamentId: string) {
   try {
-    // Get all ranked submissions for tournament
-    const submissionsSnap = await db.collection("submissions")
+    const submissionsSnap = await db
+      .collection("submissions")
       .where("tournament_id", "==", tournamentId)
       .where("score", "!=", null)
       .orderBy("score", "desc")
-      .get()
+      .get();
 
     if (submissionsSnap.empty) {
-      return { success: false, message: "No ranked submissions found for this tournament" }
+      return { success: false, message: "No ranked submissions found for this tournament" };
     }
 
-    const tournamentSnap = await db.collection("tournaments").doc(tournamentId).get()
+    const tournamentSnap = await db.collection("tournaments").doc(tournamentId).get();
     if (!tournamentSnap.exists) {
-      return { success: false, message: "Tournament not found" }
+      return { success: false, message: "Tournament not found" };
     }
 
-    const tournament = tournamentSnap.data()
-    const batch = db.batch()
-    const results = []
-    const tournamentRef = db.collection("tournaments").doc(tournamentId)
+    const tournament = tournamentSnap.data();
+    const batch = db.batch();
+    const results = [];
 
-    // Initialize counters
-    let generatedCount = 0
-    let existingCount = 0
-    let failedCount = 0
+    let generatedCount = 0;
+    let existingCount = 0;
+    let failedCount = 0;
 
     for (const doc of submissionsSnap.docs) {
-      const submission = doc.data()
-      const submissionRef = db.collection("submissions").doc(doc.id)
-      
-      // Check if certificate already exists in submissions document
+      const submission = doc.data();
+      const submissionRef = db.collection("submissions").doc(doc.id);
+
       if (submission.certificate_url) {
-        existingCount++
+        existingCount++;
         results.push({
           submissionId: doc.id,
           status: "exists",
-          certificateUrl: submission.certificate_url
-        })
-        continue
+          certificateUrl: submission.certificate_url,
+        });
+        continue;
       }
 
       try {
-        // Generate certificate data
         const certificateData = {
           name: submission.applicant_name || "Participant",
           score: submission.score?.toFixed(2) || "0.00",
           rank: submission.rank?.toString() || "0",
-          tournamentTitle: tournament?.title || "Tournament"
-        }
-      
-        // Generate PDF
-        const pdfDoc = await pdf(
-          React.createElement(Document, {},
-            React.createElement(CertificateTemplate, certificateData)
-          )
-        );
-        const pdfBlob = await pdfDoc.toBlob();
-        const buffer = await pdfBlob.arrayBuffer();
-        // Upload to storage
+          tournamentTitle: tournament?.title || "Tournament",
+        };
+
+        // Generate PDF as buffer
+        const document = CertificateTemplate(certificateData);
+        const buffer = await pdf(document).toBuffer();
+        // const buffer = await pdf(<CertificateTemplate {...certificateData} />).toBuffer();
+
+        // Upload to Firebase Storage (Admin SDK)
         const filePath = `certificates/${tournamentId}/${doc.id}.pdf`;
-        const adminStorage = getStorage();
-        const bucket = adminStorage.bucket();
+        const storage = getStorage();
+        const bucket = storage.bucket();
         const file = bucket.file(filePath);
-        await file.save(Buffer.from(buffer), { contentType: 'application/pdf' });
-        const [url] = await file.getSignedUrl({ action: 'read', expires: '03-01-2500' });
-        const downloadUrl = url;
-      
-        // Create certificate record
+
+        await file.save(buffer, { contentType: "application/pdf" });
+
+        const [url] = await file.getSignedUrl({
+          action: "read",
+          expires: "03-01-2500",
+        });
+
         const year = new Date().getFullYear().toString().slice(-2);
-        const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
-        const day = new Date().getDate().toString().padStart(2, '0');
-        const rankNumber = submission?.rank?.toString().padStart(4, '0');
+        const month = (new Date().getMonth() + 1).toString().padStart(2, "0");
+        const day = new Date().getDate().toString().padStart(2, "0");
+        const rankNumber = submission?.rank?.toString().padStart(4, "0");
+
         const certData = {
-          certificate_number: `ANUCERT${year}${month}${day}-${tournamentId.slice(-6)}${rankNumber}`,
+          certificate_number: `ANUCERT${year}${month}${day}-${tournamentId.slice(-6).toUpperCase()}${rankNumber}`,
           user_id: submission.user_id,
           tournament_id: tournamentId,
           submission_id: doc.id,
           file_path: filePath,
-          file_url: downloadUrl,
+          file_url: url,
           issue_date: FieldValue.serverTimestamp(),
           score: submission.score,
           rank: submission.rank,
-          status: "active"
+          status: "active",
         };
-      
+
         const certRef = db.collection("certificates").doc();
         batch.set(certRef, certData);
-      
-        // Update submission with certificate info
+
         batch.update(submissionRef, {
-          certificate_url: downloadUrl,
+          certificate_url: url,
           certificate_generated: true,
-          certificate_generated_at: FieldValue.serverTimestamp()
+          certificate_generated_at: FieldValue.serverTimestamp(),
         });
-      
+
         generatedCount++;
         results.push({
           submissionId: doc.id,
           status: "created",
-          certificateUrl: downloadUrl,
-          certificateId: certRef.id
+          certificateUrl: url,
+          certificateId: certRef.id,
         });
       } catch (error) {
         console.error(`Error generating certificate for submission ${doc.id}:`, error);
@@ -307,13 +303,14 @@ export async function generateCertificatesForTournament(tournamentId: string) {
         results.push({
           submissionId: doc.id,
           status: "failed",
-          message: "Failed to generate certificate"
+          message: "Failed to generate certificate",
         });
       }
     }
 
-    // Commit all updates
-    await batch.commit()
+    if (generatedCount > 0) {
+      await batch.commit();
+    }
 
     return {
       success: true,
@@ -321,14 +318,14 @@ export async function generateCertificatesForTournament(tournamentId: string) {
       existingCount,
       failedCount,
       results,
-      message: `Successfully generated ${generatedCount} certificates. ${existingCount} already existed.`
-    }
+      message: `Successfully generated ${generatedCount} certificates. ${existingCount} already existed.`,
+    };
   } catch (error) {
-    console.error("Error in generateCertificatesForTournament:", error)
+    console.error("Error in generateCertificatesForTournament:", error);
     return {
       success: false,
-      message: "Failed to generate certificates for tournament"
-    }
+      message: "Failed to generate certificates for tournament",
+    };
   }
 }
 

@@ -396,7 +396,7 @@ export default function AdminSubmissionsPage() {
               <p className="text-muted-foreground">
                 {searchQuery
                   ? "No matching submissions found."
-                  : "No submissions found for this tournament."}
+                  : "No submissions found for this competitions."}
               </p>
               {searchQuery && (
                 <Button variant="ghost" onClick={() => setSearchQuery("")}>

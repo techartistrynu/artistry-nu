@@ -23,7 +23,7 @@ export default async function DashboardPaymentsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Your Payments</CardTitle>
-          <CardDescription>View your payment history for tournament registrations</CardDescription>
+          <CardDescription>View your payment history for competition registrations</CardDescription>
         </CardHeader>
         <CardContent>
           {payments.length > 0 ? (

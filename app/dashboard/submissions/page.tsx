@@ -70,7 +70,7 @@ export default async function DashboardSubmissionsPage({
           <Card>
             <CardHeader>
               <CardTitle>All Submissions</CardTitle>
-              <CardDescription>View all your submissions across all tournaments</CardDescription>
+              <CardDescription>View all your submissions across all competitions</CardDescription>
             </CardHeader>
             <CardContent>
               {submissions.length > 0 ? (
@@ -125,7 +125,7 @@ export default async function DashboardSubmissionsPage({
                     {query ? "No matching submissions found" : "You haven't made any submissions yet"}
                   </p>
                   <Link href="/dashboard/tournaments">
-                    <Button>Browse Tournaments</Button>
+                    <Button>Browse Competitions</Button>
                   </Link>
                 </div>
               )}
@@ -180,7 +180,7 @@ export default async function DashboardSubmissionsPage({
                     {query ? "No matching drafts found" : "You don't have any draft submissions"}
                   </p>
                   <Link href="/dashboard/tournaments">
-                    <Button>Browse Tournaments</Button>
+                    <Button>Browse Competitions</Button>
                   </Link>
                 </div>
               )}
@@ -290,7 +290,7 @@ export default async function DashboardSubmissionsPage({
                     {query ? "No completed submissions found" : "You don't have any completed submissions"}
                   </p>
                   <Link href="/dashboard/tournaments">
-                    <Button>Browse Tournaments</Button>
+                    <Button>Browse Competitions</Button>
                   </Link>
                 </div>
               )}

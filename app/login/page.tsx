@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
+import Image from "next/image"
 import { Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -87,7 +88,8 @@ export default function LoginPage() {
               onClick={handleGoogleLogin}
               disabled={isLoading}
             >
-              Continue with Google
+              Continue with 
+              <Image src="/googleLogo.svg" alt="Google Logo" width={20} height={20} />
             </Button>
 
             <div className="relative">

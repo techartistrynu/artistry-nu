@@ -28,7 +28,7 @@ export async function fetchDashboardStats() {
   ])
 
   const payments = paymentSnap.docs.map(doc => doc.data().paid_amount || 0);
-  const totalPaymentAmount = (payments.reduce((acc: number, amount: number) => acc + amount, 0) / 100).toFixed(2);
+  const totalPaymentAmount = Number((payments.reduce((acc: number, amount: number) => acc + amount, 0) / 100).toFixed(2)) || 0;
 
   return {
     totalUsers: userSnap.data().count,
