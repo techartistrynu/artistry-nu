@@ -60,10 +60,12 @@ export async function submitArtwork(formData: FormData) {
     throw new Error('Missing required fields');
   }
 
+  const submissionNumber = `ANUSUB${new Date().getFullYear().toString().slice(-2)}${new Date().getMonth().toString().padStart(2, '0')}${new Date().getDate().toString().padStart(2, '0')}-${tournamentId.slice(-6).toUpperCase()}${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
   // Create a new submission document
   const submissionRef = await db.collection('submissions').add({
     title,
     description,
+    submission_number: submissionNumber,
     applicant_name: applicantName,
     date_of_birth: format(new Date(dateOfBirth), 'yyyy-MM-dd'),
     phone_number: phoneNumber,

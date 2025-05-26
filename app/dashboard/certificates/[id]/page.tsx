@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ArrowLeft, Download, Share2 } from "lucide-react"
 import Link from "next/link"
 import { getCertificateById } from "@/app/actions/certificates"
+import PDFViewerWrapper from "@/components/pdf-viewer-wrapper"
 
 interface CertificateDetailsPageProps {
   params: {
@@ -11,7 +12,8 @@ interface CertificateDetailsPageProps {
 }
 
 export default async function CertificateDetailsPage({ params }: CertificateDetailsPageProps) {
-  const certificate = await getCertificateById(params.id)
+  const { id: paramId } = await params
+  const certificate = await getCertificateById(paramId)
 
   if (!certificate) {
     return (
@@ -53,12 +55,10 @@ export default async function CertificateDetailsPage({ params }: CertificateDeta
             <CardContent>
               <div className="space-y-4">
                 <div className="aspect-[8.5/11] overflow-hidden rounded-md border bg-muted">
-                  {certificate.file_path ? (
-                    <img
-                      src={certificate.file_path || "/placeholder.svg"}
-                      alt={`${certificate.tournaments?.title} Certificate`}
-                      className="h-full w-full object-cover"
-                    />
+                  {certificate.file_url ? (
+                    <div className="h-full w-full flex items-center justify-center">
+                      <PDFViewerWrapper url={certificate.file_url} />
+                    </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
                       <h2 className="text-2xl font-bold mb-4">Certificate of Achievement</h2>
@@ -86,9 +86,11 @@ export default async function CertificateDetailsPage({ params }: CertificateDeta
                 <Share2 className="mr-2 h-4 w-4" />
                 Share
               </Button>
-              <Button>
-                <Download className="mr-2 h-4 w-4" />
-                Download
+              <Button asChild>
+                <a href={certificate.file_url} target="_blank" rel="noopener noreferrer">
+                  <Download className="mr-2 h-4 w-4" />
+                  Download
+                </a>
               </Button>
             </CardFooter>
           </Card>

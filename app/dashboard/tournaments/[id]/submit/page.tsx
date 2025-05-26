@@ -266,6 +266,16 @@ export default function SubmitToTournamentPage() {
       return;
     }
 
+    if (dateOfBirth > new Date()) {
+      toast({
+        title: "Invalid Date of Birth",
+        description: "Date of birth cannot be in the future.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+
     setIsUploading(true);
     setIsSubmitting(true);
 

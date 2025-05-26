@@ -38,8 +38,8 @@ async function enrichCertificate(cert: any) {
 
   return {
     ...cert,
-    tournament: convertTimestamps(tournamentSnap?.data()),
-    submission: convertTimestamps(submissionSnap?.data()),
+    tournaments: convertTimestamps(tournamentSnap?.data()),
+    submissions: convertTimestamps(submissionSnap?.data()),
     user: convertTimestamps(userSnap?.data()),
   }
 }
@@ -52,7 +52,7 @@ export async function getUserCertificates(userId: string) {
       .orderBy("issue_date", "desc")
       .get()
 
-    const rawCerts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    const rawCerts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), issue_date: doc.data()?.issue_date?.toDate?.().toISOString() }))
     const certsWithDetails = await Promise.all(rawCerts.map(enrichCertificate))
 
     return certsWithDetails
@@ -150,14 +150,13 @@ export async function generateCertificateForSubmission(submissionId: string) {
       tournamentTitle: tournament?.title || "Tournament"
     }
 
-    const pdfBlob = await pdf(
-      React.createElement(Document, null,
-        React.createElement(Page, { size: "A4" },
-          React.createElement(CertificateTemplate, certificateData)
-        )
+    const pdfDoc = await pdf(
+      React.createElement(Document, {},
+        React.createElement(CertificateTemplate, certificateData)
       )
-    ).toBlob()
-    const buffer = await pdfBlob.arrayBuffer()
+    );
+    const pdfBlob = await pdfDoc.toBlob();
+    const buffer = await pdfBlob.arrayBuffer();
 
     // Upload to storage
     const filePath = `certificates/${submission?.tournament_id}/${submissionId}.pdf`
@@ -251,15 +250,13 @@ export async function generateCertificatesForTournament(tournamentId: string) {
         }
       
         // Generate PDF
-        const pdfBlob = await pdf(
-          React.createElement(Document, null,
-            React.createElement(Page, { size: "A4" },
-              React.createElement(CertificateTemplate, certificateData)
-            )
+        const pdfDoc = await pdf(
+          React.createElement(Document, {},
+            React.createElement(CertificateTemplate, certificateData)
           )
-        ).toBlob();
+        );
+        const pdfBlob = await pdfDoc.toBlob();
         const buffer = await pdfBlob.arrayBuffer();
-      
         // Upload to storage
         const filePath = `certificates/${tournamentId}/${doc.id}.pdf`;
         const adminStorage = getStorage();
@@ -270,7 +267,12 @@ export async function generateCertificatesForTournament(tournamentId: string) {
         const downloadUrl = url;
       
         // Create certificate record
+        const year = new Date().getFullYear().toString().slice(-2);
+        const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
+        const day = new Date().getDate().toString().padStart(2, '0');
+        const rankNumber = submission?.rank?.toString().padStart(4, '0');
         const certData = {
+          certificate_number: `ANUCERT${year}${month}${day}-${tournamentId.slice(-6)}${rankNumber}`,
           user_id: submission.user_id,
           tournament_id: tournamentId,
           submission_id: doc.id,
