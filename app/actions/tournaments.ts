@@ -31,6 +31,10 @@ export async function getAllTournaments() {
         end_date: toISOString(data.end_date),
         created_at: toISOString(data.created_at),
         updated_at: toISOString(data.updated_at),
+        rank_generated: data.rank_generated || false,
+        rank_generated_at: toISOString(data.rank_generated_at),
+        certificate_generated: data.certificate_generated || false,
+        certificate_generated_at: toISOString(data.certificate_generated_at),
       }
 
       // Remove any null values to keep the data clean
@@ -77,6 +81,10 @@ export async function getTournamentById(id: string) {
       end_date: toISOString(data.end_date),
       created_at: toISOString(data.created_at),
       updated_at: toISOString(data.updated_at),
+      rank_generated: data?.rank_generated || false,
+      rank_generated_at: toISOString(data?.rank_generated_at),
+      certificate_generated: data?.certificate_generated || false,
+      certificate_generated_at: toISOString(data?.certificate_generated_at),
     }
 
     // Remove any null values to keep the data clean
@@ -119,6 +127,10 @@ export async function fetchTournamentById(tournamentId: string) {
       submission_deadline: toISOString(data?.submission_deadline),
       created_at: toISOString(data?.created_at),
       updated_at: toISOString(data?.updated_at),
+      rank_generated: data?.rank_generated || false,
+      rank_generated_at: toISOString(data?.rank_generated_at),
+      certificate_generated: data?.certificate_generated || false,
+      certificate_generated_at: toISOString(data?.certificate_generated_at),
     }
 
     return serializedData
@@ -156,8 +168,11 @@ export async function getUserSubmissionForTournament(userId: string, tournamentI
     const serializedData = {
       id: doc.id,
       ...data,
+      reviewed_at: data.reviewed_at?.toDate?.()?.toISOString() || null,
       created_at: data.created_at?.toDate?.()?.toISOString() || null,
       updated_at: data.updated_at?.toDate?.()?.toISOString() || null,
+      certificate_generated_at: data.certificate_generated_at?.toDate?.()?.toISOString() || null,
+      rank_generated_at: data.rank_generated_at?.toDate?.()?.toISOString() || null,
     }
 
     return serializedData
