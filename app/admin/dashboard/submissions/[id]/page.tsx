@@ -9,7 +9,7 @@ import Image from "next/image"
 import { toast } from "@/components/ui/use-toast"
 import { ArrowLeft, Star, User, Mail, Award, FileText, Calendar, CheckCircle2, XCircle, Phone, Cake, Ear } from "lucide-react"
 import Link from "next/link"
-import { DownloadButton } from "./components/download-button"
+import { DownloadButton } from "../../../../../components/download-button"
 import { SubmissionReviewForm } from "./components/submission-review-form"
 
 export default async function SubmissionDetailPage({

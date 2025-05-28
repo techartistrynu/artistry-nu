@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { createBrowserClient } from "@/lib/supabase/client"
 import { useSession } from "next-auth/react"
 import { useToast } from "@/components/ui/use-toast"
 import { BarChart, CalendarDays, Users, Award, FileText, CreditCard } from "lucide-react"

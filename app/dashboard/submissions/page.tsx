@@ -79,6 +79,7 @@ export default async function DashboardSubmissionsPage({
                     <thead>
                       <tr className="border-b">
                         <th className="p-4 text-left text-sm font-medium">Title</th>
+                        <th className="p-4 text-left text-sm font-medium">Submission No.</th>
                         <th className="p-4 text-left text-sm font-medium hidden sm:table-cell">Tournament</th>
                         <th className="p-4 text-left text-sm font-medium">Status</th>
                         <th className="p-4 text-left text-sm font-medium hidden md:table-cell">Submitted</th>
@@ -89,6 +90,7 @@ export default async function DashboardSubmissionsPage({
                       {submissions.map((submission) => (
                         <tr key={submission.id} className="hover:bg-muted/50">
                           <td className="p-4 font-medium">{submission.title}</td>
+                          <td className="p-4 font-medium">{submission.submission_number}</td>
                           <td className="p-4 hidden sm:table-cell">{submission.tournaments?.title || "N/A"}</td>
                           <td className="p-4">
                             <Badge

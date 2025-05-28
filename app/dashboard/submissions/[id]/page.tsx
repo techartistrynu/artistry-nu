@@ -68,7 +68,7 @@ export default function SubmissionDetailPage() {
       <div ref={receiptRef}>
         <h2 className="text-2xl font-bold mb-4 text-green-600">🎨 Submission Details</h2>
 
-        <div className="line"><strong>Submission ID:</strong> {submissionId}</div>
+        <div className="line"><strong>Submission No.:</strong> {submission.submission_number}</div>
         <div className="line"><strong>Title:</strong> {submission.title}</div>
         <div className="line"><strong>Description:</strong> {submission.description || "N/A"}</div>
         <div className="line"><strong>Status:</strong> {submission.status}</div>

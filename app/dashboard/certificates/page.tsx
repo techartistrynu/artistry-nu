@@ -71,10 +71,6 @@ export default async function DashboardCertificatesPage() {
                       View
                     </Button>
                   </Link>
-                  <Button className="flex-1">
-                    <Download className="mr-2 h-4 w-4" />
-                    Download
-                  </Button>
                 </div>
               </div>
             </Card>

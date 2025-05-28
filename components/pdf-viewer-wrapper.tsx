@@ -1,20 +1,16 @@
-'use client'
+// components/pdf-viewer-wrapper.tsx
+'use client';
 
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 
-const PDFViewer = dynamic(() => import('@/components/pdf-viewer'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-full">
-      <p className="text-muted-foreground">Loading PDF viewer...</p>
-    </div>
-  ),
-})
+const PDFViewer = dynamic(
+  () => import('./react-pdf-viewer').then(mod => mod.PDFViewerEnhanced),
+  {
+    ssr: false,
+    loading: () => <div className="text-center p-4">Loading PDF viewer...</div>
+  }
+);
 
-interface PDFViewerWrapperProps {
-  url: string
+export function PDFViewerWrapper({ url }: { url: string }) {
+  return <PDFViewer downloadUrl={url} />;
 }
-
-export default function PDFViewerWrapper({ url }: PDFViewerWrapperProps) {
-  return <PDFViewer pdfUrl={url} />
-} 

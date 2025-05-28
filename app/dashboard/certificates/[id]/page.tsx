@@ -3,7 +3,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ArrowLeft, Download, Share2 } from "lucide-react"
 import Link from "next/link"
 import { getCertificateById } from "@/app/actions/certificates"
-import PDFViewerWrapper from "@/components/pdf-viewer-wrapper"
+import { PDFViewerWrapper } from "@/components/pdf-viewer-wrapper"
+import { DownloadButton } from "@/components/download-button"
+import { DocumentViewer } from "@/components/document-viewer"
+import { ShareButton } from "@/components/share-button"
 
 interface CertificateDetailsPageProps {
   params: {
@@ -14,6 +17,8 @@ interface CertificateDetailsPageProps {
 export default async function CertificateDetailsPage({ params }: CertificateDetailsPageProps) {
   const { id: paramId } = await params
   const certificate = await getCertificateById(paramId)
+  console.log(certificate);
+  
 
   if (!certificate) {
     return (
@@ -57,7 +62,7 @@ export default async function CertificateDetailsPage({ params }: CertificateDeta
                 <div className="aspect-[8.5/11] overflow-hidden rounded-md border bg-muted">
                   {certificate.file_url ? (
                     <div className="h-full w-full flex items-center justify-center">
-                      <PDFViewerWrapper url={certificate.file_url} />
+                      <DocumentViewer url={certificate.file_url} />
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
@@ -82,16 +87,8 @@ export default async function CertificateDetailsPage({ params }: CertificateDeta
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline">
-                <Share2 className="mr-2 h-4 w-4" />
-                Share
-              </Button>
-              <Button asChild>
-                <a href={certificate.file_url} target="_blank" rel="noopener noreferrer">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download
-                </a>
-              </Button>
+              <ShareButton url={certificate.file_url} />
+              <DownloadButton url={certificate.file_url} fileName={certificate.certificate_number}/>
             </CardFooter>
           </Card>
         </div>

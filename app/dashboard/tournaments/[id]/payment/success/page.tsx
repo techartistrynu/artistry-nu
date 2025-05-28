@@ -69,7 +69,7 @@ export default function PaymentSuccessPage() {
         <h2 className="text-2xl font-bold mb-4 text-green-600">🎉 Payment Successful!</h2>
 
         <div className="line"><strong>Tournament:</strong> {tournament?.title ?? "N/A"}</div>
-        <div className="line"><strong>Submission ID:</strong> {submissionId ?? "N/A"}</div>
+        <div className="line"><strong>Submission No.:</strong> {submission.submission_number ?? "N/A"}</div>
         <div className="line"><strong>Submission Title:</strong> {submission.title}</div>
         <div className="line"><strong>Applicant:</strong> {submission.applicant_name}</div>
         <div className="line"><strong>Phone:</strong> {submission.phone_number}</div>

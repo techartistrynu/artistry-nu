@@ -25,22 +25,20 @@ async function enrichCertificate(cert: any) {
   ])
 
   // Convert timestamps to ISO strings
-  const convertTimestamps = (data: any) => {
-    if (!data) return null;
-    const result = { ...data };
-    for (const key in result) {
-      if (result[key]?.toDate) {
-        result[key] = result[key].toDate().toISOString();
-      }
-    }
-    return result;
-  };
+  const toISOString = (timestamp: any) => {
+    if (!timestamp) return null
+    if (timestamp.toDate) return timestamp.toDate().toISOString()
+    if (timestamp._seconds) return new Date(timestamp._seconds * 1000).toISOString()
+    if (typeof timestamp === 'string') return timestamp
+    return null
+  }
 
   return {
     ...cert,
-    tournaments: convertTimestamps(tournamentSnap?.data()),
-    submissions: convertTimestamps(submissionSnap?.data()),
-    user: convertTimestamps(userSnap?.data()),
+    issue_date: toISOString(cert.issue_date),
+    tournaments: {...tournamentSnap?.data(), created_at: toISOString(tournamentSnap?.data()?.created_at)},
+    submissions: {...submissionSnap?.data(), created_at: toISOString(submissionSnap?.data()?.created_at)},
+    user: {...userSnap?.data(), created_at: toISOString(userSnap?.data()?.created_at)},
   }
 }
 
