@@ -257,7 +257,7 @@ export default function AdminCertificatesPage() {
                     <div className="col-span-1">Rank</div>
                     <div className="col-span-2">Date of Birth</div>
                     <div className="col-span-2">Certificate</div>
-                    <div className="col-span-2">Actions</div>
+                    {/* <div className="col-span-2">Actions</div> */}
                   </div>
 
                   {/* Data rows */}
@@ -298,7 +298,7 @@ export default function AdminCertificatesPage() {
                             <span className="text-muted-foreground">Not generated</span>
                           )}
                         </div>
-                        <div className="col-span-2">
+                        {/* <div className="col-span-2">
                           <Button
                             variant="outline"
                             size="sm"
@@ -310,7 +310,7 @@ export default function AdminCertificatesPage() {
                             <FileText className="h-4 w-4 mr-2" />
                             Generate
                           </Button>
-                        </div>
+                        </div> */}
                       </div>
                     ))}
                   </div>
