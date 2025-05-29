@@ -306,6 +306,12 @@ export async function generateCertificatesForTournament(tournamentId: string) {
       }
     }
 
+    const tournamentRef = db.collection("tournaments").doc(tournamentId);
+    batch.update(tournamentRef, { 
+      certificates_generated: true,
+      certificates_generated_at: FieldValue.serverTimestamp() 
+    });
+    
     if (generatedCount > 0) {
       await batch.commit();
     }

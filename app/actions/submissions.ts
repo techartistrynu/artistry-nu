@@ -291,22 +291,67 @@ export async function getSubmissionsByTournament(
     const totalSnapshot = await query.count().get();
     const total = totalSnapshot.data().count;
 
-    // Convert timestamps to ISO strings
-    const convertTimestamps = (data: any) => {
-      if (!data) return null;
-      const result = { ...data };
-      for (const key in result) {
-        if (result[key]?.toDate) {
-          result[key] = result[key].toDate().toISOString();
-        }
-      }
-      return result;
-    };
+    const submissions = await Promise.all(
+      snapshot.docs.map(async (doc) => {
+        const submissionData = doc.data()
+        const submissionId = doc.id
 
-    const submissions = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...convertTimestamps(doc.data())
-    }));
+        const userId = submissionData.user_id
+        const tournamentId = submissionData.tournament_id
+
+        let user = null
+        let tournament = null
+
+        // Sanitize user
+        if (userId && typeof userId === "string") {
+          const userSnap = await db.collection("users").doc(userId).get()
+          if (userSnap.exists) {
+            const rawUser = userSnap.data()
+            user = {
+              id: userSnap.id,
+              name: rawUser?.name || null,
+              email: rawUser?.email || null,
+              image: rawUser?.image || null,
+              createdAt: rawUser?.createdAt?.toDate?.().toISOString() || null,
+            }
+          }
+        }
+
+        // Sanitize tournament
+        if (tournamentId && typeof tournamentId === "string") {
+          const tournamentSnap = await db.collection("tournaments").doc(tournamentId).get()
+          if (tournamentSnap.exists) {
+            const rawTournament = tournamentSnap.data()
+            tournament = {
+              id: tournamentSnap.id,
+              title: rawTournament?.title || null,
+              registration_start: rawTournament?.registration_start?.toDate?.().toISOString() || null,
+              registration_end: rawTournament?.registration_end?.toDate?.().toISOString() || null,
+              submission_deadline: rawTournament?.submission_deadline?.toDate?.().toISOString() || null,
+              updated_at: rawTournament?.updated_at?.toDate?.().toISOString() || null,
+            }
+          }
+        }
+
+        return {
+          id: submissionId,
+          title: submissionData.title || null,
+          description: submissionData.description || null,
+          status: submissionData.status || null,
+          rank: submissionData.rank || null,
+          score: submissionData.score || null,
+          applicant_name: submissionData.applicant_name || null,
+          date_of_birth: submissionData.date_of_birth || null,
+          certificate_url: submissionData.certificate_url || null,
+          submission_number: submissionData.submission_number || null,
+          reviewed_at: submissionData.reviewed_at?.toDate?.().toISOString() || null,
+          created_at: submissionData.created_at?.toDate?.().toISOString() || null,
+          updated_at: submissionData.updated_at?.toDate?.().toISOString() || null,
+          user,
+          tournaments: tournament,
+        }
+      })
+    )
 
     return { submissions, total };
   } catch (error) {

@@ -39,6 +39,7 @@ interface Tournament {
   registration_start: string | null;
   registration_end: string | null;
   submission_deadline: string | null;
+  certificates_generated: boolean;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -46,14 +47,15 @@ interface Tournament {
 export default function AdminCertificatesPage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [selectedTournament, setSelectedTournament] = useState("");
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [filteredSubmissions, setFilteredSubmissions] = useState<any[]>([]);
   const [totalSubmissions, setTotalSubmissions] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [generatingRank, setGeneratingRank] = useState(false);
   const [generatingCertificates, setGeneratingCertificates] = useState(false);
   const [ranksGenerated, setRanksGenerated] = useState(false);
+  const [certificatesGenerated, setCertificatesGenerated] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 10;
 
@@ -87,7 +89,7 @@ export default function AdminCertificatesPage() {
           setFilteredSubmissions(submissions);
           setTotalSubmissions(total);
           setLoading(false);
-          setRanksGenerated(submissions.some(sub => typeof sub.rank === 'number'));
+          setRanksGenerated(submissions.some(sub => typeof sub?.rank === 'number'));
         } catch (error) {
           console.error("Error fetching submissions:", error);
           setLoading(false);
@@ -100,6 +102,7 @@ export default function AdminCertificatesPage() {
   const totalPages = Math.ceil(totalSubmissions / itemsPerPage);
 
   const handleTournamentChange = (value: string) => {
+    setCertificatesGenerated(tournaments.find(t => t.id === value)?.certificates_generated || false);
     setSelectedTournament(value);
     setCurrentPage(1);
     setSearchQuery("");
@@ -253,6 +256,7 @@ export default function AdminCertificatesPage() {
                   <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted/50 text-center">
                     <div className="col-span-2">User</div>
                     <div className="col-span-2">Email</div>
+                    <div className="col-span-2">Submission No.</div>
                     <div className="col-span-1">Score</div>
                     <div className="col-span-1">Rank</div>
                     <div className="col-span-2">Date of Birth</div>
@@ -271,7 +275,10 @@ export default function AdminCertificatesPage() {
                           {submission.applicant_name || "N/A"}
                         </div>
                         <div className="col-span-2 truncate text-sm">
-                          {submission.user?.email || "N/A"}
+                          {submission?.user?.email || "N/A"}
+                        </div>
+                        <div className="col-span-2">
+                          {submission.submission_number || "N/A"}
                         </div>
                         <div className="col-span-1">
                           {submission.score?.toFixed(2) || "N/A"}
@@ -329,7 +336,7 @@ export default function AdminCertificatesPage() {
                   </Button>
                   <Button
                     onClick={handleGenerateCertificates}
-                    disabled={(generatingCertificates || !ranksGenerated)}
+                    disabled={(generatingCertificates || !ranksGenerated) && certificatesGenerated}
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     {generatingCertificates ? "Generating Certificates..." : "Generate All Certificates"}
