@@ -352,7 +352,6 @@ export async function revokeCertificate(certificateId: string) {
 
 export async function generateRanksForTournament(tournamentId: string) {
   try {
-    // Get all scored submissions for the tournament
     const submissionsSnap = await db.collection("submissions")
       .where("tournament_id", "==", tournamentId)
       .where("score", "!=", null)
@@ -367,48 +366,32 @@ export async function generateRanksForTournament(tournamentId: string) {
       ...doc.data()
     })) as any[];
 
-    // Sort by score (descending), then by date_of_birth (ascending), then by applicant_name (alphabetical)
     const sortedSubmissions = [...submissions].sort((a, b) => {
-      if (a?.score !== b?.score) return b?.score! - a?.score!;
-      
-      // If scores are equal, compare dates of birth
-      if (a?.date_of_birth && b?.date_of_birth) {
-        const dateA = new Date(a?.date_of_birth);
-        const dateB = new Date(b?.date_of_birth);
-        if (dateA.getTime() !== dateB.getTime()) {
-          return dateA.getTime() - dateB.getTime();
-        }
+      if (a?.score !== b?.score) return b.score - a.score;
+
+      const dateA = new Date(a?.date_of_birth);
+      const dateB = new Date(b?.date_of_birth);
+      if (dateA.getTime() !== dateB.getTime()) {
+        return dateA.getTime() - dateB.getTime(); // earlier DOB gets higher rank
       }
-      
-      // If still equal, compare names
+
       return (a?.applicant_name || '').localeCompare(b?.applicant_name || '');
     });
 
-    // Assign ranks (handling ties)
-    let currentRank = 1;
     const batch = db.batch();
-    
+
     sortedSubmissions.forEach((sub, index) => {
       const submissionRef = db.collection("submissions").doc(sub.id);
-      
-      // If this submission has the same score as the previous one, it's a tie
-      if (index > 0 && sub?.score === sortedSubmissions[index - 1]?.score) {
-        // Same rank as previous
-        batch.update(submissionRef, { rank: currentRank });
-      } else {
-        currentRank = index + 1;
-        batch.update(submissionRef, { rank: currentRank });
-      }
+      const rank = index + 1; // Unique rank always
+      batch.update(submissionRef, { rank });
     });
 
-    // Update tournament to mark ranks as generated
     const tournamentRef = db.collection("tournaments").doc(tournamentId);
     batch.update(tournamentRef, { 
       rank_generated: true,
       rank_generated_at: FieldValue.serverTimestamp() 
     });
 
-    // Commit all updates in a single batch
     await batch.commit();
 
     return { 

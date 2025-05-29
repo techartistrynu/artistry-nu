@@ -61,7 +61,7 @@ export default function AdminCertificatesPage() {
     const fetchTournaments = async () => {
       try {
         const data = await getAllTournaments();
-        const validTournaments = data.filter((t) => t.title) as Tournament[];
+        const validTournaments = data.filter((t) => t.title && t.submission_deadline < new Date().toISOString()) as Tournament[];
         setTournaments(validTournaments);
         setLoading(false);
       } catch (error) {
@@ -329,7 +329,7 @@ export default function AdminCertificatesPage() {
                   </Button>
                   <Button
                     onClick={handleGenerateCertificates}
-                    disabled={generatingCertificates || !ranksGenerated}
+                    disabled={(generatingCertificates || !ranksGenerated)}
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     {generatingCertificates ? "Generating Certificates..." : "Generate All Certificates"}
