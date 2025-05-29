@@ -16,7 +16,6 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "ArtistryNu - Creative Design & Art Competition Platform",
   description: "A platform for creative design and art competitions",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
