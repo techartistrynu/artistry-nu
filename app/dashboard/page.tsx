@@ -40,8 +40,12 @@ export default function DashboardPage() {
     }
   }
 
-  if (status === "loading" || isLoading) {
-    return <div className="flex-1 p-8 flex items-center justify-center">Loading...</div>
+  if (status === "loading" || isLoading) {   
+      return (
+        <div className="container px-4 sm:px-6 md:px-8 py-10 md:py-20 flex justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      )
   }
 
   return (

@@ -38,7 +38,7 @@ export function UserNav({ user }: UserNavProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={user.image || "/placeholder.svg"} alt={user.name || user.email || "Admin"} />
+            <AvatarImage src={user.role === "admin" ? "Admin" : user.image || "/placeholder.svg"} alt={user.role === "admin" ? "Admin" : user.name || user.email || "User"} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
         </Button>

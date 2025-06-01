@@ -61,7 +61,13 @@ export default function SubmissionDetailPage() {
     printWindow.print()
   }
 
-  if (loading) return <div className="p-8">Loading submission details...</div>
+  if (loading) {
+    return (
+      <div className="container px-4 sm:px-6 md:px-8 py-10 md:py-20 flex justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-xl">

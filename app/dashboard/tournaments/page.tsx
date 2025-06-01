@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, DollarSign } from "lucide-react"
 import Link from "next/link"
-import { getAllTournamentForUser } from "@/app/actions/tournaments"
+import { getAllTournamentForUser, getAllTournaments } from "@/app/actions/tournaments"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
@@ -15,7 +15,12 @@ export default async function DashboardTournamentsPage() {
     redirect("/login")
   }
 
-  const tournaments: any = await getAllTournamentForUser()
+  const fetchedTournaments: any = await getAllTournaments()
+  let tournaments: any = []
+  if(fetchedTournaments) {
+    tournaments = fetchedTournaments.filter((tournament: any) => tournament.status !== "closed")
+  }
+  
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -33,7 +38,7 @@ export default async function DashboardTournamentsPage() {
                     <CardTitle>{tournament.title}</CardTitle>
                     <CardDescription className="mt-1">{tournament.category}</CardDescription>
                   </div>
-                  <Badge className="capitalize">{tournament.status}</Badge>
+                  <Badge className={`capitalize ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>{tournament.status}</Badge>
                 </div>
               </CardHeader>
               <CardContent className="flex-1">
