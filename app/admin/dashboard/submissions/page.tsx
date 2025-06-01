@@ -138,78 +138,78 @@ export default function AdminSubmissionsPage() {
     setCurrentPage(1);
   };
 
-  const handleDownload = async (filePath: string, fileName: string) => {
-    setDownloading(true);
-    try {
-      // Get the proper download URL from Firebase
-      const downloadUrl = await getDownloadUrl(filePath);
-      if (!downloadUrl) throw new Error("Could not generate download URL");
+  // const handleDownload = async (filePath: string, fileName: string) => {
+  //   setDownloading(true);
+  //   try {
+  //     // Get the proper download URL from Firebase
+  //     const downloadUrl = await getDownloadUrl(filePath);
+  //     if (!downloadUrl) throw new Error("Could not generate download URL");
 
-      const response = await fetch(downloadUrl);
-      const blob = await response.blob();
-      const downloadUrlObject = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = downloadUrlObject;
-      link.download = fileName || "submission-file";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrlObject);
-    } catch (error) {
-      console.error("Download failed:", error);
-      toast.error("Failed to download file");
-    } finally {
-      setDownloading(false);
-    }
-  };
+  //     const response = await fetch(downloadUrl);
+  //     const blob = await response.blob();
+  //     const downloadUrlObject = window.URL.createObjectURL(blob);
+  //     const link = document.createElement("a");
+  //     link.href = downloadUrlObject;
+  //     link.download = fileName || "submission-file";
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //     window.URL.revokeObjectURL(downloadUrlObject);
+  //   } catch (error) {
+  //     console.error("Download failed:", error);
+  //     toast.error("Failed to download file");
+  //   } finally {
+  //     setDownloading(false);
+  //   }
+  // };
 
-  const handleScoreSubmit = async (status: "approved" | "rejected") => {
-    if (!currentSubmission?.id) {
-      toast.error("No submission selected");
-      return;
-    }
+  // const handleScoreSubmit = async (status: "approved" | "rejected") => {
+  //   if (!currentSubmission?.id) {
+  //     toast.error("No submission selected");
+  //     return;
+  //   }
 
-    if (!score || isNaN(parseFloat(score))) {
-      toast.error("Please enter a valid score");
-      return;
-    }
+  //   if (!score || isNaN(parseFloat(score))) {
+  //     toast.error("Please enter a valid score");
+  //     return;
+  //   }
 
-    const numericScore = parseFloat(score);
-    if (numericScore < 0 || numericScore > 10) {
-      toast.error("Score must be between 0 and 10");
-      return;
-    }
+  //   const numericScore = parseFloat(score);
+  //   if (numericScore < 0 || numericScore > 10) {
+  //     toast.error("Score must be between 0 and 10");
+  //     return;
+  //   }
 
-    setIsUpdating(true);
-    try {
-      const result = await updateSubmissionScore(
-        currentSubmission.id,
-        numericScore,
-        status
-      );
+  //   setIsUpdating(true);
+  //   try {
+  //     const result = await updateSubmissionScore(
+  //       currentSubmission.id,
+  //       numericScore,
+  //       status
+  //     );
 
-      if (result.success) {
-        toast.success(
-          `Submission ${status} with score ${numericScore.toFixed(2)}`
-        );
-        setPreviewImage(null);
-        // Refresh submissions data
-        const { submissions: any } = await getSubmissionsByTournament(
-          selectedTournament,
-          currentPage,
-          itemsPerPage,
-          searchQuery
-        );
-        setSubmissions(submissions);
-      } else {
-        toast.error(result.message);
-      }
-    } catch (error) {
-      toast.error("Failed to update submission");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
+  //     if (result.success) {
+  //       toast.success(
+  //         `Submission ${status} with score ${numericScore.toFixed(2)}`
+  //       );
+  //       setPreviewImage(null);
+  //       // Refresh submissions data
+  //       const { submissions: any } = await getSubmissionsByTournament(
+  //         selectedTournament,
+  //         currentPage,
+  //         itemsPerPage,
+  //         searchQuery
+  //       );
+  //       setSubmissions(submissions);
+  //     } else {
+  //       toast.error(result.message);
+  //     }
+  //   } catch (error) {
+  //     toast.error("Failed to update submission");
+  //   } finally {
+  //     setIsUpdating(false);
+  //   }
+  // };
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -252,19 +252,18 @@ export default function AdminSubmissionsPage() {
         <CardHeader>
           <CardTitle>
             {selectedTournament &&
-              `Submissions for ${
-                tournaments.find((t) => t.id === selectedTournament)?.title
+              `Submissions for ${tournaments.find((t) => t.id === selectedTournament)?.title
               }`}
           </CardTitle>
           <CardDescription>
             {totalSubmissions && selectedTournament
               ? `${totalSubmissions} submissions found. Showing ${Math.min(
-                  (currentPage - 1) * itemsPerPage + 1,
-                  totalSubmissions
-                )} to ${Math.min(
-                  currentPage * itemsPerPage,
-                  totalSubmissions
-                )}.`
+                (currentPage - 1) * itemsPerPage + 1,
+                totalSubmissions
+              )} to ${Math.min(
+                currentPage * itemsPerPage,
+                totalSubmissions
+              )}.`
               : "Please select a Competition to view submissions."}
           </CardDescription>
         </CardHeader>
@@ -284,8 +283,8 @@ export default function AdminSubmissionsPage() {
                     <div className="col-span-2">Submission Title</div>
                     <div className="col-span-2">Files</div>
                     <div className="col-span-2">Date</div>
-                    <div className="col-span-2">Scored </div>
-                    <div className="col-span-2">Actions</div>
+                    <div className="col-span-1">Score</div>
+                    <div className="col-span-1">Actions</div>
                   </div>
 
                   {/* Data rows */}
@@ -306,88 +305,44 @@ export default function AdminSubmissionsPage() {
                         </div>
                         <div className="col-span-2">
                           {submission.files?.length > 0 ? (
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 justify-center">
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() =>
-                                  setPreviewImage(submission.image_url || submission.files[0].file_url)
+                                  setPreviewImage(
+                                    submission.image_url || submission.files[0].file_url
+                                  )
                                 }
                               >
                                 <ImageIcon className="h-4 w-4" />
                               </Button>
-                              {/* <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  handleDownload(
-                                    submission.files[0].file_path,
-                                    submission.files[0].file_name
-                                  )
-                                }
-                                disabled={downloading}
-                              >
-                                <Download className="h-4 w-4" />
-                              </Button> */}
                             </div>
                           ) : (
-                            <span className="text-muted-foreground">
-                              No files
-                            </span>
+                            <span className="text-muted-foreground">No files</span>
                           )}
                         </div>
                         <div className="col-span-2 text-sm">
                           {submission.created_at
-                            ? new Date(
-                                submission.created_at
-                              ).toLocaleDateString()
+                            ? new Date(submission.created_at).toLocaleDateString()
                             : "N/A"}
                         </div>
-                        <div className="col-span-2 text-sm">
-                          {submission.score
-                            ? submission.score.toFixed(2)
-                            : "N/A"}
+                        <div className="col-span-1 text-sm">
+                          {submission.score ? submission.score.toFixed(2) : "N/A"}
                         </div>
-                        <div className="col-span-2 flex gap-2">
+                        <div className="col-span-1 flex justify-center">
                           <Link
                             href={`/admin/dashboard/submissions/${submission.id}`}
                           >
                             <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4 mr-2" />
+                              <Eye className="h-4 w-4 mr-1" />
                               View
                             </Button>
                           </Link>
-                          {/* <Button variant="outline" size="sm">
-                            <Star className="h-4 w-4 mr-2" />
-                            Score
-                          </Button> */}
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              </div>
-
-              {/* Pagination */}
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  Page {currentPage} of {totalPages}
-                </div>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    disabled={currentPage <= 1}
-                    onClick={() => paginate(currentPage - 1)}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    disabled={currentPage >= totalPages}
-                    onClick={() => paginate(currentPage + 1)}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
             </div>
@@ -416,7 +371,7 @@ export default function AdminSubmissionsPage() {
 
       {/* Image Preview Dialog */}
       {previewImage && (
-        <ImagePreview 
+        <ImagePreview
           imageUrl={previewImage}
           alt="Submission preview"
           className="rounded-lg shadow-md"

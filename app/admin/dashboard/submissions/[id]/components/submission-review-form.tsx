@@ -14,6 +14,7 @@ export function SubmissionReviewForm({ submissionId, initialScore }: { submissio
     
     if (!score || !status) return
     
+    alert("Are you sure you want to update the submission score?" + score + " ")
     const result = await updateSubmissionScore(
       submissionId,
       parseFloat(score as string),
