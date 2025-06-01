@@ -33,8 +33,24 @@ export async function getAllTournaments() {
         updated_at: toISOString(data.updated_at),
         rank_generated: data.rank_generated || false,
         rank_generated_at: toISOString(data.rank_generated_at),
-        certificate_generated: data.certificate_generated || false,
-        certificate_generated_at: toISOString(data.certificate_generated_at),
+        certificates_generated: data.certificates_generated || false,
+        certificates_generated_at: toISOString(data.certificates_generated_at),
+        status: (() => {
+          const now = new Date();
+          const registrationStart = data.registration_start?.toDate?.() || new Date(data.registration_start);
+          const registrationEnd = data.registration_end?.toDate?.() || new Date(data.registration_end);
+          const submissionEnd = data.submission_deadline?.toDate?.() || new Date(data.submission_deadline);
+
+          if (now < registrationStart) {
+            return "coming_soon";
+          } else if (now >= registrationStart && now <= registrationEnd) {
+            return "open";
+          } else if (now > registrationEnd && now <= submissionEnd) {
+            return "submission_period";
+          } else {
+            return "closed";
+          }
+        })(),
       }
 
       // Remove any null values to keep the data clean
@@ -83,8 +99,24 @@ export async function getTournamentById(id: string) {
       updated_at: toISOString(data.updated_at),
       rank_generated: data?.rank_generated || false,
       rank_generated_at: toISOString(data?.rank_generated_at),
-      certificate_generated: data?.certificate_generated || false,
-      certificate_generated_at: toISOString(data?.certificate_generated_at),
+      certificates_generated: data?.certificates_generated || false,
+      certificates_generated_at: toISOString(data?.certificates_generated_at),
+      status: (() => {
+        const now = new Date();
+        const registrationStart = data.registration_start?.toDate?.() || new Date(data.registration_start);
+        const registrationEnd = data.registration_end?.toDate?.() || new Date(data.registration_end);
+        const submissionEnd = data.submission_deadline?.toDate?.() || new Date(data.submission_deadline);
+
+        if (now < registrationStart) {
+          return "coming_soon";
+        } else if (now >= registrationStart && now <= registrationEnd) {
+          return "open";
+        } else if (now > registrationEnd && now <= submissionEnd) {
+          return "submission_period";
+        } else {
+          return "closed";
+        }
+      })(),
     }
 
     // Remove any null values to keep the data clean
@@ -129,8 +161,23 @@ export async function fetchTournamentById(tournamentId: string) {
       updated_at: toISOString(data?.updated_at),
       rank_generated: data?.rank_generated || false,
       rank_generated_at: toISOString(data?.rank_generated_at),
-      certificate_generated: data?.certificate_generated || false,
-      certificate_generated_at: toISOString(data?.certificate_generated_at),
+      certificates_generated: data?.certificates_generated || false,
+      certificates_generated_at: toISOString(data?.certificates_generated_at),
+      status: (() => {
+          const now = new Date();
+          const registrationStart = data?.registration_start?.toDate?.() || new Date(data?.registration_start);
+          const registrationEnd = data?.registration_end?.toDate?.() || new Date(data?.registration_end);
+          const submissionEnd = data?.submission_deadline?.toDate?.() || new Date(data?.submission_deadline);
+          if (now < registrationStart) {
+            return "coming_soon";
+          } else if (now >= registrationStart && now <= registrationEnd) {
+            return "open";
+          } else if (now > registrationEnd && now <= submissionEnd) {
+            return "submission_period";
+          } else {
+            return "closed";
+          }
+        })()
     }
 
     return serializedData

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { fetchSubmissionById } from "@/app/actions/submissions"
+import { getSubmissionById } from "@/app/actions/submissions"
 import Image from "next/image"
 import { fetchTournamentById } from "@/app/actions/tournaments"
 
@@ -23,7 +23,7 @@ export default function SubmissionDetailPage() {
         return
       }
 
-      const submissionData = await fetchSubmissionById(submissionId as string)
+      const submissionData = await getSubmissionById(submissionId as string)
       if (!submissionData) {
         router.push("/dashboard")
         return
@@ -79,7 +79,7 @@ export default function SubmissionDetailPage() {
         <div className="line">
           <strong>Submitted At:</strong>{" "}
           {submission.created_at
-            ? new Date(submission.created_at._seconds * 1000).toLocaleString()
+            ? new Date(submission.created_at).toLocaleString()
             : "N/A"}
         </div>
 

@@ -51,18 +51,18 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Submissions" value={stats.totalSubmissions} />
-        <StatCard title="Pending Review" value={stats.pendingSubmissions} />
-        <StatCard title="Approved Submissions" value={stats.approvedSubmissions} />
-        <StatCard title="Certificates Earned" value={stats.totalCertificates} />
+        <StatCard title="Total Submissions" value={stats.totalSubmissions} onClick={() => router.push("/dashboard/submissions")} />
+        <StatCard title="Pending Review" value={stats.pendingSubmissions} onClick={() => router.push("/dashboard/submissions")} />
+        <StatCard title="Approved Submissions" value={stats.approvedSubmissions} onClick={() => router.push("/dashboard/submissions")} />
+        <StatCard title="Certificates Earned" value={stats.totalCertificates} onClick={() => router.push("/dashboard/certificates")} />
       </div>
     </div>
   )
 }
 
-function StatCard({ title, value }: { title: string; value: number }) {
+function StatCard({ title, value, onClick }: { title: string; value: number; onClick: () => void }) {
   return (
-    <Card>
+    <Card onClick={onClick} className="cursor-pointer">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
       </CardHeader>

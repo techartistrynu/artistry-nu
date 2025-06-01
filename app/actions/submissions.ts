@@ -93,7 +93,28 @@ export async function getSubmissionById(id: string) {
       { 
         ...tournamentSnap.data(), 
         id: tournamentSnap.id,
-        submission_deadline: toISOString(tournamentSnap.data()?.submission_deadline)
+        created_at: toISOString(tournamentSnap.data()?.created_at),
+        updated_at: toISOString(tournamentSnap.data()?.updated_at),
+        submission_deadline: toISOString(tournamentSnap.data()?.submission_deadline),
+        rank_generated_at: toISOString(tournamentSnap.data()?.rank_generated_at),
+        certificates_generated_at: toISOString(tournamentSnap.data()?.certificates_generated_at),
+        registration_start: toISOString(tournamentSnap.data()?.registration_start),
+        registration_end: toISOString(tournamentSnap.data()?.registration_end),
+        status: (() => {
+          const now = new Date();
+          const registrationStart = tournamentSnap.data()?.registration_start?.toDate?.() || new Date(tournamentSnap.data()?.registration_start);
+          const registrationEnd = tournamentSnap.data()?.registration_end?.toDate?.() || new Date(tournamentSnap.data()?.registration_end);
+          const submissionEnd = tournamentSnap.data()?.submission_deadline?.toDate?.() || new Date(tournamentSnap.data()?.submission_deadline);
+          if (now < registrationStart) {
+            return "coming_soon";
+          } else if (now >= registrationStart && now <= registrationEnd) {
+            return "open";
+          } else if (now > registrationEnd && now <= submissionEnd) {
+            return "submission_period";
+          } else {
+            return "closed";
+          }
+        })()
       } : null,
       files: submissionFilesSnap.docs.map(d => {
         const data = d.data()
@@ -105,7 +126,14 @@ export async function getSubmissionById(id: string) {
       }),
       created_at: toISOString(submission.created_at),
       updated_at: toISOString(submission.updated_at),
-      reviewed_at: toISOString(submission.reviewed_at)
+      reviewed_at: toISOString(submission.reviewed_at),
+      certificate_generated_at: toISOString(submission.certificate_generated_at),
+      rank: submission.rank,
+      score: submission.score,
+      applicant_name: submission.applicant_name,
+      date_of_birth: submission.date_of_birth,
+      certificate_url: submission.certificate_url,
+      submission_number: submission.submission_number,
     } as Submission
   } catch (error) {
     console.error("Error in getSubmissionById:", error)
@@ -333,6 +361,17 @@ export async function getSubmissionsByTournament(
           }
         }
 
+        // Get submission files
+        const submissionFilesSnap = await db.collection("submission_files")
+          .where("submission_id", "==", submissionId)
+          .get()
+        
+        const files = submissionFilesSnap.docs.map(d => ({
+          id: d.id,
+          ...d.data(),
+          uploaded_at: d.data().uploaded_at?.toDate?.().toISOString() || null
+        }))
+
         return {
           id: submissionId,
           title: submissionData.title || null,
@@ -349,6 +388,7 @@ export async function getSubmissionsByTournament(
           updated_at: submissionData.updated_at?.toDate?.().toISOString() || null,
           user,
           tournaments: tournament,
+          files
         }
       })
     )

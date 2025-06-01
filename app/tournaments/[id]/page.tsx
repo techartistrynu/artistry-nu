@@ -174,7 +174,7 @@ export default function TournamentPage() {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Badge variant={tournament.status === "open" ? "default" : "secondary"} className="capitalize">
+                  <Badge className={`capitalize ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>
                     {tournament.status}
                   </Badge>
                 </div>

@@ -194,7 +194,7 @@ export default function AdminSubmissionsPage() {
         );
         setPreviewImage(null);
         // Refresh submissions data
-        const { submissions } = await getSubmissionsByTournament(
+        const { submissions: any } = await getSubmissionsByTournament(
           selectedTournament,
           currentPage,
           itemsPerPage,
