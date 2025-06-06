@@ -290,6 +290,8 @@ export const getAllTournaments = async () => {
       registration_start: data.registration_start?.toDate?.().toISOString() || null,
       registration_end: data.registration_end?.toDate?.().toISOString() || null,
       submission_deadline: data.submission_deadline?.toDate?.().toISOString() || null,
+      certificates_generated: data.certificates_generated || false,
+      rank_generated: data.rank_generated || false,
       created_at: data.created_at?.toDate?.().toISOString() || null,
       updated_at: data.updated_at?.toDate?.().toISOString() || null
     }

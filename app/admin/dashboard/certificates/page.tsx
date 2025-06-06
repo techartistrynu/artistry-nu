@@ -30,7 +30,7 @@ import {
 } from "@/app/actions/submissions";
 import { generateCertificatesForTournament, generateRanksForTournament } from '@/app/actions/certificates';
 import type { Submission } from "@/app/actions/submissions";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import { Input } from "@/components/ui/input";
 
 interface Tournament {
@@ -58,7 +58,6 @@ export default function AdminCertificatesPage() {
   const [certificatesGenerated, setCertificatesGenerated] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 10;
-
   useEffect(() => {
     const fetchTournaments = async () => {
       try {
@@ -116,7 +115,6 @@ export default function AdminCertificatesPage() {
 
   const generateRank = async () => {
     if (!selectedTournament) {
-      console.log("No tournament selected");
       toast.error("Please select a tournament first");
       return;
     }
@@ -190,6 +188,7 @@ export default function AdminCertificatesPage() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+      {/* <Toaster position="top-right" richColors /> */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h2 className="text-3xl font-bold tracking-tight">Certificates</h2>
 
@@ -336,10 +335,10 @@ export default function AdminCertificatesPage() {
                   </Button>
                   <Button
                     onClick={handleGenerateCertificates}
-                    disabled={(generatingCertificates || !ranksGenerated) && certificatesGenerated}
+                    disabled={generatingCertificates || !ranksGenerated ||certificatesGenerated}
                   >
                     <FileText className="h-4 w-4 mr-2" />
-                    {generatingCertificates ? "Generating Certificates..." : "Generate All Certificates"}
+                    {generatingCertificates ? "Generating Certificates..." : certificatesGenerated ? "Certificates Generated" : "Generate All Certificates"}
                   </Button>
                 </div>
 

@@ -9,13 +9,6 @@ import { FieldValue } from "firebase-admin/firestore";
 import React from 'react'
 import { getStorage } from "firebase-admin/storage"
 
-interface Submission {
-  id: string;
-  score?: number;
-  date_of_birth?: string;
-  applicant_name?: string;
-}
-
 // Helper to fetch related documents
 async function enrichCertificate(cert: any) {
   const [tournamentSnap, submissionSnap, userSnap] = await Promise.all([
@@ -249,7 +242,7 @@ export async function generateCertificatesForTournament(tournamentId: string) {
         // const buffer = await pdf(<CertificateTemplate {...certificateData} />).toBuffer();
 
         // Upload to Firebase Storage (Admin SDK)
-        const filePath = `certificates/${tournamentId}/${doc.id}.pdf`;
+        const filePath = `certificates/${tournamentId}/${doc.id}-${Date.now()}.pdf`;
         const storage = getStorage();
         const bucket = storage.bucket();
         const file = bucket.file(filePath);
@@ -358,9 +351,10 @@ export async function revokeCertificate(certificateId: string) {
 
 export async function generateRanksForTournament(tournamentId: string) {
   try {
+    console.log("Generating ranks for tournament", tournamentId);
     const submissionsSnap = await db.collection("submissions")
       .where("tournament_id", "==", tournamentId)
-      .where("score", "!=", null)
+      // .where("score", "!=", null)
       .get();
 
     if (submissionsSnap.empty) {
@@ -371,6 +365,12 @@ export async function generateRanksForTournament(tournamentId: string) {
       id: doc.id,
       ...doc.data()
     })) as any[];
+
+    console.log("Score is not set for some submissions", submissions.some(sub => !sub.score));
+    if(submissions && submissions.some(sub => !sub.score)) {
+      console.log("Score is not set for some submissions", submissions.filter(sub => !sub.score));
+      return { success: false, message: "Score is not set for some submissions" };
+    }
 
     const sortedSubmissions = [...submissions].sort((a, b) => {
       if (a?.score !== b?.score) return b.score - a.score;
@@ -395,6 +395,7 @@ export async function generateRanksForTournament(tournamentId: string) {
     const tournamentRef = db.collection("tournaments").doc(tournamentId);
     batch.update(tournamentRef, { 
       rank_generated: true,
+      certificates_generated: false,
       rank_generated_at: FieldValue.serverTimestamp() 
     });
 

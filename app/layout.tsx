@@ -5,10 +5,10 @@ import "./globals.css"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/lib/auth-context"
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import { Toaster } from "sonner"
 
 
 const inter = Inter({ subsets: ["latin"] })
@@ -39,7 +39,7 @@ export default function RootLayout({
               <div className="flex-1 px-4 sm:px-6 md:px-8">{children}</div>
               <SiteFooter />
             </div>
-            <Toaster />
+            <Toaster position="top-right" richColors />
           </AuthProvider>
         </ThemeProvider>
       </body>
