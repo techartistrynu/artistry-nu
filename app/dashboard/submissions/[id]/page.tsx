@@ -92,7 +92,11 @@ export default function SubmissionDetailPage() {
         <div className="mt-6 mb-4">
           <h3 className="text-lg font-semibold">Tournament Details</h3>
           <div className="line"><strong>Title:</strong> {tournament?.title || "N/A"}</div>
-          <div className="line"><strong>Category:</strong> {tournament?.category || "N/A"}</div>
+          <div className="line"><strong>Categories:</strong> {Array.isArray(tournament?.categories) ? tournament.categories.join(', ') : tournament?.category || "N/A"}
+          {tournament?.ageCategory && (
+            <span className="ml-2 text-xs text-muted-foreground">(Age: {tournament.ageCategory})</span>
+          )}
+          </div>
         </div>
 
         {submission.submission_files?.length > 0 && (

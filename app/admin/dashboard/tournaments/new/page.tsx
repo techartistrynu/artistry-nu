@@ -38,12 +38,39 @@ function NewTournamentForm() {
       fetchTournamentById(tournamentId).then(data => setDefaultValues(data))
     }
   }, [tournamentId])
+  console.log(defaultValues);
+  
+  const categoryOptions = [
+    { value: "digital-art", label: "Digital Art" },
+    { value: "photography", label: "Photography" },
+    { value: "graphic-design", label: "Graphic Design" },
+    { value: "illustration", label: "Illustration" },
+    { value: "3d-modeling", label: "3D Modeling" },
+  ];
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(defaultValues?.categories || []);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
+  };
+
+  const ageCategoryOptions = [
+    { value: "under-12", label: "Under 12" },
+    { value: "12-17", label: "12-17" },
+    { value: "18-25", label: "18-25" },
+    { value: "26-40", label: "26-40" },
+    { value: "40+", label: "40+" },
+  ];
+  const [selectedAgeCategory, setSelectedAgeCategory] = useState<string>(defaultValues?.ageCategory || "18-25");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
 
     const formData = new FormData(e.currentTarget)
+    selectedCategories.forEach((cat) => formData.append('categories[]', cat));
+    formData.append('ageCategory', selectedAgeCategory);
     if (files) {
       for (const file of files) {
         formData.append('files', file)
@@ -94,17 +121,49 @@ function NewTournamentForm() {
               <Textarea id="description" name="description" defaultValue={defaultValues?.description} rows={4} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select name="category" defaultValue={defaultValues?.category} required>
+              <Label htmlFor="category">Categories</Label>
+              <div className="relative">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full flex justify-between items-center"
+                  onClick={() => setShowCategoryDropdown((prev) => !prev)}
+                >
+                  {selectedCategories.length > 0
+                    ? selectedCategories.map((cat) => categoryOptions.find((o) => o.value === cat)?.label).join(", ")
+                    : "Select categories"}
+                  <span className="ml-2">▼</span>
+                </Button>
+                {showCategoryDropdown && (
+                  <div className="absolute z-10 mt-2 w-full bg-white border rounded shadow p-2 space-y-1">
+                    {categoryOptions.map((option) => (
+                      <label key={option.value} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="categories[]"
+                          value={option.value}
+                          checked={selectedCategories.includes(option.value)}
+                          onChange={() => handleCategoryChange(option.value)}
+                        />
+                        <span>{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ageCategory">Age Category</Label>
+              <Select name="ageCategory" defaultValue={defaultValues?.ageCategory} required>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder="Select age category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="digital-art">Digital Art</SelectItem>
-                  <SelectItem value="photography">Photography</SelectItem>
-                  <SelectItem value="graphic-design">Graphic Design</SelectItem>
-                  <SelectItem value="illustration">Illustration</SelectItem>
-                  <SelectItem value="3d-modeling">3D Modeling</SelectItem>
+                  <SelectItem value="under-12">Under 12</SelectItem>
+                  <SelectItem value="12-17">12-17</SelectItem>
+                  <SelectItem value="18-25">18-25</SelectItem>
+                  <SelectItem value="26-40">26-40</SelectItem>
+                  <SelectItem value="40+">40+</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -125,7 +184,7 @@ function NewTournamentForm() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="entryFee">Entry Fee (₹)</Label>
-                <Input id="entryFee" name="entryFee" type="number" min="0" step="0.01" defaultValue={defaultValues?.entry_fee || 25} required />
+                <Input id="entryFee" name="entryFee" type="number" min="0" step="0.01" defaultValue={defaultValues?.entry_fee} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="files">Upload Banner Image*</Label>

@@ -306,7 +306,8 @@ export async function registerForTournament(formData: FormData) {
 export async function createTournament(formData: FormData) {
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
-  const category = formData.get('category') as string;
+  const categories = formData.getAll('categories[]') as string[];
+  const ageCategory = formData.get('ageCategory') as string;
   const registrationStartDate = formData.get('registrationStartDate') as string;
   const registrationEndDate = formData.get('registrationEndDate') as string;
   const submissionEndDate = formData.get('submissionEndDate') as string;
@@ -314,7 +315,7 @@ export async function createTournament(formData: FormData) {
   const files = formData.getAll('files') as File[];
   const status = registrationStartDate > new Date().toISOString() ? "coming_soon" : "open";
 
-  if (!title || !description || !category || !registrationStartDate || !registrationEndDate || !submissionEndDate || !entryFee || files.length === 0) {
+  if (!title || !description || !categories.length || !registrationStartDate || !registrationEndDate || !submissionEndDate || !entryFee || files.length === 0 || !ageCategory) {
     throw new Error('Missing required fields');
   }
 
@@ -322,7 +323,8 @@ export async function createTournament(formData: FormData) {
   const tournamentRef = await db.collection('tournaments').add({
     title,
     description,
-    category,
+    categories,
+    ageCategory,
     registration_start: Timestamp.fromDate(new Date(registrationStartDate)),
     registration_end: Timestamp.fromDate(new Date(registrationEndDate)),
     submission_deadline: Timestamp.fromDate(new Date(submissionEndDate)),
@@ -368,14 +370,15 @@ export async function editTournament(tournamentId: string, formData: FormData) {
   try {
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
-    const category = formData.get('category') as string;
+    const categories = formData.getAll('categories[]') as string[];
+    const ageCategory = formData.get('ageCategory') as string;
     const registrationStartDate = formData.get('registrationStartDate') as string;
     const registrationEndDate = formData.get('registrationEndDate') as string;
     const submissionEndDate = formData.get('submissionEndDate') as string;
     const entryFee = parseFloat(formData.get('entryFee') as string);
     const files = formData.getAll('files') as File[];
 
-    if (!tournamentId || !title || !description || !category || !registrationStartDate || !registrationEndDate || !submissionEndDate || !entryFee) {
+    if (!tournamentId || !title || !description || !categories.length || !registrationStartDate || !registrationEndDate || !submissionEndDate || !entryFee || !ageCategory) {
       throw new Error('Missing required fields');
     }
 
@@ -384,7 +387,8 @@ export async function editTournament(tournamentId: string, formData: FormData) {
     const updatedData: any = {
       title,
       description,
-      category,
+      categories,
+      ageCategory,
       registration_start: Timestamp.fromDate(new Date(registrationStartDate)),
       registration_end: Timestamp.fromDate(new Date(registrationEndDate)),
       submission_deadline: Timestamp.fromDate(new Date(submissionEndDate)),

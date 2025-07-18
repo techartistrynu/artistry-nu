@@ -36,7 +36,12 @@ export default async function DashboardTournamentsPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle>{tournament.title}</CardTitle>
-                    <CardDescription className="mt-1">{tournament.category}</CardDescription>
+                    <CardDescription className="mt-1">
+                      {Array.isArray(tournament.categories) ? tournament.categories.join(', ') : tournament.category}
+                      {tournament.ageCategory && (
+                        <span className="ml-2 text-xs text-muted-foreground">(Age: {tournament.ageCategory})</span>
+                      )}
+                    </CardDescription>
                   </div>
                   <Badge className={`capitalize ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>{tournament.status}</Badge>
                 </div>
