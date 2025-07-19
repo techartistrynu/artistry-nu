@@ -101,6 +101,9 @@ export async function getTournamentById(id: string) {
       rank_generated_at: toISOString(data?.rank_generated_at),
       certificates_generated: data?.certificates_generated || false,
       certificates_generated_at: toISOString(data?.certificates_generated_at),
+      first_prize: data?.first_prize,
+      second_prize: data?.second_prize,
+      third_prize: data?.third_prize,
       status: (() => {
         const now = new Date();
         const registrationStart = data.registration_start?.toDate?.() || new Date(data.registration_start);
@@ -312,6 +315,9 @@ export async function createTournament(formData: FormData) {
   const registrationEndDate = formData.get('registrationEndDate') as string;
   const submissionEndDate = formData.get('submissionEndDate') as string;
   const entryFee = parseFloat(formData.get('entryFee') as string);
+  const firstPrize = formData.get('firstPrize') ? parseFloat(formData.get('firstPrize') as string) : null;
+  const secondPrize = formData.get('secondPrize') ? parseFloat(formData.get('secondPrize') as string) : null;
+  const thirdPrize = formData.get('thirdPrize') ? parseFloat(formData.get('thirdPrize') as string) : null;
   const files = formData.getAll('files') as File[];
   const status = registrationStartDate > new Date().toISOString() ? "coming_soon" : "open";
 
@@ -329,6 +335,9 @@ export async function createTournament(formData: FormData) {
     registration_end: Timestamp.fromDate(new Date(registrationEndDate)),
     submission_deadline: Timestamp.fromDate(new Date(submissionEndDate)),
     entry_fee: entryFee,
+    first_prize: firstPrize,
+    second_prize: secondPrize,
+    third_prize: thirdPrize,
     created_at: Timestamp.now(),
     updated_at: Timestamp.now(),
     status: status,
@@ -376,6 +385,9 @@ export async function editTournament(tournamentId: string, formData: FormData) {
     const registrationEndDate = formData.get('registrationEndDate') as string;
     const submissionEndDate = formData.get('submissionEndDate') as string;
     const entryFee = parseFloat(formData.get('entryFee') as string);
+    const firstPrize = formData.get('firstPrize') ? parseFloat(formData.get('firstPrize') as string) : null;
+    const secondPrize = formData.get('secondPrize') ? parseFloat(formData.get('secondPrize') as string) : null;
+    const thirdPrize = formData.get('thirdPrize') ? parseFloat(formData.get('thirdPrize') as string) : null;
     const files = formData.getAll('files') as File[];
 
     if (!tournamentId || !title || !description || !categories.length || !registrationStartDate || !registrationEndDate || !submissionEndDate || !entryFee || !ageCategory) {
@@ -393,6 +405,9 @@ export async function editTournament(tournamentId: string, formData: FormData) {
       registration_end: Timestamp.fromDate(new Date(registrationEndDate)),
       submission_deadline: Timestamp.fromDate(new Date(submissionEndDate)),
       entry_fee: entryFee,
+      first_prize: firstPrize,
+      second_prize: secondPrize,
+      third_prize: thirdPrize,
       updated_at: Timestamp.now(),
     };
 

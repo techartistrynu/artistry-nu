@@ -33,13 +33,6 @@ function NewTournamentForm() {
   const [files, setFiles] = useState<FileList | null>(null)
   const [defaultValues, setDefaultValues] = useState<any>(null)
 
-  useEffect(() => {
-    if (tournamentId) {
-      fetchTournamentById(tournamentId).then(data => setDefaultValues(data))
-    }
-  }, [tournamentId])
-  console.log(defaultValues);
-  
   const categoryOptions = [
     { value: "digital-art", label: "Digital Art" },
     { value: "photography", label: "Photography" },
@@ -47,7 +40,7 @@ function NewTournamentForm() {
     { value: "illustration", label: "Illustration" },
     { value: "3d-modeling", label: "3D Modeling" },
   ];
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(defaultValues?.categories || []);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const handleCategoryChange = (value: string) => {
     setSelectedCategories((prev) =>
@@ -62,7 +55,26 @@ function NewTournamentForm() {
     { value: "26-40", label: "26-40" },
     { value: "40+", label: "40+" },
   ];
-  const [selectedAgeCategory, setSelectedAgeCategory] = useState<string>(defaultValues?.ageCategory || "18-25");
+  const [selectedAgeCategory, setSelectedAgeCategory] = useState<string>("18-25");
+
+  useEffect(() => {
+    if (tournamentId) {
+      fetchTournamentById(tournamentId).then(data => {
+        setDefaultValues(data)
+        // Update the selected values when data is loaded
+        if (data && typeof data === 'object') {
+          const tournamentData = data as any
+          if (Array.isArray(tournamentData.categories)) {
+            setSelectedCategories(tournamentData.categories)
+          }
+          if (tournamentData.ageCategory && typeof tournamentData.ageCategory === 'string') {
+            setSelectedAgeCategory(tournamentData.ageCategory)
+          }
+        }
+      })
+    }
+  }, [tournamentId])
+  console.log(defaultValues);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -154,7 +166,12 @@ function NewTournamentForm() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="ageCategory">Age Category</Label>
-              <Select name="ageCategory" defaultValue={defaultValues?.ageCategory} required>
+              <Select 
+                name="ageCategory" 
+                value={selectedAgeCategory} 
+                onValueChange={setSelectedAgeCategory}
+                required
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select age category" />
                 </SelectTrigger>
@@ -167,7 +184,7 @@ function NewTournamentForm() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="registrationStartDate">Registration Start Date</Label>
                 <Input id="registrationStartDate" name="registrationStartDate" type="date" defaultValue={defaultValues?.registration_start?.slice(0, 10)} required />
@@ -176,42 +193,65 @@ function NewTournamentForm() {
                 <Label htmlFor="registrationEndDate">Registration End Date</Label>
                 <Input id="registrationEndDate" name="registrationEndDate" type="date" defaultValue={defaultValues?.registration_end?.slice(0, 10)} required />
               </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="submissionEndDate">Submission End Date</Label>
                 <Input id="submissionEndDate" name="submissionEndDate" type="date" defaultValue={defaultValues?.submission_deadline?.slice(0, 10)} required />
               </div>
+            </div>
+            
+            {/* Price Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Pricing</h3>
               <div className="space-y-2">
                 <Label htmlFor="entryFee">Entry Fee (₹)</Label>
                 <Input id="entryFee" name="entryFee" type="number" min="0" step="0.01" defaultValue={defaultValues?.entry_fee} required />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="files">Upload Banner Image*</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center">
-                  <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-500 mb-2">Drag and drop or click to upload</p>
-                  <Input
-                    id="files"
-                    type="file"
-                    className="hidden"
-                    onChange={(e) => setFiles(e.target.files)}
-                    multiple
-                    accept=".jpg,.jpeg,.png,.pdf,.svg"
-                    required={!tournamentId}
-                  />
-                  <Button type="button" variant="outline" onClick={() => document.getElementById("files")?.click()}>
-                    Select Files
-                  </Button>
+            </div>
+
+            {/* Prize Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Prizes (Optional)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstPrize">1st Prize (₹)</Label>
+                  <Input id="firstPrize" name="firstPrize" type="number" min="0" step="0.01" defaultValue={defaultValues?.first_prize} />
                 </div>
-                {files && (
-                  <ul className="text-sm mt-2 text-gray-500 list-disc list-inside">
-                    {Array.from(files).map((file, idx) => (
-                      <li key={idx}>{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</li>
-                    ))}
-                  </ul>
-                )}
+                <div className="space-y-2">
+                  <Label htmlFor="secondPrize">2nd Prize (₹)</Label>
+                  <Input id="secondPrize" name="secondPrize" type="number" min="0" step="0.01" defaultValue={defaultValues?.second_prize} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="thirdPrize">3rd Prize (₹)</Label>
+                  <Input id="thirdPrize" name="thirdPrize" type="number" min="0" step="0.01" defaultValue={defaultValues?.third_prize} />
+                </div>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="files">Upload Banner Image*</Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center">
+                <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                <p className="text-sm text-gray-500 mb-2">Drag and drop or click to upload</p>
+                <Input
+                  id="files"
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => setFiles(e.target.files)}
+                  multiple
+                  accept=".jpg,.jpeg,.png,.pdf,.svg"
+                  required={!tournamentId}
+                />
+                <Button type="button" variant="outline" onClick={() => document.getElementById("files")?.click()}>
+                  Select Files
+                </Button>
+              </div>
+              {files && (
+                <ul className="text-sm mt-2 text-gray-500 list-disc list-inside">
+                  {Array.from(files).map((file, idx) => (
+                    <li key={idx}>{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</li>
+                  ))}
+                </ul>
+              )}
             </div>
           </CardContent>
           <CardFooter>

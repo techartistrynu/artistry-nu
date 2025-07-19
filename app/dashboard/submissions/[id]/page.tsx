@@ -42,67 +42,223 @@ export default function SubmissionDetailPage() {
     if (!receiptRef.current) return
 
     const printContent = receiptRef.current.innerHTML
-    const printWindow = window.open("", "", "height=600,width=800")
+    const printWindow = window.open("", "", "height=842,width=595")
     if (!printWindow) return
 
-    printWindow.document.write("<html><head><title>Submission Receipt</title>")
-    printWindow.document.write(
-      `<style>
-        body { font-family: sans-serif; padding: 20px; }
-        h2 { color: green; }
-        .line { margin-bottom: 8px; }
-        img { max-width: 100%; height: auto; margin-top: 10px; }
-      </style>`
-    )
-    printWindow.document.write("</head><body>")
-    printWindow.document.write(printContent)
-    printWindow.document.write("</body></html>")
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Payment Receipt</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+            body {
+              font-family: 'Roboto', sans-serif;
+              padding: 40px;
+              max-width: 500px;
+              margin: 0 auto;
+              color: #333;
+              line-height: 1.5;
+            }
+            .receipt-container {
+              border: 1px solid #e2e8f0;
+              padding: 20px;
+              border-radius: 4px;
+            }
+            .receipt-header {
+              text-align: center;
+              margin-bottom: 15px;
+            }
+            .company-name {
+              font-size: 18px;
+              font-weight: 700;
+              margin-bottom: 4px;
+            }
+            .receipt-title {
+              font-size: 16px;
+              font-weight: 600;
+              margin-bottom: 20px;
+              color: #1e40af;
+            }
+            .section-title {
+              font-size: 14px;
+              font-weight: 600;
+              margin: 20px 0 10px 0;
+              color: #1e293b;
+            }
+            .receipt-line {
+              display: flex;
+              margin-bottom: 6px;
+              font-size: 12px;
+            }
+            .receipt-label {
+              font-weight: 500;
+              min-width: 140px;
+              color: #475569;
+            }
+            .divider {
+              border-top: 1px dashed #cbd5e1;
+              margin: 20px 0;
+            }
+            .payment-details {
+              background-color: #f8fafc;
+              padding: 15px;
+              border-radius: 4px;
+              margin-top: 10px;
+            }
+            .total-amount {
+              font-weight: 600;
+              font-size: 15px;
+              margin-top: 8px;
+            }
+            .footer {
+              margin-top: 30px;
+              font-size: 13px;
+              color: #64748b;
+            }
+            .authorized {
+              margin-top: 40px;
+              text-align: right;
+              font-size: 13px;
+              color: #64748b;
+            }
+            .stamp {
+              position: absolute;
+              right: 60px;
+              opacity: 0.7;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="receipt-container">
+            ${printContent}
+          </div>
+        </body>
+      </html>
+    `)
     printWindow.document.close()
-    printWindow.print()
+    printWindow.focus()
+    setTimeout(() => {
+      printWindow.print()
+    }, 300)
   }
 
   if (loading) {
     return (
-      <div className="container px-4 sm:px-6 md:px-8 py-10 md:py-20 flex justify-center">
+      <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     )
   }
 
-  return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-xl">
-      <div ref={receiptRef}>
-        <h2 className="text-2xl font-bold mb-4 text-green-600">🎨 Submission Details</h2>
+  // Calculate amounts based on submission data
+  const baseAmount = 499.00
+  const gstAmount = (baseAmount * 0.18).toFixed(2)
+  const totalAmount = (baseAmount + parseFloat(gstAmount)).toFixed(2)
 
-        <div className="line"><strong>Submission No.:</strong> {submission.submission_number}</div>
-        <div className="line"><strong>Title:</strong> {submission.title}</div>
-        <div className="line"><strong>Description:</strong> {submission.description || "N/A"}</div>
-        <div className="line"><strong>Status:</strong> {submission.status}</div>
-        <div className="line"><strong>Applicant:</strong> {submission.applicant_name || "N/A"}</div>
-        <div className="line"><strong>Phone:</strong> {submission.phone_number || "N/A"}</div>
-        <div className="line"><strong>Payment Status:</strong> {submission.payment_status || "unpaid"}</div>
-        <div className="line"><strong>Paid Amount:</strong> ₹{(submission.paid_amount ?? 0) / 100}</div>
-        <div className="line">
-          <strong>Submitted At:</strong>{" "}
-          {submission.created_at
-            ? new Date(submission.created_at).toLocaleString()
-            : "N/A"}
+  return (
+    <div className="flex flex-col items-center p-4 bg-gray-50 min-h-screen">
+      <div ref={receiptRef} className="w-full max-w-lg bg-white p-8 shadow-sm border border-gray-200 rounded-lg">
+        {/* Receipt Header */}
+        <div className="receipt-header">
+          <div className="company-name font-bold text-xl">ARTISTRYNU PRIVATE LIMITED</div>
+          <div className="receipt-title text-lg font-semibold text-blue-800">Receipt of Payment</div>
         </div>
 
-        <div className="mt-6 mb-4">
-          <h3 className="text-lg font-semibold">Tournament Details</h3>
-          <div className="line"><strong>Title:</strong> {tournament?.title || "N/A"}</div>
-          <div className="line"><strong>Categories:</strong> {Array.isArray(tournament?.categories) ? tournament.categories.join(', ') : tournament?.category || "N/A"}
-          {tournament?.ageCategory && (
-            <span className="ml-2 text-xs text-muted-foreground">(Age: {tournament.ageCategory})</span>
-          )}
+        {/* Competition Details */}
+        <div>
+          <div className="section-title font-medium text-gray-800">Competition Details:</div>
+          <div className="receipt-line">
+            <span className="receipt-label">Category:</span>
+            <span>First Category</span>
+          </div>
+          <div className="receipt-line">
+            <span className="receipt-label">Title:</span>
+            <span>Drawing and Painting</span>
           </div>
         </div>
 
+        <div className="divider border-t border-dashed border-gray-300 my-4" />
+
+        {/* Applicant Details */}
+        <div>
+          <div className="section-title font-medium text-gray-800">Applicant Details:</div>
+          <div className="receipt-line">
+            <span className="receipt-label">Name:</span>
+            <span>{submission.applicant_name || "N/A"}</span>
+          </div>
+          <div className="receipt-line">
+            <span className="receipt-label">Contact:</span>
+            <span>{submission.phone_number || "N/A"}</span>
+          </div>
+          <div className="receipt-line">
+            <span className="receipt-label">Title of Work:</span>
+            <span>{submission.title}</span>
+          </div>
+          <div className="receipt-line">
+            <span className="receipt-label">Submission Number:</span>
+            <span>{submission.submission_number}</span>
+          </div>
+          <div className="receipt-line">
+            <span className="receipt-label">Payment Status:</span>
+            <span className="font-medium text-green-600">Paid</span>
+          </div>
+        </div>
+
+        <div className="divider border-t border-dashed border-gray-300 my-4" />
+
+        {/* Payment Details */}
+        <div>
+          <div className="section-title font-medium text-gray-800">Payment Details:</div>
+          <div className="payment-details bg-gray-50 p-4 rounded">
+            <div className="receipt-line">
+              <span className="receipt-label">Base Amount:</span>
+              <span>₹{baseAmount.toFixed(2)}</span>
+            </div>
+            <div className="receipt-line">
+              <span className="receipt-label">GST (18%):</span>
+              <span>₹{gstAmount}</span>
+            </div>
+            <div className="receipt-line total-amount">
+              <span className="receipt-label">Total Paid:</span>
+              <span>₹{totalAmount}</span>
+            </div>
+            <div className="receipt-line">
+              <span className="receipt-label">Payment Date:</span>
+              <span>{submission.created_at ? new Date(submission.created_at).toLocaleDateString('en-GB') : "N/A"}</span>
+            </div>
+            <div className="receipt-line">
+              <span className="receipt-label">Mode of Payment:</span>
+              <span>Google Pay</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="divider border-t border-dashed border-gray-300 my-4" />
+
+        {/* Confirmation Text */}
+        <p className="text-sm text-gray-600 mt-4">
+          This is to confirm that the above-named applicant has successfully submitted their entry and paid
+          the full fee for participating in the Drawing and Painting competition under the First Category
+          organized by Artistrynu Private Limited.
+        </p>
+
+        {/* Footer */}
+        <div className="footer text-sm text-gray-500 mt-6">
+          <p>Thank you for your participation.</p>
+          <p>For queries, contact: info@artistrynu.com</p>
+        </div>
+
+        {/* Authorized Signature */}
+        <div className="authorized text-sm text-gray-500 mt-8 text-right">
+          <p>Authorized by: Artistrynu Private Limited</p>
+          <p>Date of Issue: {submission.created_at ? new Date(submission.created_at).toLocaleDateString('en-GB') : "N/A"}</p>
+        </div>
+
+        {/* Submission Files (hidden from print) */}
         {submission.submission_files?.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-2">Attached Files</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="mt-8 print:hidden">
+            <h3 className="text-lg font-semibold mb-3">Attached Submission</h3>
+            <div className="grid grid-cols-2 gap-3">
               {submission.submission_files.map((file: any) => (
                 <div key={file.id} className="border rounded p-2">
                   <a href={file.url} target="_blank" rel="noopener noreferrer">
@@ -111,10 +267,10 @@ export default function SubmissionDetailPage() {
                       alt={file.name || "Submission file"}
                       width={200}
                       height={200}
-                      className="rounded shadow"
+                      className="rounded shadow w-full h-auto"
                     />
                   </a>
-                  <p className="text-sm mt-1 truncate">{file.name}</p>
+                  <p className="text-xs mt-1 truncate">{file.name}</p>
                 </div>
               ))}
             </div>
@@ -122,8 +278,11 @@ export default function SubmissionDetailPage() {
         )}
       </div>
 
-      <div className="mt-6 flex justify-end">
-        <Button onClick={handleDownloadReceipt}>Download Receipt</Button>
+      {/* Download Button (hidden from print) */}
+      <div className="mt-6 print:hidden">
+        <Button onClick={handleDownloadReceipt} className="bg-blue-600 hover:bg-blue-700">
+          Download Receipt
+        </Button>
       </div>
     </div>
   )

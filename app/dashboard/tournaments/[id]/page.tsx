@@ -68,8 +68,26 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
             </div>
             <div className="space-y-2">
               <h3 className="font-medium">Entry Fee</h3>
-              <p className="text-sm text-muted-foreground">₹{tournament.entry_fee}</p>
+              <p className="text-sm text-muted-foreground">₹{tournament.entry_fee} +GST</p>
             </div>
+            
+            {/* Prize Section */}
+            {(tournament.first_prize || tournament.second_prize || tournament.third_prize) && (
+              <div className="space-y-2">
+                <h3 className="font-medium">Prizes</h3>
+                <div className="space-y-1">
+                  {tournament.first_prize && (
+                    <p className="text-sm text-muted-foreground">1st Prize: ₹{tournament.first_prize}</p>
+                  )}
+                  {tournament.second_prize && (
+                    <p className="text-sm text-muted-foreground">2nd Prize: ₹{tournament.second_prize}</p>
+                  )}
+                  {tournament.third_prize && (
+                    <p className="text-sm text-muted-foreground">3rd Prize: ₹{tournament.third_prize}</p>
+                  )}
+                </div>
+              </div>
+            )}
             <div className="space-y-2">
               <h3 className="font-medium">Status</h3>
               <div

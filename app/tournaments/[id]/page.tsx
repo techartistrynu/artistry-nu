@@ -80,7 +80,7 @@ export default function TournamentPage() {
       <div className="container px-4 sm:px-6 md:px-8 py-10 md:py-20">
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
-            <CardTitle>Tournament Not Found</CardTitle>
+            <CardTitle>Competition Not Found</CardTitle>
             <CardDescription>The tournament you are looking for does not exist.</CardDescription>
           </CardHeader>
           <CardFooter>
@@ -108,8 +108,8 @@ export default function TournamentPage() {
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Tournament Details</CardTitle>
-              <CardDescription>Information about this tournament</CardDescription>
+              <CardTitle>Competition Details</CardTitle>
+              <CardDescription>Information about this competition</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -169,7 +169,7 @@ export default function TournamentPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Tournament Status</CardTitle>
+              <CardTitle>Competition Status</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -207,7 +207,7 @@ export default function TournamentPage() {
                       <DollarSign className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium">Entry Fee:</span>
                     </div>
-                    <span className="text-sm font-medium">₹{tournament.entry_fee}</span>
+                    <span className="text-sm font-medium">₹{tournament.entry_fee} +GST</span>
                   </div>
                 </div>
               </div>
@@ -223,36 +223,44 @@ export default function TournamentPage() {
             </CardFooter>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Award className="h-5 w-5" />
-                <span>Prizes</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">1st Place:</span>
-                    <span className="text-sm">₹5000 + Certificate</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">2nd Place:</span>
-                    <span className="text-sm">₹2500 + Certificate</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">3rd Place:</span>
-                    <span className="text-sm">₹1000 + Certificate</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Honorable Mentions:</span>
-                    <span className="text-sm">Certificate</span>
+          {(tournament.first_prize || tournament.second_prize || tournament.third_prize) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-5 w-5" />
+                  <span>Prizes</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    {tournament.first_prize && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">1st Place:</span>
+                        <span className="text-sm">₹{tournament.first_prize} + Certificate</span>
+                      </div>
+                    )}
+                    {tournament.second_prize && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">2nd Place:</span>
+                        <span className="text-sm">₹{tournament.second_prize} + Certificate</span>
+                      </div>
+                    )}
+                    {tournament.third_prize && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">3rd Place:</span>
+                        <span className="text-sm">₹{tournament.third_prize} + Certificate</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Honorable Mentions:</span>
+                      <span className="text-sm">Certificate</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>
