@@ -1,5 +1,13 @@
 import Link from "next/link"
 import { Facebook, Instagram, Youtube, Linkedin, X } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  icons: [
+    { rel: "icon", url: "/favicon.ico" },
+    { rel: "apple-touch-icon", url: "/favicon.ico" },
+  ],
+}
 
 export function SiteFooter() {
   return (
@@ -7,7 +15,7 @@ export function SiteFooter() {
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 py-10 px-6 md:px-12">
         {/* Social Section */}
         <div>
-          <h3 className="text-xl font-semibold mb-2">Connect our socials</h3>
+          <div className="text-xl font-semibold mb-2">Connect our socials</div>
           <p className="text-sm text-gray-300 mb-4">
             Fostering creativity through art and design services.
           </p>
@@ -36,19 +44,18 @@ export function SiteFooter() {
 
         {/* Contact Section */}
         <div>
-          <h3 className="text-xl font-semibold mb-2">Contact us</h3>
-          <ul className="text-sm text-gray-300 space-y-1">
+          <div className="text-xl font-semibold mb-2">Contact us</div>
+          <ul className="text-sm text-gray-300 space-y-1 font-sans text-lg">
             <li>Phone - +91-8527339721</li>
             <li>Whatsapp - +91-8527339721</li>
             <li>support@artistrynu.com</li>
-            <li>support@artistrynu.in</li>
             <li>artistrynu@gmail.com</li>
           </ul>
         </div>
 
         {/* Subscribe Section */}
         <div>
-          <h3 className="text-xl font-semibold mb-2">Subscribe</h3>
+          <div className="text-xl font-semibold mb-2">Subscribe</div>
           <p className="text-sm text-gray-300 mb-2">Enter your email address</p>
           <form className="flex flex-col sm:flex-row gap-2">
             <input

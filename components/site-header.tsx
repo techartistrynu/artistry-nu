@@ -103,9 +103,14 @@ export function SiteHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
           <Link
             href="https://www.artistrynu.com/artistrynucomabout-artistrynu-artists-empowerment-and-networking"
+            className="text-sm font-medium"
+          >
+            Blogs/Videos
+          </Link>
+          <Link
+            href="https://www.artistrynu.com/artistrynucomart-blog-insights-art-blog-and-industry-trends-finearts-paintingguids-creativedesigninsights"
             className="text-sm font-medium"
           >
             About

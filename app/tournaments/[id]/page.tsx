@@ -81,11 +81,11 @@ export default function TournamentPage() {
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
             <CardTitle>Competition Not Found</CardTitle>
-            <CardDescription>The tournament you are looking for does not exist.</CardDescription>
+            <CardDescription>The competition you are looking for does not exist.</CardDescription>
           </CardHeader>
           <CardFooter>
             <Link href="/tournaments">
-              <Button>Back to Tournaments</Button>
+              <Button>Back to Competitions</Button>
             </Link>
           </CardFooter>
         </Card>
