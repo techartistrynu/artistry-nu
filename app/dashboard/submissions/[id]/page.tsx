@@ -151,7 +151,7 @@ export default function SubmissionDetailPage() {
   }
 
   // Calculate amounts based on submission data
-  const baseAmount = 499.00
+  const baseAmount = submission.paid_amount / 100
   const gstAmount = (baseAmount * 0.18).toFixed(2)
   const totalAmount = (baseAmount + parseFloat(gstAmount)).toFixed(2)
 
@@ -230,6 +230,10 @@ export default function SubmissionDetailPage() {
               <span className="receipt-label">Mode of Payment:</span>
               <span>Google Pay</span>
             </div>
+            <div className="receipt-line">
+              <span className="receipt-label">Payment Reference ID:</span>
+              <span>{submission.razorpay_payment_id}</span>
+            </div>
           </div>
         </div>
 
@@ -245,7 +249,7 @@ export default function SubmissionDetailPage() {
         {/* Footer */}
         <div className="footer text-sm text-gray-500 mt-6">
           <p>Thank you for your participation.</p>
-          <p>For queries, contact: info@artistrynu.com</p>
+          <p>For queries, contact: support@artistrynu.com</p>
         </div>
 
         {/* Authorized Signature */}
