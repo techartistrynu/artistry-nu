@@ -1,43 +1,114 @@
+"use client"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { getSubmissionById, updateSubmissionScore } from "@/app/actions/submissions"
-import { notFound } from "next/navigation"
+import { notFound, useParams } from "next/navigation"
 import Image from "next/image"
 import { toast } from "@/components/ui/use-toast"
-import { ArrowLeft, Star, User, Mail, Award, FileText, Calendar, CheckCircle2, XCircle, Phone, Cake, Ear } from "lucide-react"
+import { ArrowLeft, Star, User, Mail, Award, FileText, Calendar, CheckCircle2, XCircle, Phone, Cake, Ear, Download } from "lucide-react"
 import Link from "next/link"
 import { DownloadButton } from "../../../../../components/download-button"
 import { SubmissionReviewForm } from "./components/submission-review-form"
+import { useRef, useState, useEffect } from "react"
+import html2canvas from "html2canvas"
+import jsPDF from "jspdf"
 
-export default async function SubmissionDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  const submission = await getSubmissionById(id)
+export default function SubmissionDetailPage() {
+  const params = useParams()
+  const [submission, setSubmission] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const receiptRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const fetchSubmission = async () => {
+      try {
+        const data = await getSubmissionById(params.id as string)
+        setSubmission(data)
+      } catch (error) {
+        console.error("Failed to fetch submission:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSubmission()
+  }, [params.id])
+
+  const handleDownloadReceipt = async () => {
+    if (!receiptRef.current || !submission) return
+
+    try {
+      const canvas = await html2canvas(receiptRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: true,
+      })
+      
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const imgWidth = 240 // A4 width in mm
+      const pageHeight = 295 // A4 height in mm
+      const imgHeight = canvas.height * imgWidth / canvas.width
+      let heightLeft = imgHeight
+      let position = 0
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      heightLeft -= pageHeight
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        heightLeft -= pageHeight
+      }
+
+      pdf.save(`submission-${submission.submission_number || params.id}.pdf`)
+    } catch (error) {
+      console.error("Error generating PDF:", error)
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF",
+        variant: "destructive",
+      })
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="container px-4 sm:px-6 md:px-8 py-10 md:py-12 flex justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
   
   if (!submission) {
     return notFound()
   }
 
   return (
-    <div className="container px-4 sm:px-6 md:px-8 py-10 md:py-12">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/admin/dashboard/submissions">
-          <Button variant="outline" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Submission Review</h1>
-          <p className="text-muted-foreground">
-            {submission.tournament?.title || "Tournament submission"}
-          </p>
+    <div className="container px-4 sm:px-6 md:px-8 py-10 md:py-12" ref={receiptRef}>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+          <Link href="/admin/dashboard/submissions">
+            <Button variant="outline" size="icon">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Submission Review</h1>
+            <p className="text-muted-foreground">
+              {submission.tournament?.title || "Tournament submission"}
+            </p>
+          </div>
         </div>
+        <Button onClick={handleDownloadReceipt} className="gap-2 w-full md:w-auto">
+          <Download className="h-4 w-4" />
+          Export as PDF
+        </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -191,7 +262,7 @@ export default async function SubmissionDetailPage({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SubmissionReviewForm submissionId={id} initialScore={submission.score} />
+              <SubmissionReviewForm submissionId={params.id as string} initialScore={submission.score} />
             </CardContent>
           </Card>
 

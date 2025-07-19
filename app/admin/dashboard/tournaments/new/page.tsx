@@ -34,11 +34,14 @@ function NewTournamentForm() {
   const [defaultValues, setDefaultValues] = useState<any>(null)
 
   const categoryOptions = [
-    { value: "digital-art", label: "Digital Art" },
     { value: "photography", label: "Photography" },
-    { value: "graphic-design", label: "Graphic Design" },
     { value: "illustration", label: "Illustration" },
     { value: "3d-modeling", label: "3D Modeling" },
+    { value: "painting", label: "Painting" },
+    { value: "sculpture", label: "Sculpture" },
+    { value: "drawing", label: "Drawing" },
+    { value: "print-making-art", label: "Print Making Art" },
+    { value: "other", label: "Other" },
   ];
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
@@ -114,14 +117,14 @@ function NewTournamentForm() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <h2 className="text-3xl font-bold tracking-tight">
-          {tournamentId ? 'Edit Tournament' : 'Create New Tournament'}
+          {tournamentId ? 'Edit Tournament' : 'Create New Competition'}
         </h2>
       </div>
 
       <Card>
         <form onSubmit={handleSubmit}>
           <CardHeader>
-            <CardTitle>Tournament Details</CardTitle>
+            <CardTitle>Competition Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
