@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getAllTournaments } from "../actions/tournaments";
 import { toast } from "sonner";
+import { getCategoryLabels } from "@/lib/utils";
 
 export default function TournamentsPage() {
   const { data: session } = useSession()
@@ -73,12 +74,12 @@ export default function TournamentsPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle>{tournament.title}</CardTitle>
-                    <CardDescription className="mt-1">
-                      {Array.isArray(tournament.categories) ? tournament.categories.join(', ') : tournament.category}
-                      {tournament.ageCategory && (
-                        <span className="ml-2 text-xs text-muted-foreground">(Age: {tournament.ageCategory})</span>
-                      )}
-                    </CardDescription>
+                      <CardDescription className="mt-1">
+                        {Array.isArray(tournament.categories) ? getCategoryLabels(tournament.categories) : tournament.category}
+                        {tournament.ageCategory && (
+                          <span className="ml-2 text-xs text-muted-foreground">(Age: {tournament.ageCategory})</span>
+                        )}
+                      </CardDescription>
                   </div>
                   <Badge className={`capitalize ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>{tournament.status}</Badge>
                 </div>

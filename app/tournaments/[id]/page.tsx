@@ -10,6 +10,7 @@ import { toast } from "@/components/ui/use-toast"
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { getTournamentById } from "@/app/actions/tournaments"
+import { getAgeRangeFromCategory, getCategoryLabels } from "@/lib/utils"
 
 export default function TournamentPage() {
   const params = useParams()
@@ -139,17 +140,18 @@ export default function TournamentPage() {
                   <h3 className="text-lg font-medium">Eligibility</h3>
                   <ul className="list-disc pl-5 text-muted-foreground">
                     <li>Open to all students enrolled in an accredited educational institution</li>
-                    <li>Participants must be at least 16 years of age</li>
+                    <li>Participants must be {getAgeRangeFromCategory(tournament.age_category || "21-34")}</li>
                     <li>Previous winners are eligible to participate</li>
                   </ul>
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-lg font-medium">Submission Requirements</h3>
                   <ul className="list-disc pl-5 text-muted-foreground">
+                    <li>All submissions come under these categories: {getCategoryLabels(tournament.categories)} are only accepted.</li>
                     <li>All submissions must be original work created by the participant</li>
                     <li>Submissions must adhere to the tournament theme</li>
-                    <li>File formats: JPG, PNG, PDF (max 10MB per file)</li>
-                    <li>Maximum of 3 entries per participant</li>
+                    <li>File formats: JPG, PNG, PDF (max 5MB per file)</li>
+                    <li>Maximum of 1 entries per participant</li>
                   </ul>
                 </div>
                 <div className="space-y-2">
