@@ -52,11 +52,10 @@ function NewTournamentForm() {
   };
 
   const ageCategoryOptions = [
-    { value: "under-12", label: "Under 12" },
-    { value: "12-17", label: "12-17" },
-    { value: "18-25", label: "18-25" },
-    { value: "26-40", label: "26-40" },
-    { value: "40+", label: "40+" },
+    { value: "5-12", label: "5-12" },
+    { value: "13-20", label: "13-20" },
+    { value: "21-34", label: "21-34" },
+    { value: "35+", label: "35+" },
   ];
   const [selectedAgeCategory, setSelectedAgeCategory] = useState<string>("18-25");
 
@@ -179,11 +178,11 @@ function NewTournamentForm() {
                   <SelectValue placeholder="Select age category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="under-12">Under 12</SelectItem>
-                  <SelectItem value="12-17">12-17</SelectItem>
-                  <SelectItem value="18-25">18-25</SelectItem>
-                  <SelectItem value="26-40">26-40</SelectItem>
-                  <SelectItem value="40+">40+</SelectItem>
+                  {ageCategoryOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
