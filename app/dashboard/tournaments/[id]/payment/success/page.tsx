@@ -284,7 +284,7 @@ export default function PaymentSuccessPage() {
 
       {/* Download Button (hidden from print) */}
       <div className="mt-6 print:hidden">
-        <Button onClick={handleDownloadReceipt} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={handleDownloadReceipt}>
           Download Receipt
         </Button>
       </div>
