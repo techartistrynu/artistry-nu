@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, DollarSign } from "lucide-react"
+import { Calendar, Clock, BadgeIndianRupee } from "lucide-react"
 import Link from "next/link"
 import { getAllTournamentForUser, getAllTournaments } from "@/app/actions/tournaments"
 import { getServerSession } from "next-auth/next"
@@ -68,7 +68,7 @@ export default async function DashboardTournamentsPage() {
                     <span>Submission Deadline: {new Date(tournament.submission_deadline).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center text-sm">
-                    <DollarSign className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <BadgeIndianRupee className="mr-2 h-4 w-4 text-muted-foreground" />
                     <span>Entry Fee: ₹{tournament.entry_fee}</span>
                   </div>
                 </div>

@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, DollarSign } from "lucide-react";
+import { Calendar, Clock, BadgeIndianRupee } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -109,7 +109,7 @@ export default function TournamentsPage() {
                     </span>
                   </div>
                   <div className="flex items-center text-sm">
-                    <DollarSign className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <BadgeIndianRupee className="mr-2 h-4 w-4 text-muted-foreground" />
                     <span>Entry Fee: ₹{tournament.entry_fee}</span>
                   </div>
                 </div>

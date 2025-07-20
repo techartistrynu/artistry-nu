@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Calendar, Clock, DollarSign, Award } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, Award, BadgeIndianRupee } from "lucide-react"
 import Link from "next/link"
 import { useSession, signIn } from "next-auth/react"
 import { toast } from "@/components/ui/use-toast"
@@ -204,7 +204,7 @@ export default function TournamentPage() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      <BadgeIndianRupee className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium">Entry Fee:</span>
                     </div>
                     <span className="text-sm font-medium">₹{tournament.entry_fee} +GST</span>

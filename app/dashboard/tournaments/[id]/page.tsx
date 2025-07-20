@@ -20,12 +20,12 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
       <div className="container mx-auto py-8">
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
-            <CardTitle>Tournament Not Found</CardTitle>
-            <CardDescription>The tournament you are looking for does not exist.</CardDescription>
+            <CardTitle>Competition Not Found</CardTitle>
+            <CardDescription>The competition you are looking for does not exist.</CardDescription>
           </CardHeader>
           <CardFooter>
             <Link href="/dashboard/tournaments">
-              <Button>Back to Tournaments</Button>
+              <Button>Back to Competitions</Button>
             </Link>
           </CardFooter>
         </Card>
@@ -45,7 +45,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
       <Card className="max-w-3xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl">{tournament.title}</CardTitle>
-          <CardDescription>Tournament Details</CardDescription>
+          <CardDescription>Competition Details</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="prose dark:prose-invert">

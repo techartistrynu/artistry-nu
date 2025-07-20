@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Calendar, Clock, DollarSign, Award } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, BadgeIndianRupee, Award } from "lucide-react"
 import Link from "next/link"
 import { useSession, signIn } from "next-auth/react"
 import { toast } from "@/components/ui/use-toast"
@@ -58,12 +58,12 @@ export default function TournamentPage() {
       <div className="container px-4 sm:px-6 md:px-8 py-10 md:py-20">
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
-            <CardTitle>Tournament Not Found</CardTitle>
-            <CardDescription>The tournament you are looking for does not exist.</CardDescription>
+            <CardTitle>Competition Not Found</CardTitle>
+            <CardDescription>The competition you are looking for does not exist.</CardDescription>
           </CardHeader>
           <CardFooter>
             <Link href="/admin/dashboard/tournaments">
-              <Button>Back to Tournaments</Button>
+              <Button>Back to Competitions</Button>
             </Link>
           </CardFooter>
         </Card>
@@ -86,8 +86,8 @@ export default function TournamentPage() {
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Tournament Details</CardTitle>
-              <CardDescription>Information about this tournament</CardDescription>
+              <CardTitle>Competition Details</CardTitle>
+              <CardDescription>Information about this competition</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -147,7 +147,7 @@ export default function TournamentPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Tournament Status</CardTitle>
+              <CardTitle>Competition Status</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -182,40 +182,12 @@ export default function TournamentPage() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      <BadgeIndianRupee className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium">Entry Fee:</span>
                     </div>
                     <span className="text-sm font-medium">₹{tournament.entry_fee}</span>
                   </div>
                 </div>
-                
-                {/* Prize Section */}
-                {(tournament.first_prize || tournament.second_prize || tournament.third_prize) && (
-                  <div className="space-y-3 pt-4 border-t">
-                    <div className="flex items-center gap-2">
-                      <Award className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">Prizes:</span>
-                    </div>
-                    {tournament.first_prize && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">1st Prize:</span>
-                        <span className="text-sm font-medium">₹{tournament.first_prize}</span>
-                      </div>
-                    )}
-                    {tournament.second_prize && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">2nd Prize:</span>
-                        <span className="text-sm font-medium">₹{tournament.second_prize}</span>
-                      </div>
-                    )}
-                    {tournament.third_prize && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">3rd Prize:</span>
-                        <span className="text-sm font-medium">₹{tournament.third_prize}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             </CardContent>
             <CardFooter>
