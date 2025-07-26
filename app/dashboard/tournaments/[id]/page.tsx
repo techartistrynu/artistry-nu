@@ -34,7 +34,9 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
     )
   }
 
-  const existingSubmission = await getUserSubmissionForTournament(userId, paramId)
+  const existingSubmission = null;
+
+  // const existingSubmission = await getUserSubmissionForTournament(userId, paramId)
 
   const isRegistrationOpen =
     tournament.status === "open" &&
@@ -114,15 +116,15 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
             </ul>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex flex-col md:flex-row md:justify-between gap-2">
           <Link href="/dashboard/tournaments">
             <Button variant="outline">Back to Competition Enrollment</Button>
           </Link>
 
           {existingSubmission ? (
-            <Link href={`/dashboard/submissions/${existingSubmission.id}`}>
+            // <Link href={`/dashboard/submissions/${existingSubmission?.id}`}>
               <Button>View Your Submission</Button>
-            </Link>
+            // </Link>
           ) : isRegistrationOpen ? (
             <Link href={`/dashboard/tournaments/${tournament.id}/submit`}>
               <Button>Submit Entry</Button>

@@ -151,7 +151,7 @@ export default function TournamentPage() {
                     <li>All submissions must be original work created by the participant</li>
                     <li>Submissions must adhere to the tournament theme</li>
                     <li>File formats: JPG, PNG (max 5MB per file)</li>
-                    <li>Maximum of 1 entries per participant</li>
+                    <li>Maximum of 5 entries per participant</li>
                   </ul>
                 </div>
                 <div className="space-y-2">

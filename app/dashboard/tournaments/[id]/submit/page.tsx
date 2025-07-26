@@ -65,10 +65,10 @@ export default function SubmitToTournamentPage() {
       try {
         setIsLoading(true);
         const tournamentData = await getTournamentById(tournamentId as string);
-        const existingSubmission = await getUserSubmissionForTournament(
-          userId,
-          tournamentId
-        );
+        // const existingSubmission = await getUserSubmissionForTournament(
+        //   userId,
+        //   tournamentId
+        // );
         setTournament(tournamentData);
         setExistingSubmission(existingSubmission);
       } catch (error) {
@@ -266,6 +266,19 @@ export default function SubmitToTournamentPage() {
       return;
     }
 
+    // File size validation (max 5MB per file)
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    for (const file of Array.from(files)) {
+      if (file.size > maxFileSize) {
+        toast({
+          title: "File Too Large",
+          description: `Each file must be under 5MB. "${file.name}" is too large.`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     if (dateOfBirth > new Date()) {
       toast({
         title: "Invalid Date of Birth",
@@ -421,7 +434,7 @@ export default function SubmitToTournamentPage() {
                   className="hidden"
                   onChange={(e) => setFiles(e.target.files)}
                   multiple
-                  accept=".jpg,.jpeg,.png,.pdf,.svg"
+                  accept=".jpg,.jpeg,.png,.svg"
                   required
                 />
                 <Button
