@@ -10,7 +10,7 @@ import { toast } from "@/components/ui/use-toast"
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { getTournamentById } from "@/app/actions/tournaments"
-import { getAgeRangeFromCategory, getCategoryLabels } from "@/lib/utils"
+import { getAgeRangeFromCategory, getCategoryLabels, getTournamentStatusText } from "@/lib/utils"
 
 export default function TournamentPage() {
   const params = useParams()
@@ -155,7 +155,7 @@ export default function TournamentPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Badge variant={tournament.status === "open" ? "default" : "secondary"} className="capitalize">
-                    {tournament.status}
+                    {getTournamentStatusText(tournament.status)}
                   </Badge>
                 </div>
                 <div className="space-y-2">
@@ -205,33 +205,53 @@ export default function TournamentPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    {tournament.first_prize && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">1st Place:</span>
-                        <span className="text-sm">₹{tournament.first_prize} + Certificate</span>
-                      </div>
-                    )}
-                    {tournament.second_prize && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">2nd Place:</span>
-                        <span className="text-sm">₹{tournament.second_prize} + Certificate</span>
-                      </div>
-                    )}
-                    {tournament.third_prize && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">3rd Place:</span>
-                        <span className="text-sm">₹{tournament.third_prize} + Certificate</span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Honorable Mentions:</span>
-                      <span className="text-sm">Certificate</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
+  <div className="space-y-4">
+    <div className="space-y-2">
+      {tournament.first_prize && (
+        <div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">1st Place:</span>
+            <span className="text-sm">₹{tournament.first_prize}</span>
+          </div>
+          <div className="pl-4 text-sm text-muted-foreground">
+            (Framed Certificate + Gift Hamper + Free Voucher)
+          </div>
+        </div>
+      )}
+      {tournament.second_prize && (
+        <div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">2nd Place:</span>
+            <span className="text-sm">₹{tournament.second_prize}</span>
+          </div>
+          <div className="pl-4 text-sm text-muted-foreground">
+            (Framed Certificate + Gift Hamper + Free Voucher)
+          </div>
+        </div>
+      )}
+      {tournament.third_prize && (
+        <div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">3rd Place:</span>
+            <span className="text-sm">₹{tournament.third_prize}</span>
+          </div>
+          <div className="pl-4 text-sm text-muted-foreground">
+            (Framed Certificate + Gift Hamper + Free Voucher)
+          </div>
+        </div>
+      )}
+      <div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Honorable Mentions:</span>
+          <span className="text-sm">₹1000</span>
+        </div>
+        <div className="pl-4 text-sm text-muted-foreground">
+          + E-Certificate
+        </div>
+      </div>
+    </div>
+  </div>
+</CardContent>
             </Card>
           )}
 

@@ -1,8 +1,24 @@
-import { clsx, type ClassValue } from "clsx"
+import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+// Function to get user-friendly tournament status text
+export function getTournamentStatusText(status: string): string {
+  switch (status) {
+    case "submission_period":
+      return "Submission Period"
+    case "open":
+      return "Open"
+    case "closed":
+      return "Closed"
+    case "coming_soon":
+      return "Coming Soon"
+    default:
+      return status.charAt(0).toUpperCase() + status.slice(1)
+  }
 }
 
 export function getAgeRangeFromCategory(ageCategory: string): string {

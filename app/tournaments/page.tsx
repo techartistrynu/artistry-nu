@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getAllTournaments } from "../actions/tournaments";
 import { toast } from "sonner";
-import { getCategoryLabels } from "@/lib/utils";
+import { getCategoryLabels, getTournamentStatusText } from "@/lib/utils";
 
 export default function TournamentsPage() {
   const { data: session } = useSession()
@@ -81,7 +81,7 @@ export default function TournamentsPage() {
                         )}
                       </CardDescription>
                   </div>
-                  <Badge className={`capitalize ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>{tournament.status}</Badge>
+                  <Badge className={`capitalize ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>{getTournamentStatusText(tournament.status)}</Badge>
                 </div>
               </CardHeader>
               <CardContent className="flex-1">

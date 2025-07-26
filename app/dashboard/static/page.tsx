@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Trophy, Upload, CreditCard, Award } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { getTournamentStatusText } from "@/lib/utils"
 
 // Static fallback data
 const staticData = {
@@ -149,7 +150,7 @@ export default function StaticDashboardPage() {
                             : "bg-yellow-500/10 text-yellow-500"
                         }`}
                       >
-                        Registration: {tournament.status === "open" ? "Open" : "Coming Soon"}
+                        Registration: {getTournamentStatusText(tournament.status)}
                       </div>
                       <div className="rounded-full bg-muted px-3 py-1 text-xs">
                         Deadline: {new Date(tournament.submission_deadline).toLocaleDateString()}

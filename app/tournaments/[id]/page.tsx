@@ -10,7 +10,7 @@ import { toast } from "@/components/ui/use-toast"
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { getTournamentById } from "@/app/actions/tournaments"
-import { getAgeRangeFromCategory, getCategoryLabels } from "@/lib/utils"
+import { getAgeRangeFromCategory, getCategoryLabels, getTournamentStatusText } from "@/lib/utils"
 
 export default function TournamentPage() {
   const params = useParams()
@@ -139,7 +139,7 @@ export default function TournamentPage() {
                 <div className="space-y-2">
                   <h3 className="text-lg font-medium">Eligibility</h3>
                   <ul className="list-disc pl-5 text-muted-foreground">
-                    <li>Open to all students enrolled in an accredited educational institution</li>
+                    <li>Open to all candidates</li>
                     <li>Participants must be {getAgeRangeFromCategory(tournament.age_category || "21-34")}</li>
                     <li>Previous winners are eligible to participate</li>
                   </ul>
@@ -150,7 +150,7 @@ export default function TournamentPage() {
                     <li>All submissions come under these categories: {getCategoryLabels(tournament.categories)} are only accepted.</li>
                     <li>All submissions must be original work created by the participant</li>
                     <li>Submissions must adhere to the tournament theme</li>
-                    <li>File formats: JPG, PNG, PDF (max 5MB per file)</li>
+                    <li>File formats: JPG, PNG (max 5MB per file)</li>
                     <li>Maximum of 1 entries per participant</li>
                   </ul>
                 </div>
@@ -177,7 +177,7 @@ export default function TournamentPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Badge className={`capitalize ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>
-                    {tournament.status}
+                    {getTournamentStatusText(tournament.status)}
                   </Badge>
                 </div>
                 <div className="space-y-2">
@@ -209,7 +209,7 @@ export default function TournamentPage() {
                       <BadgeIndianRupee className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium">Entry Fee:</span>
                     </div>
-                    <span className="text-sm font-medium">₹{tournament.entry_fee} +GST</span>
+                    <span className="text-sm font-medium">₹{tournament.entry_fee}</span>
                   </div>
                 </div>
               </div>
@@ -239,24 +239,24 @@ export default function TournamentPage() {
                     {tournament.first_prize && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">1st Place:</span>
-                        <span className="text-sm">₹{tournament.first_prize} + Certificate</span>
+                        <span className="text-sm">₹{tournament.first_prize} (Framed Certificate + Gift Hamper + Free Voucher)</span>
                       </div>
                     )}
                     {tournament.second_prize && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">2nd Place:</span>
-                        <span className="text-sm">₹{tournament.second_prize} + Certificate</span>
+                        <span className="text-sm">₹{tournament.second_prize} (Framed Certificate + Gift Hamper + Free Voucher)</span>
                       </div>
                     )}
                     {tournament.third_prize && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">3rd Place:</span>
-                        <span className="text-sm">₹{tournament.third_prize} + Certificate</span>
+                        <span className="text-sm">₹{tournament.third_prize} (Framed Certificate + Gift Hamper + Free Voucher)</span>
                       </div>
                     )}
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Honorable Mentions:</span>
-                      <span className="text-sm">Certificate</span>
+                      <span className="text-sm">₹1000 + E-Certificate</span>
                     </div>
                   </div>
                 </div>

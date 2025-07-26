@@ -8,6 +8,7 @@ import Link from "next/link"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
+import { getTournamentStatusText } from "@/lib/utils"
 
 export default async function TournamentDetailPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
@@ -68,7 +69,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
             </div>
             <div className="space-y-2">
               <h3 className="font-medium">Entry Fee</h3>
-              <p className="text-sm text-muted-foreground">₹{tournament.entry_fee} +GST</p>
+              <p className="text-sm text-muted-foreground">₹{tournament.entry_fee}</p>
             </div>
             
             {/* Prize Section */}
@@ -77,13 +78,13 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
                 <h3 className="font-medium">Prizes</h3>
                 <div className="space-y-1">
                   {tournament.first_prize && (
-                    <p className="text-sm text-muted-foreground">1st Prize: ₹{tournament.first_prize}</p>
+                    <p className="text-sm text-muted-foreground">1st Prize: ₹{tournament.first_prize} (Framed Certificate + Gift Hamper + Free Voucher)</p>
                   )}
                   {tournament.second_prize && (
-                    <p className="text-sm text-muted-foreground">2nd Prize: ₹{tournament.second_prize}</p>
+                    <p className="text-sm text-muted-foreground">2nd Prize: ₹{tournament.second_prize} (Framed Certificate + Gift Hamper + Free Voucher)</p>
                   )}
                   {tournament.third_prize && (
-                    <p className="text-sm text-muted-foreground">3rd Prize: ₹{tournament.third_prize}</p>
+                    <p className="text-sm text-muted-foreground">3rd Prize: ₹{tournament.third_prize} (Framed Certificate + Gift Hamper + Free Voucher)</p>
                   )}
                 </div>
               </div>
@@ -94,10 +95,11 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                   tournament.status === "open"
                     ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                    : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                    : tournament.status === "coming_soon" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300" 
+                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                 }`}
               >
-                {tournament.status === "open" ? "Open" : "Coming Soon"}
+                {getTournamentStatusText(tournament.status)}
               </div>
             </div>
           </div>
@@ -106,8 +108,8 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
             <h3 className="font-medium mb-2">Submission Guidelines</h3>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
               <li>All submissions must be original work</li>
-              <li>Accepted file formats: JPG, PNG, PDF</li>
-              <li>Maximum file size: 10MB</li>
+              <li>Accepted file formats: JPG, PNG</li>
+              <li>Maximum file size: 5MB</li>
               <li>One submission per participant</li>
             </ul>
           </div>

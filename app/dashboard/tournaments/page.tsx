@@ -7,6 +7,7 @@ import { getAllTournamentForUser, getAllTournaments } from "@/app/actions/tourna
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
+import { getCategoryLabels, getTournamentStatusText } from "@/lib/utils"
 
 export default async function DashboardTournamentsPage() {
   const session = await getServerSession(authOptions)
@@ -37,13 +38,13 @@ export default async function DashboardTournamentsPage() {
                   <div>
                     <CardTitle>{tournament.title}</CardTitle>
                     <CardDescription className="mt-1">
-                      {Array.isArray(tournament.categories) ? tournament.categories.join(', ') : tournament.category}
+                      {Array.isArray(tournament.categories) ? getCategoryLabels(tournament.categories) : tournament.category}
                       {tournament.ageCategory && (
                         <span className="ml-2 text-xs text-muted-foreground">(Age: {tournament.ageCategory})</span>
                       )}
                     </CardDescription>
                   </div>
-                  <Badge className={`capitalize ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>{tournament.status}</Badge>
+                  <Badge className={`justify ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>{getTournamentStatusText(tournament.status)}</Badge>
                 </div>
               </CardHeader>
               <CardContent className="flex-1">

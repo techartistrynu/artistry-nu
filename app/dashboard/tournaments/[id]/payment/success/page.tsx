@@ -151,8 +151,8 @@ export default function PaymentSuccessPage() {
 
   // Calculate amounts based on submission data
   const baseAmount = submission.paid_amount / 100
-  const gstAmount = (baseAmount * 0.18).toFixed(2)
-  const totalAmount = (baseAmount + parseFloat(gstAmount)).toFixed(2)
+  // const gstAmount = (baseAmount * 0.18).toFixed(2)
+  const totalAmount = (baseAmount).toFixed(2)
 
   return (
     <div className="flex flex-col items-center p-4 bg-gray-50 min-h-screen">
@@ -160,6 +160,7 @@ export default function PaymentSuccessPage() {
       <div ref={receiptRef} className="w-full max-w-lg bg-white p-8 shadow-sm border border-gray-200 rounded-lg">
         {/* Receipt Header */}
         <div className="receipt-header">
+          <Image src={"/drawing111.png"} alt="Artistrynu Logo" width={80} height={80} className="mx-auto mb-2" />
           <div className="company-name font-bold text-xl font-sans text-center">ARTISTRYNU PRIVATE LIMITED</div>
           <div className="receipt-title text-lg font-semibold text-blue-800">Receipt of Payment</div>
         </div>
@@ -214,10 +215,10 @@ export default function PaymentSuccessPage() {
               <span className="receipt-label">Base Amount:</span>
               <span>₹{baseAmount.toFixed(2)}</span>
             </div>
-            <div className="receipt-line">
+            {/* <div className="receipt-line">
               <span className="receipt-label">GST (18%):</span>
               <span>₹{gstAmount}</span>
-            </div>
+            </div> */}
             <div className="receipt-line total-amount">
               <span className="receipt-label">Total Paid:</span>
               <span>₹{totalAmount}</span>

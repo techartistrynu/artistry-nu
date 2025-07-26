@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { format } from "date-fns"
 import { closeTournament, deleteTournament, getAllTournaments } from "@/app/actions/tournaments"
+import { getTournamentStatusText } from "@/lib/utils"
 import {
   Table,
   TableBody,
@@ -63,13 +64,13 @@ export default function AdminTournamentsPage() {
     }
 
     if (now < registrationStart) {
-      return <Badge variant="secondary">Coming Soon</Badge>
+      return <Badge variant="secondary">{getTournamentStatusText("coming_soon")}</Badge>
     } else if (now >= registrationStart && now <= registrationEnd) {
-      return <Badge className="bg-green-500 hover:bg-green-600">Open</Badge>
+      return <Badge className="bg-green-500 hover:bg-green-600">{getTournamentStatusText("open")}</Badge>
     } else if (now > registrationEnd && now <= submissionEnd) {
-      return <Badge className="bg-yellow-500 hover:bg-yellow-600">Submission Period</Badge>
+      return <Badge className="bg-yellow-500 hover:bg-yellow-600">{getTournamentStatusText("submission_period")}</Badge>
     } else {
-      return <Badge variant="destructive">Closed</Badge>
+      return <Badge variant="destructive">{getTournamentStatusText("closed")}</Badge>
     }
   }
 

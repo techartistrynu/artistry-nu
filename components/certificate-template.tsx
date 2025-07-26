@@ -108,7 +108,7 @@ export const CertificateTemplate = ({
       <View style={styles.detailsContainer}>
         <Text style={styles.detailItem}>Date: {new Date().toLocaleDateString()}</Text>
         <Text style={styles.detailItem}>Rank: {rank}</Text>
-        <Text style={styles.detailItem}>Score: {score}</Text>
+        {/* <Text style={styles.detailItem}>Score: {score}</Text> */}
       </View>
       
       <View style={styles.signatureLine}>
