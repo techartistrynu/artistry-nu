@@ -149,7 +149,8 @@ export default function TournamentPage() {
                   <ul className="list-disc pl-5 text-muted-foreground">
                     <li>All submissions come under these categories: {getCategoryLabels(tournament.categories)} are only accepted.</li>
                     <li>All submissions must be original work created by the participant</li>
-                    <li>Submissions must adhere to the tournament theme</li>
+                    <li>Age verification will be conducted after the competition and submissions may be rejected if verification fails</li>
+                    <li>Submissions must adhere to the competition theme</li>
                     <li>File formats: JPG, PNG (max 5MB per file)</li>
                     <li>Maximum of 5 entries per participant</li>
                   </ul>
@@ -225,7 +226,7 @@ export default function TournamentPage() {
             </CardFooter>
           </Card>
 
-          {(tournament.first_prize || tournament.second_prize || tournament.third_prize) && (
+          {(tournament.first_prize || tournament.second_prize || tournament.third_prize || tournament.mention_prize) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -254,10 +255,12 @@ export default function TournamentPage() {
                         <span className="text-sm">₹{tournament.third_prize} (Framed Certificate + Gift Hamper + Free Voucher)</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Honorable Mentions:</span>
-                      <span className="text-sm">₹1000 + E-Certificate</span>
-                    </div>
+                    {tournament.mention_prize && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Honorable Mentions:</span>
+                        <span className="text-sm">₹{tournament.mention_prize}+ E-Certificate</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>

@@ -226,6 +226,10 @@ function NewTournamentForm() {
                   <Label htmlFor="thirdPrize">3rd Prize (₹)</Label>
                   <Input id="thirdPrize" name="thirdPrize" type="number" min="0" step="0.01" defaultValue={defaultValues?.third_prize} />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="thirdPrize">Hounorable mentions Prize (₹)</Label>
+                  <Input id="mentionPrize" name="mentionPrize" type="number" min="0" step="0.01" defaultValue={defaultValues?.mention_prize} />
+                </div>
               </div>
             </div>
 
@@ -240,7 +244,7 @@ function NewTournamentForm() {
                   className="hidden"
                   onChange={(e) => setFiles(e.target.files)}
                   multiple
-                  accept=".jpg,.jpeg,.png,.pdf,.svg"
+                  accept=".jpg,.jpeg,.png,.svg"
                   required={!tournamentId}
                 />
                 <Button type="button" variant="outline" onClick={() => document.getElementById("files")?.click()}>

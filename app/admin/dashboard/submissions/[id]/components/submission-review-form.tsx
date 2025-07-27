@@ -7,7 +7,15 @@ import { Star, CheckCircle2, XCircle } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { updateSubmissionScore } from "@/app/actions/submissions"
 
-export function SubmissionReviewForm({ submissionId, initialScore }: { submissionId: string, initialScore?: number }) {
+export function SubmissionReviewForm({ 
+  submissionId, 
+  initialScore, 
+  onUpdate 
+}: { 
+  submissionId: string, 
+  initialScore?: number,
+  onUpdate?: (score: number, status: string) => void
+}) {
   async function handleSubmit(formData: FormData) {
     const score = formData.get("score")
     const status = formData.get("status")
@@ -26,6 +34,11 @@ export function SubmissionReviewForm({ submissionId, initialScore }: { submissio
         title: "Submission Updated",
         description: `Submission ${status} with score ${score}`,
       })
+      
+      // Call the onUpdate callback to update parent component data
+      if (onUpdate) {
+        onUpdate(parseFloat(score as string), status as "approved" | "rejected")
+      }
     } else {
       toast({
         variant: "destructive",

@@ -12,9 +12,10 @@ import { ArrowLeft, Star, User, Mail, Award, FileText, Calendar, CheckCircle2, X
 import Link from "next/link"
 import { DownloadButton } from "../../../../../components/download-button"
 import { SubmissionReviewForm } from "./components/submission-review-form"
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, useCallback } from "react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
+import { getAgeRangeFromCategory, getCategoryLabels } from "@/lib/utils"
 
 export default function SubmissionDetailPage() {
   const params = useParams()
@@ -22,51 +23,219 @@ export default function SubmissionDetailPage() {
   const [loading, setLoading] = useState(true)
   const receiptRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const fetchSubmission = async () => {
-      try {
-        const data = await getSubmissionById(params.id as string)
-        setSubmission(data)
-      } catch (error) {
-        console.error("Failed to fetch submission:", error)
-      } finally {
-        setLoading(false)
-      }
+  const fetchSubmission = useCallback(async () => {
+    try {
+      setLoading(true)
+      const data = await getSubmissionById(params.id as string)
+      setSubmission(data)
+    } catch (error) {
+      console.error("Failed to fetch submission:", error)
+    } finally {
+      setLoading(false)
     }
+  }, [params.id])
 
+  const handleSubmissionUpdate = useCallback((updatedScore: number, status: string) => {
+    setSubmission((prev: any) => prev ? {
+      ...prev,
+      score: updatedScore,
+      status: status,
+      reviewed_at: new Date().toISOString()
+    } : null)
+  }, [])
+
+  useEffect(() => {
     fetchSubmission()
   }, [params.id])
 
   const handleDownloadReceipt = async () => {
-    if (!receiptRef.current || !submission) return
+    if (!submission) return
 
     try {
-      const canvas = await html2canvas(receiptRef.current, {
+      // Create a custom HTML template for the PDF
+      const pdfContainer = document.createElement('div')
+      pdfContainer.style.position = 'absolute'
+      pdfContainer.style.left = '-9999px'
+      pdfContainer.style.top = '0'
+      pdfContainer.style.width = '1000px'
+      pdfContainer.style.backgroundColor = 'white'
+      pdfContainer.style.padding = '40px'
+      pdfContainer.style.fontFamily = 'Arial, sans-serif'
+      pdfContainer.style.fontSize = '14px'
+      pdfContainer.style.lineHeight = '1.6'
+      pdfContainer.style.color = '#333'
+      
+      // Create the PDF content
+              pdfContainer.innerHTML = `
+          <div style="text-align: center; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 15px;">
+            <img src="/drawing111.png" alt="Artistrynu Logo" style="width: 60px; height: 60px;" />
+            <h1 style="font-size: 24px; font-weight: bold; margin: 0; color: #1a1a1a;">Review Form</h1>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h2 style="font-size: 18px; font-weight: bold; margin: 0 0 10px 0; color: #2a2a2a;">
+              ${submission.tournament?.title || 'Tournament Submission'}
+            </h2>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 8px 0; color: #2a2a2a;">Tournament Details</h3>
+            <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+                <div><strong>Age Group:</strong> ${getAgeRangeFromCategory(submission.tournament?.age_category) || 'N/A'}</div>
+                <div><strong>Category:</strong> ${getCategoryLabels(submission.tournament?.categories) || 'N/A'}</div>
+                <div><strong>Deadline:</strong> ${submission.tournament?.submission_deadline ? new Date(submission.tournament.submission_deadline).toLocaleDateString() : 'N/A'}</div>
+                <div><strong>Status:</strong> 
+                  <span style="
+                    padding: 1px 6px; 
+                    border-radius: 3px; 
+                    font-size: 11px; 
+                    font-weight: bold;
+                    ${submission.status === 'approved' ? 'background: #d4edda; color: #155724;' : 
+                      submission.status === 'pending' ? 'background: #fff3cd; color: #856404;' : 
+                      'background: #f8d7da; color: #721c24;'}
+                  ">${submission.status || 'pending'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            ${submission.files?.length > 0 && submission.files[0].file_url ? `
+              <div style="text-align: center;">
+                <img 
+                  src="${submission.files[0].file_url}" 
+                  alt="Submission" 
+                  style="max-width: 100%; max-height: 50vh; width: auto; height: auto; object-fit: contain; border: 2px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                />
+              </div>
+            ` : '<p style="text-align: center; color: #666; font-size: 12px;">No image available</p>'}
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 14px; font-weight: bold; margin: 0 0 8px 0; color: #2a2a2a;">Submission Details</h3>
+            <div style="background: #f8f9fa; padding: 12px; border-radius: 6px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+                <div><strong>Applicant:</strong> ${submission.applicant_name || 'N/A'}</div>
+                <div><strong>Date of Birth:</strong> ${submission.date_of_birth || 'N/A'}</div>
+                <div><strong>Submitted:</strong> ${submission.created_at ? new Date(submission.created_at).toLocaleDateString() : 'N/A'}</div>
+                <div><strong>Source:</strong> ${submission.source || 'N/A'}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <h3 style="font-size: 16px; font-weight: bold; margin: 0 0 15px 0; color: #2a2a2a; border-bottom: 1px solid #e9ecef; padding-bottom: 8px;">
+              Evaluation
+            </h3>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
+              <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                <label style="font-weight: bold; font-size: 12px; min-width: 80px;">Score:</label>
+                <div style="
+                  flex: 1;
+                  padding: 6px 10px; 
+                  background: white; 
+                  border: 1px solid #ddd; 
+                  border-radius: 4px; 
+                  min-height: 25px;
+                  font-size: 12px;
+                "></div>
+              </div>
+              
+              <div style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;">
+                <label style="font-weight: bold; font-size: 12px; min-width: 80px; margin-top: 6px;">Review Notes:</label>
+                <div style="
+                  flex: 1;
+                  padding: 8px; 
+                  background: white; 
+                  border: 1px solid #ddd; 
+                  border-radius: 4px; 
+                  min-height: 50px;
+                  white-space: pre-wrap;
+                  font-size: 12px;
+                "></div>
+              </div>
+              
+              <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                <label style="font-weight: bold; font-size: 12px; min-width: 80px;">Reviewer:</label>
+                <div style="
+                  flex: 1;
+                  padding: 6px 10px; 
+                  background: white; 
+                  border: 1px solid #ddd; 
+                  border-radius: 4px; 
+                  min-height: 25px;
+                  font-size: 12px;
+                "></div>
+              </div>
+              
+              ${submission.reviewed_at ? `
+                <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                  <label style="font-weight: bold; font-size: 12px; min-width: 80px;">Reviewed On:</label>
+                  <div style="
+                    flex: 1;
+                    padding: 6px 10px; 
+                    background: white; 
+                    border: 1px solid #ddd; 
+                    border-radius: 4px; 
+                    min-height: 25px;
+                    font-size: 12px;
+                  ">${new Date(submission.reviewed_at).toLocaleDateString()}</div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `
+      
+      document.body.appendChild(pdfContainer)
+
+      const canvas = await html2canvas(pdfContainer, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        logging: true,
+        backgroundColor: '#ffffff',
+        width: 1000,
+        height: pdfContainer.scrollHeight,
+        logging: false,
       })
       
-      const imgData = canvas.toDataURL('image/png')
+      // Clean up
+      document.body.removeChild(pdfContainer)
+      
+      const imgData = canvas.toDataURL('image/jpeg', 0.95)
       const pdf = new jsPDF('p', 'mm', 'a4')
-      const imgWidth = 240 // A4 width in mm
-      const pageHeight = 295 // A4 height in mm
-      const imgHeight = canvas.height * imgWidth / canvas.width
-      let heightLeft = imgHeight
-      let position = 0
-
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-      heightLeft -= pageHeight
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight
-        pdf.addPage()
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-        heightLeft -= pageHeight
+      const pageWidth = pdf.internal.pageSize.getWidth()
+      const pageHeight = pdf.internal.pageSize.getHeight()
+      const margin = 15
+      const imgWidth = pageWidth - (2 * margin)
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      
+      // Calculate how many pages we need
+      const pagesNeeded = Math.ceil(imgHeight / (pageHeight - (2 * margin)))
+      
+      for (let i = 0; i < pagesNeeded; i++) {
+        if (i > 0) {
+          pdf.addPage()
+        }
+        
+        const sourceY = i * (canvas.height / pagesNeeded)
+        const sourceHeight = canvas.height / pagesNeeded
+        
+        const destY = margin
+        const destHeight = pageHeight - (2 * margin)
+        
+        pdf.addImage(
+          imgData, 
+          'JPEG', 
+          margin, 
+          destY, 
+          imgWidth, 
+          destHeight
+        )
       }
 
-      pdf.save(`submission-${submission.submission_number || params.id}.pdf`)
+      pdf.save(`submission-review-${submission.submission_number || params.id}.pdf`)
     } catch (error) {
       console.error("Error generating PDF:", error)
       toast({
@@ -105,7 +274,7 @@ export default function SubmissionDetailPage() {
             </p>
           </div>
         </div>
-        <Button onClick={handleDownloadReceipt} className="gap-2 w-full md:w-auto">
+        <Button onClick={handleDownloadReceipt} className="gap-2 w-full md:w-auto" data-pdf-exclude>
           <Download className="h-4 w-4" />
           Export as PDF
         </Button>
@@ -134,7 +303,7 @@ export default function SubmissionDetailPage() {
                         className="object-contain"
                         priority
                       />
-                      <div className="absolute bottom-4 right-4">
+                      <div className="absolute bottom-4 right-4" data-pdf-exclude>
                         <DownloadButton url={submission.files[0].file_url} fileName={submission.files[0].file_name} />
                       </div>
                     </>
@@ -262,7 +431,11 @@ export default function SubmissionDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SubmissionReviewForm submissionId={params.id as string} initialScore={submission.score} />
+              <SubmissionReviewForm 
+                submissionId={params.id as string} 
+                initialScore={submission.score} 
+                onUpdate={handleSubmissionUpdate}
+              />
             </CardContent>
           </Card>
 

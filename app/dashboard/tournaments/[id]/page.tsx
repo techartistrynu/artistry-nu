@@ -75,7 +75,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
             </div>
             
             {/* Prize Section */}
-            {(tournament.first_prize || tournament.second_prize || tournament.third_prize) && (
+            {(tournament.first_prize || tournament.second_prize || tournament.third_prize || tournament.mention_prize) && (
               <div className="space-y-2">
                 <h3 className="font-medium">Prizes</h3>
                 <div className="space-y-1">
@@ -87,6 +87,9 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
                   )}
                   {tournament.third_prize && (
                     <p className="text-sm text-muted-foreground">3rd Prize: ₹{tournament.third_prize} (Framed Certificate + Gift Hamper + Free Voucher)</p>
+                  )}
+                  {tournament.mention_prize && (
+                    <p className="text-sm text-muted-foreground">3rd Prize: ₹{tournament.mention_prize} (Framed Certificate + Gift Hamper + Free Voucher)</p>
                   )}
                 </div>
               </div>
