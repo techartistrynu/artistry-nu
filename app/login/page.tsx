@@ -8,12 +8,12 @@ import { Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { toast } = useToast()
+
   const router = useRouter()
   const { data: session, status } = useSession()
 
@@ -35,21 +35,13 @@ export default function LoginPage() {
       
       if (result?.error) {
         setError(result.error)
-        toast({
-          title: "Login Failed",
-          description: result.error,
-          variant: "destructive",
-        })
+        toast.error(result.error)
       } else if (result?.url) {
         router.push(result.url)
       }
     } catch (error) {
       setError("An unexpected error occurred")
-      toast({
-        title: "Login Failed",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      })
+      toast.error("An unexpected error occurred. Please try again.")
     } finally {
       setIsLoading(false)
     }

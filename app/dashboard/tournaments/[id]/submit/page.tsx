@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { Upload, Loader2, Link } from "lucide-react";
 import {
   submitArtwork,
@@ -39,7 +39,7 @@ export default function SubmitToTournamentPage() {
   const tournamentId = params?.id as string;
   const { data: session } = useSession();
   const userId = session?.user?.id;
-  const { toast } = useToast();
+
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -72,11 +72,7 @@ export default function SubmitToTournamentPage() {
         setTournament(tournamentData);
         setExistingSubmission(existingSubmission);
       } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load tournament data",
-          variant: "destructive",
-        });
+        toast.error("Failed to load tournament data");
       } finally {
         setIsLoading(false);
       }
@@ -172,11 +168,7 @@ export default function SubmitToTournamentPage() {
       const isScriptLoaded = await loadRazorpay();
 
       if (!isScriptLoaded || !data.id) {
-        toast({
-          title: "Payment failed",
-          description: "Razorpay script load or order creation failed.",
-          variant: "destructive",
-        });
+        toast.error("Razorpay script load or order creation failed.");
         return;
       }
 
@@ -191,11 +183,7 @@ export default function SubmitToTournamentPage() {
           try {
             setIsPaymentLoading(true);
             setIsLoading(true);
-            toast({
-              title: "Payment Successful",
-              description:
-                "Don't refresh the page, it will redirect you to the success page.",
-            });
+            toast.success("Don't refresh the page, it will redirect you to the success page.");
             const result = await updatePaymentDetails({
               submissionId,
               paymentData: {
@@ -209,24 +197,16 @@ export default function SubmitToTournamentPage() {
             });
 
             if (!result.success) {
-              toast({
-                title: "Payment Recorded Failed",
-                description: result.error,
-                variant: "destructive",
-              });
+              toast.error(result.error);
               return;
             }
 
-            toast({ title: "Payment Successful", description: "Thank you!" });
+            toast.success("Thank you!");
             router.push(
               `/dashboard/tournaments/${tournamentId}/payment/success?submissionId=${submissionId}`
             );
           } catch (error) {
-            toast({
-              title: "Payment Failed",
-              description: "Failed to process payment",
-              variant: "destructive",
-            });
+            toast.error("Failed to process payment");
           } finally {
             setIsLoading(false);
             setIsPaymentLoading(false);
@@ -244,11 +224,7 @@ export default function SubmitToTournamentPage() {
       const razorpay = new (window as any).Razorpay(options);
       razorpay.open();
     } catch (error) {
-      toast({
-        title: "Payment Failed",
-        description: "Failed to initialize payment",
-        variant: "destructive",
-      });
+      toast.error( "Failed to initialize payment",);
     } finally {
       setIsPaymentLoading(false);
     }
@@ -258,11 +234,7 @@ export default function SubmitToTournamentPage() {
     e.preventDefault();
 
     if (!files || !dateOfBirth) {
-      toast({
-        title: "Missing Fields",
-        description: "Please upload files and select your date of birth.",
-        variant: "destructive",
-      });
+      toast.error("Please upload files and select your date of birth.");
       return;
     }
 
@@ -270,21 +242,13 @@ export default function SubmitToTournamentPage() {
     const maxFileSize = 5 * 1024 * 1024; // 5MB
     for (const file of Array.from(files)) {
       if (file.size > maxFileSize) {
-        toast({
-          title: "File Too Large",
-          description: `Each file must be under 5MB. "${file.name}" is too large.`,
-          variant: "destructive",
-        });
+        toast.error(`Each file must be under 5MB. "${file.name}" is too large.`);
         return;
       }
     }
 
-    if (dateOfBirth > new Date()) {
-      toast({
-        title: "Invalid Date of Birth",
-        description: "Date of birth cannot be in the future.",
-        variant: "destructive",
-      });
+    if (dateOfBirth >= new Date()) {
+      toast.error("Date of birth cannot be in the future.");
       return;
     }
     
@@ -307,27 +271,15 @@ export default function SubmitToTournamentPage() {
       const result = await submitArtwork(formData);
 
       if (!result) {
-        toast({
-          title: "Submission Failed",
-          description: "Failed to submit artwork",
-          variant: "destructive",
-        });
+        toast( "Submission Failed, Failed to submit artwork");
         return;
       }
 
-      toast({
-        title: "Submission Received",
-        description: "Proceeding to payment...",
-      });
+      toast.info( "Submission Received, Proceeding to payment...");
       await triggerPayment(result.submissionId);
     } catch (error) {
       console.error(error);
-      toast({
-        title: "Submission Failed",
-        description:
-          error instanceof Error ? error.message : "Unexpected error",
-        variant: "destructive",
-      });
+      toast(`Submission Failed!"`);
     } finally {
       setIsSubmitting(false);
       setIsUploading(false);

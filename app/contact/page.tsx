@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { Mail, Phone, MapPin } from "lucide-react"
 
 export default function ContactPage() {
@@ -17,7 +17,7 @@ export default function ContactPage() {
   const [subject, setSubject] = useState("")
   const [message, setMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,10 +27,7 @@ export default function ContactPage() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      toast({
-        title: "Message Sent",
-        description: "Thank you for your message. We'll get back to you soon!",
-      })
+      toast.success("Thank you for your message. We'll get back to you soon!")
 
       // Reset form
       setName("")
@@ -38,11 +35,7 @@ export default function ContactPage() {
       setSubject("")
       setMessage("")
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "An error occurred while sending your message. Please try again.",
-        variant: "destructive",
-      })
+      toast.error("An error occurred while sending your message. Please try again.")
     } finally {
       setIsLoading(false)
     }

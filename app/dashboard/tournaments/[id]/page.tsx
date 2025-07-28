@@ -80,16 +80,16 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
                 <h3 className="font-medium">Prizes</h3>
                 <div className="space-y-1">
                   {tournament.first_prize && (
-                    <p className="text-sm text-muted-foreground">1st Prize: ₹{tournament.first_prize} (Framed Certificate + Gift Hamper + Free Voucher)</p>
+                    <p className="text-sm text-muted-foreground">1st Prize: ₹{tournament.first_prize}</p>
                   )}
                   {tournament.second_prize && (
-                    <p className="text-sm text-muted-foreground">2nd Prize: ₹{tournament.second_prize} (Framed Certificate + Gift Hamper + Free Voucher)</p>
+                    <p className="text-sm text-muted-foreground">2nd Prize: ₹{tournament.second_prize}</p>
                   )}
                   {tournament.third_prize && (
-                    <p className="text-sm text-muted-foreground">3rd Prize: ₹{tournament.third_prize} (Framed Certificate + Gift Hamper + Free Voucher)</p>
+                    <p className="text-sm text-muted-foreground">3rd Prize: ₹{tournament.third_prize}</p>
                   )}
                   {tournament.mention_prize && (
-                    <p className="text-sm text-muted-foreground">3rd Prize: ₹{tournament.mention_prize} (Framed Certificate + Gift Hamper + Free Voucher)</p>
+                    <p className="text-sm text-muted-foreground">3rd Prize: ₹{tournament.mention_prize}</p>
                   )}
                 </div>
               </div>
@@ -117,6 +117,15 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
               <li>Maximum file size: 5MB</li>
               <li>One submission per participant</li>
             </ul>
+          </div>
+          <div className="space-y-2 pt-4">
+              <h3 className="text-lg font-medium">Benefits for Participants</h3>
+              <ul className="list-disc pl-5 text-muted-foreground">
+                <li><strong>Exposure:</strong> Winning artworks will be featured on Artistrynu's website, social media, and in promotional materials.</li>
+                <li><strong>Professional Development:</strong> Free vouchers for lectures and seminars provide access to industry insights and networking opportunities.</li>
+                <li><strong>Recognition:</strong> Cash prizes, gift hampers, mementos, and shawls (for Categories 3 and 4) enhance artists' portfolios and credibility.</li>
+                <li><strong>Exhibition Opportunity:</strong> Senior artists (Category 4) gain the chance to showcase their work in a prestigious group exhibition.</li>
+              </ul>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col md:flex-row md:justify-between gap-2">

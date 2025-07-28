@@ -51,6 +51,12 @@ const styles = StyleSheet.create({
   detailItem: {
     fontSize: 14,
   },
+  gstInfo: {
+    marginTop: 20,
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#7f8c8d',
+  },
   signatureLine: {
     marginTop: 60,
     borderTop: '1px solid #34495e',
@@ -110,6 +116,8 @@ export const CertificateTemplate = ({
         <Text style={styles.detailItem}>Rank: {rank}</Text>
         {/* <Text style={styles.detailItem}>Score: {score}</Text> */}
       </View>
+      
+      <Text style={styles.gstInfo}>GST No: 10ABCCA9309E1Z7</Text>
       
       <View style={styles.signatureLine}>
         <Text style={styles.signatureText}>Authorized Signature</Text>

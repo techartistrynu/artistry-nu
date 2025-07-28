@@ -162,6 +162,7 @@ export default function SubmissionDetailPage() {
         <div className="receipt-header">
           <Image src={"/drawing111.png"} alt="Artistrynu Logo" width={80} height={80} className="mx-auto mb-2" />
           <div className="company-name font-bold text-xl">ARTISTRYNU PRIVATE LIMITED</div>
+          <div className="text-sm text-gray-600 mb-2">GST No: 10ABCCA9309E1Z7</div>
           <div className="receipt-title text-lg font-semibold text-blue-800">Receipt of Payment</div>
         </div>
 

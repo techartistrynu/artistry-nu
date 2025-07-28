@@ -7,14 +7,6 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
 
-const galleryImages = [
-  "https://fastly.picsum.photos/id/967/536/354.jpg?hmac=tiSjXla6v9WshyaQYJPoDJ6Ow6b52ZVSZS1Q8r2FDxI",
-  "https://fastly.picsum.photos/id/625/536/354.jpg?hmac=jBI5estK5IS3_Ux9B3Io49XVEtNBulVMmlQ4DDXqXb4",
-  "https://fastly.picsum.photos/id/134/536/354.jpg?hmac=GqngKpJ4MNwWb4KIR11yok3yVmLUyrVIYAX2E37h4dA",
-  "https://fastly.picsum.photos/id/645/536/354.jpg?hmac=96r6IlgzOM-FeJsYA4jlClwhnx4PR7yOxB-P4d5ih3A",
-  "https://fastly.picsum.photos/id/824/536/354.jpg?hmac=3b2BSF4o6tG_5gOx0YiMDgEtQ8-2ZLuhKAxmObpqgXg",
-  "https://fastly.picsum.photos/id/982/536/354.jpg?hmac=xXo1bhVRPwA6K0ttkJqSEghDCDNd7xWKfKpE5kqXlQo",
-];
 
 export default function Home() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -119,156 +111,130 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Gallery Section */}
-        <section className="py-16 bg-muted">
+        {/* Policies Section */}
+        <section className="py-16 bg-white">
           <div className="container px-4 sm:px-6 md:px-8">
-            <h2 className="text-3xl md:text-4xl font-semibold text-center mb-10">
-              Gallery Showcase
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {galleryImages.map((src, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.05 }}
-                  onClick={() => setPreviewImage(src)}
-                  className="cursor-pointer"
-                >
-                  <Image
-                    src={src}
-                    alt={`Art ${index + 1}`}
-                    width={300}
-                    height={200}
-                    className="rounded-md object-cover"
-                  />
-                </motion.div>
-              ))}
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4">Our Policies</h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                ArtistryNu Pvt Ltd is committed to fostering artistic excellence while ensuring transparency, professionalism, and ethical business practices. Below are the key policies that define our operations.
+              </p>
             </div>
-          </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Terms & Conditions */}
+              <div className="bg-muted p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4 text-center">Terms & Conditions</h3>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li>• Users must engage ethically when participating in competitions, purchases, or exhibitions.</li>
+                  <li>• All artworks sold are subject to ownership rights and copyright protection.</li>
+                  <li>• ArtistryNu Pvt. Ltd. reserves the right to update terms without prior notice.</li>
+                </ul>
+              </div>
 
-          {/* Modal Preview */}
-          {previewImage && (
-            <motion.div
-              className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-              onClick={() => setPreviewImage(null)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <div className="relative">
-                <Image
-                  src={previewImage}
-                  alt="Preview"
-                  width={800}
-                  height={600}
-                  className="rounded-lg max-h-[80vh] w-auto"
-                />
-                <Button
-                  variant="ghost"
-                  className="absolute top-2 right-2 text-white"
-                  onClick={() => setPreviewImage(null)}
-                >
-                  <X />
-                </Button>
+              {/* Privacy Policy */}
+              <div className="bg-muted p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4 text-center">Privacy Policy</h3>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li>• User data is securely stored and used only for purchase processing and event registration.</li>
+                  <li>• ArtistryNu Pvt. Ltd. does not share user information with third parties without consent.</li>
+                  <li>• Secure payment gateways ensure data protection.</li>
+                </ul>
               </div>
-            </motion.div>
-          )}
-        </section>
-        {/* Expert Insights Section */}
-        <section className="py-16 bg-muted">
-          <div className="container px-4 sm:px-6 md:px-8">
-            <h2 className="text-3xl md:text-4xl font-semibold text-center mb-10">
-              Expert Insights
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 bg-white rounded-lg text-center shadow">
-                <h3 className="text-lg font-bold mb-2">Dr. Maya Arora</h3>
-                <p className="text-sm text-muted-foreground">
-                  Renowned Art Historian & Critic
-                </p>
+
+              {/* Shipping Policy */}
+              <div className="bg-muted p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4 text-center">Shipping Policy</h3>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li>• All artworks are carefully packaged and shipped via trusted couriers.</li>
+                  <li>• Domestic delivery within 5-10 business days, international delivery within 10-20 business days.</li>
+                  <li>• Tracking details will be shared upon dispatch.</li>
+                </ul>
               </div>
-              <div className="p-6 bg-white rounded-lg text-center shadow">
-                <h3 className="text-lg font-bold mb-2">Rahul Mehta</h3>
-                <p className="text-sm text-muted-foreground">
-                  Gallery Curator & Exhibition Designer
-                </p>
+
+              {/* Cancellation & Refund Policy */}
+              <div className="bg-muted p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4 text-center">Cancellation & Refund Policy</h3>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li>• Art Sales: No refunds once a purchase is finalized, except in cases of damage during transit.</li>
+                  <li>• Competition Fees: Non-refundable unless the event is canceled by ArtistryNu Pvt Ltd.</li>
+                  <li>• Exhibitions & Seminars: Refunds are processed within 7 days if cancellation is requested 48 hours before the event.</li>
+                </ul>
               </div>
-              <div className="p-6 bg-white rounded-lg text-center shadow">
-                <h3 className="text-lg font-bold mb-2">Shruti Verma</h3>
-                <p className="text-sm text-muted-foreground">
-                  Award-winning Visual Artist
-                </p>
+
+              {/* Disclaimer */}
+              <div className="bg-muted p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4 text-center">Disclaimer</h3>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li>• All artworks displayed are subject to availability and variations in digital representation.</li>
+                  <li>• ArtistryNu Pvt Ltd is not responsible for external opinions or reviews about artists.</li>
+                </ul>
+              </div>
+
+              {/* Contact Us */}
+              <div className="bg-muted p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4 text-center">Contact Us</h3>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li>• Direct channels for:</li>
+                  <li>• Inquiries</li>
+                  <li>• Collaborations</li>
+                  <li>• Customer support</li>
+                </ul>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section
-          className="py-16 bg-fixed bg-center bg-cover"
-          style={{ backgroundImage: "url('https://fastly.picsum.photos/id/291/536/354.jpg?hmac=bfJIaH0FmtH4w44We3rF30m4Kd8zK4jsOAbLFVh2E20')" }} // Place this image in your public/ folder
-        >
-          <div className="bg-white bg-opacity-90 p-8 rounded-lg max-w-2xl mx-auto shadow-lg">
-            <h2 className="text-3xl md:text-4xl font-semibold text-center mb-8">
-              Get in Touch
-            </h2>
-            <form className="space-y-4">
-              <input
-                type="text"
-                placeholder="Name"
-                className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <textarea
-                placeholder="Your message"
-                className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-              ></textarea>
-              <Button className="w-full">Submit</Button>
-            </form>
           </div>
         </section>
 
         {/* FAQ Section */}
         <section className="py-16 bg-muted">
           <div className="container px-4 sm:px-6 md:px-8">
-            <h2 className="text-3xl md:text-4xl font-semibold text-center mb-8">
-              Frequently Asked Questions
-            </h2>
-            <div className="grid gap-6 max-w-4xl mx-auto">
-              <div>
-                <h3 className="text-lg font-semibold">
-                  What services do you offer?
-                </h3>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4">Frequently Asked Questions (FAQ)</h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                In this section, we systematically address a selection of commonly posed enquiries with precision.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h3 className="text-xl font-semibold mb-3">What sets us apart?</h3>
                 <p className="text-sm text-muted-foreground">
-                  We help artists compete, sell artwork, exhibit, and gain
-                  knowledge through seminars.
+                  We offer bespoke solutions, ensuring that every art lover, art connoisseur and industry professional benefits from unparalleled service precise to address their unique needs.
                 </p>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold">
-                  Is the website user-friendly?
-                </h3>
+              
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h3 className="text-xl font-semibold mb-3">What support do we offer?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Yes, we ensure a seamless user experience across devices.
+                  Our dedicated support team is available from 10:00 to 18:00 pm through a range of communication channels, including WhatsApp chat, email, text messaging, and telephone, to assist you with any inquiries you may have.
                 </p>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold">
-                  What support do artists receive?
-                </h3>
+              
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h3 className="text-xl font-semibold mb-3">Is the website user-friendly?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Support includes listing services, networking events, and
-                  promotional features.
+                  Our website has been thoughtfully developed with a focus on user-friendly navigation, allowing you to effortlessly explore various sections and find the information you need in a timely manner, enhancing your overall experience.
                 </p>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold">
-                  How is your data secured?
-                </h3>
+              
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h3 className="text-xl font-semibold mb-3">How is your data secured?</h3>
                 <p className="text-sm text-muted-foreground">
-                  We use industry-grade security practices to protect user data.
+                  Your personal data is meticulously protected by sophisticated encryption technologies and comprehensive security protocols, ensuring its integrity and confidentiality.
+                </p>
+              </div>
+              
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h3 className="text-xl font-semibold mb-3">Can you trust with us and our team?</h3>
+                <p className="text-sm text-muted-foreground">
+                  We collaborate closely with a highly esteemed and exceptionally skilled team of professionals to carefully design and deliver a wide range of premium art and services that consistently exceed your expectations and fulfill your needs.
+                </p>
+              </div>
+              
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h3 className="text-xl font-semibold mb-3">Are links to other websites approved?</h3>
+                <p className="text-sm text-muted-foreground">
+                  This Website may feature links to external sites; however, we do not, either directly or indirectly, express any endorsement of those sites.
                 </p>
               </div>
             </div>

@@ -4,14 +4,14 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSession } from "next-auth/react"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { BarChart, CalendarDays, Users, Award, FileText, CreditCard } from "lucide-react"
 import { fetchDashboardStats } from "@/app/actions/admin-stat"
 
 export default function AdminDashboardPage() {
   const { data: session } = useSession()
   const user = session?.user
-  const { toast } = useToast()
+
 
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -32,11 +32,7 @@ export default function AdminDashboardPage() {
         setStats(data)
       } catch (error) {
         console.error("Error fetching dashboard stats:", error)
-        toast({
-          title: "Error",
-          description: "Failed to fetch dashboard statistics",
-          variant: "destructive",
-        })
+        toast.error("Failed to fetch dashboard statistics")
       } finally {
         setIsLoading(false)
       }

@@ -165,6 +165,15 @@ export default function TournamentPage() {
                   </ul>
                 </div>
               </div>
+              <div className="space-y-2 pt-4">
+                  <h3 className="text-lg font-medium">Benefits for Participants</h3>
+                  <ul className="list-disc pl-5 text-muted-foreground">
+                    <li><strong>Exposure:</strong> Winning artworks will be featured on Artistrynu's website, social media, and in promotional materials.</li>
+                    <li><strong>Professional Development:</strong> Free vouchers for lectures and seminars provide access to industry insights and networking opportunities.</li>
+                    <li><strong>Recognition:</strong> Cash prizes, gift hampers, mementos, and shawls (for Categories 3 and 4) enhance artists' portfolios and credibility.</li>
+                    <li><strong>Exhibition Opportunity:</strong> Senior artists (Category 4) gain the chance to showcase their work in a prestigious group exhibition.</li>
+                  </ul>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -240,25 +249,25 @@ export default function TournamentPage() {
                     {tournament.first_prize && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">1st Place:</span>
-                        <span className="text-sm">₹{tournament.first_prize} (Framed Certificate + Gift Hamper + Free Voucher)</span>
+                        <span className="text-sm">₹{tournament.first_prize}</span>
                       </div>
                     )}
                     {tournament.second_prize && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">2nd Place:</span>
-                        <span className="text-sm">₹{tournament.second_prize} (Framed Certificate + Gift Hamper + Free Voucher)</span>
+                        <span className="text-sm">₹{tournament.second_prize}</span>
                       </div>
                     )}
                     {tournament.third_prize && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">3rd Place:</span>
-                        <span className="text-sm">₹{tournament.third_prize} (Framed Certificate + Gift Hamper + Free Voucher)</span>
+                        <span className="text-sm">₹{tournament.third_prize}</span>
                       </div>
                     )}
                     {tournament.mention_prize && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">Honorable Mentions:</span>
-                        <span className="text-sm">₹{tournament.mention_prize}+ E-Certificate</span>
+                        <span className="text-sm">₹{tournament.mention_prize}</span>
                       </div>
                     )}
                   </div>

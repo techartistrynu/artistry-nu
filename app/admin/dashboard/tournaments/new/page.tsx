@@ -216,19 +216,19 @@ function NewTournamentForm() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstPrize">1st Prize (₹)</Label>
-                  <Input id="firstPrize" name="firstPrize" type="number" min="0" step="0.01" defaultValue={defaultValues?.first_prize} />
+                  <Input id="firstPrize" name="firstPrize" type="text"  defaultValue={defaultValues?.first_prize} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="secondPrize">2nd Prize (₹)</Label>
-                  <Input id="secondPrize" name="secondPrize" type="number" min="0" step="0.01" defaultValue={defaultValues?.second_prize} />
+                  <Input id="secondPrize" name="secondPrize" type="text"  defaultValue={defaultValues?.second_prize} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="thirdPrize">3rd Prize (₹)</Label>
-                  <Input id="thirdPrize" name="thirdPrize" type="number" min="0" step="0.01" defaultValue={defaultValues?.third_prize} />
+                  <Input id="thirdPrize" name="thirdPrize" type="text"  defaultValue={defaultValues?.third_prize} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="thirdPrize">Hounorable mentions Prize (₹)</Label>
-                  <Input id="mentionPrize" name="mentionPrize" type="number" min="0" step="0.01" defaultValue={defaultValues?.mention_prize} />
+                  <Input id="mentionPrize" name="mentionPrize" type="text"  defaultValue={defaultValues?.mention_prize} />
                 </div>
               </div>
             </div>

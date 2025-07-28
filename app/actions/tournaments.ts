@@ -316,10 +316,10 @@ export async function createTournament(formData: FormData) {
   const registrationEndDate = formData.get('registrationEndDate') as string;
   const submissionEndDate = formData.get('submissionEndDate') as string;
   const entryFee = parseFloat(formData.get('entryFee') as string);
-  const firstPrize = formData.get('firstPrize') ? parseFloat(formData.get('firstPrize') as string) : null;
-  const secondPrize = formData.get('secondPrize') ? parseFloat(formData.get('secondPrize') as string) : null;
-  const thirdPrize = formData.get('thirdPrize') ? parseFloat(formData.get('thirdPrize') as string) : null;
-  const mentionPrize = formData.get('mentionPrize') ? parseFloat(formData.get('mentionPrize') as string) : null;
+  const firstPrize = formData.get('firstPrize') ? formData.get('firstPrize') as string : null;
+  const secondPrize = formData.get('secondPrize') ? formData.get('secondPrize') as string : null;
+  const thirdPrize = formData.get('thirdPrize') ? formData.get('thirdPrize') as string : null;
+  const mentionPrize = formData.get('mentionPrize') ? formData.get('mentionPrize') as string : null;
   const files = formData.getAll('files') as File[];
   const status = registrationStartDate > new Date().toISOString() ? "coming_soon" : "open";
 
@@ -388,10 +388,10 @@ export async function editTournament(tournamentId: string, formData: FormData) {
     const registrationEndDate = formData.get('registrationEndDate') as string;
     const submissionEndDate = formData.get('submissionEndDate') as string;
     const entryFee = parseFloat(formData.get('entryFee') as string);
-    const firstPrize = formData.get('firstPrize') ? parseFloat(formData.get('firstPrize') as string) : null;
-    const secondPrize = formData.get('secondPrize') ? parseFloat(formData.get('secondPrize') as string) : null;
-    const thirdPrize = formData.get('thirdPrize') ? parseFloat(formData.get('thirdPrize') as string) : null;
-    const mentionPrize = formData.get('mentionPrize') ? parseFloat(formData.get('mentionPrize') as string) : null;
+    const firstPrize = formData.get('firstPrize') ? formData.get('firstPrize') as string : null;
+    const secondPrize = formData.get('secondPrize') ? formData.get('secondPrize') as string : null;
+    const thirdPrize = formData.get('thirdPrize') ? formData.get('thirdPrize') as string : null;
+    const mentionPrize = formData.get('mentionPrize') ? formData.get('mentionPrize') as string : null;
     const files = formData.getAll('files') as File[];
 
     if (!tournamentId || !title || !description || !categories.length || !registrationStartDate || !registrationEndDate || !submissionEndDate || !entryFee || !ageCategory) {
