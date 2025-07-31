@@ -4,6 +4,9 @@ import { getPaymentsByUserId } from "@/app/actions/payments"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Eye } from "lucide-react"
 
 export default async function DashboardPaymentsPage() {
   const session = await getServerSession(authOptions)
@@ -31,20 +34,21 @@ export default async function DashboardPaymentsPage() {
               <div className="min-w-[800px]">
                 {/* Header row */}
                 <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted/50">
-                  <div className="col-span-4">Tournament</div>
+                  <div className="col-span-3">Tournament</div>
                   <div className="col-span-2">Amount</div>
-                  <div className="col-span-3">Date</div>
+                  <div className="col-span-2">Date</div>
                   <div className="col-span-2">Payment Method</div>
                   <div className="col-span-1">Status</div>
+                  <div className="col-span-2">Actions</div>
                 </div>
                 
                 {/* Data rows */}
                 <div className="divide-y">
                   {payments.map((payment) => (
                     <div key={payment.id} className="grid grid-cols-12 items-center p-4 hover:bg-muted/50">
-                      <div className="col-span-4 truncate font-medium">{payment.tournament?.title}</div>
+                      <div className="col-span-3 truncate font-medium">{payment.tournament?.title}</div>
                       <div className="col-span-2">₹{(payment.paid_amount / 100).toFixed(2)}</div>
-                      <div className="col-span-3 truncate text-sm">
+                      <div className="col-span-2 truncate text-sm">
                         {new Date(payment.payment_date._seconds * 1000).toLocaleString()}
                       </div>
                       <div className="col-span-2 capitalize truncate">
@@ -62,6 +66,17 @@ export default async function DashboardPaymentsPage() {
                         >
                           {payment.payment_status ? payment.payment_status.charAt(0).toUpperCase() + payment.payment_status.slice(1) : "Unpaid"}
                         </Badge>
+                      </div>
+                      <div className="col-span-2">
+                        <Link 
+                          href={`/dashboard/submissions/${payment.submission_id}`}
+                          className="w-full"
+                        >
+                          <Button variant="ghost" size="sm" className="gap-2">
+                            <Eye className="h-4 w-4" />
+                            View Receipt
+                          </Button>
+                        </Link>
                       </div>
                     </div>
                   ))}

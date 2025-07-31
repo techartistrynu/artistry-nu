@@ -7,6 +7,10 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const response = NextResponse.next()
 
+  if (request.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/tournaments', request.url))
+  }
+
   // Allow access to login pages without redirection
   if (pathname === '/login' || pathname === '/admin/login' || pathname === '/register') {
     if (token) {

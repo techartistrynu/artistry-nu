@@ -4,12 +4,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Trophy, Upload, CreditCard, Award, X } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 
 export default function Home() {
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const router = useRouter();
+  
+  useEffect(() => {
+    // Redirect to /tournaments when the component mounts
+    router.push("/tournaments");
+  }, [router]);
 
   return (
     <div className="flex flex-col font-sans text-gray-900">

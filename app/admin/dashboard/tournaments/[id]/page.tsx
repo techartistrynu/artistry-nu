@@ -136,10 +136,10 @@ export default function TournamentPage() {
                 <div className="space-y-2">
                   <h3 className="text-lg font-medium">Judging Criteria</h3>
                   <ul className="list-disc pl-5 text-muted-foreground">
-                    <li>Creativity and originality (30%)</li>
+                    <li>Creativity and originality (50%)</li>
                     <li>Technical skill and execution (30%)</li>
-                    <li>Adherence to theme (20%)</li>
-                    <li>Overall presentation (20%)</li>
+                    <li>Adherence to theme (10%)</li>
+                    <li>Overall presentation (10%)</li>
                   </ul>
                 </div>
                 <div className="space-y-2">

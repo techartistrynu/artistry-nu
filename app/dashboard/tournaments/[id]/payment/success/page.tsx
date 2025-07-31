@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { fetchSubmissionById, getSubmissionById } from "@/app/actions/submissions"
 import { fetchTournamentById } from "@/app/actions/tournaments"
 import Image from "next/image"
+import { getCategoryLabels } from "@/lib/utils"
 
 export default function PaymentSuccessPage() {
   const router = useRouter()
@@ -175,7 +176,7 @@ export default function PaymentSuccessPage() {
           </div>
           <div className="receipt-line">
             <span className="receipt-label">Title:</span>
-            <span>Drawing and Painting</span>
+            <span>{getCategoryLabels(tournament.categories)}</span>
           </div>
         </div>
 

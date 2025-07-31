@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { getSubmissionById } from "@/app/actions/submissions"
 import Image from "next/image"
 import { fetchTournamentById } from "@/app/actions/tournaments"
+import { getCategoryLabels } from "@/lib/utils"
 
 export default function SubmissionDetailPage() {
   const { id: submissionId } = useParams()
@@ -175,7 +176,7 @@ export default function SubmissionDetailPage() {
           </div>
           <div className="receipt-line">
             <span className="receipt-label">Title:</span>
-            <span>Drawing and Painting</span>
+            <span>{getCategoryLabels(tournament.categories)}</span>
           </div>
         </div>
 
