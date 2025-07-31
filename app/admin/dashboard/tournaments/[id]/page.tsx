@@ -275,9 +275,7 @@ export default function TournamentPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Results Announcement:</span>
                     <span className="text-sm">
-                      {(tournament?.certificate_generated_at && new Date(tournament?.certificate_generated_at).toLocaleDateString()) ?? new Date(
-                        new Date(tournament.submission_deadline).getTime() + 14 * 24 * 60 * 60 * 1000,
-                      ).toLocaleDateString() }
+                      {(tournament?.result_date && new Date(tournament?.result_date).toLocaleDateString()) ?? "To be Commenced"}
                     </span>
                   </div>
                 </div>

@@ -96,6 +96,7 @@ export async function getSubmissionById(id: string) {
         created_at: toISOString(tournamentSnap.data()?.created_at),
         updated_at: toISOString(tournamentSnap.data()?.updated_at),
         submission_deadline: toISOString(tournamentSnap.data()?.submission_deadline),
+        result_date: toISOString(tournamentSnap.data()?.result_date),
         rank_generated_at: toISOString(tournamentSnap.data()?.rank_generated_at),
         certificates_generated_at: toISOString(tournamentSnap.data()?.certificates_generated_at),
         registration_start: toISOString(tournamentSnap.data()?.registration_start),

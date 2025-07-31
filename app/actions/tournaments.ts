@@ -27,6 +27,7 @@ export async function getAllTournaments() {
         registration_start: toISOString(data.registration_start),
         registration_end: toISOString(data.registration_end),
         submission_deadline: toISOString(data.submission_deadline),
+        result_date: toISOString(data.result_date),
         start_date: toISOString(data.start_date),
         end_date: toISOString(data.end_date),
         created_at: toISOString(data.created_at),
@@ -93,6 +94,7 @@ export async function getTournamentById(id: string) {
       registration_start: toISOString(data.registration_start),
       registration_end: toISOString(data.registration_end),
       submission_deadline: toISOString(data.submission_deadline),
+      result_date: toISOString(data.result_date),
       start_date: toISOString(data.start_date),
       end_date: toISOString(data.end_date),
       created_at: toISOString(data.created_at),
@@ -161,6 +163,7 @@ export async function fetchTournamentById(tournamentId: string) {
       registration_start: toISOString(data?.registration_start),
       registration_end: toISOString(data?.registration_end),
       submission_deadline: toISOString(data?.submission_deadline),
+      result_date: toISOString(data?.result_date),
       created_at: toISOString(data?.created_at),
       updated_at: toISOString(data?.updated_at),
       rank_generated: data?.rank_generated || false,
@@ -315,6 +318,7 @@ export async function createTournament(formData: FormData) {
   const registrationStartDate = formData.get('registrationStartDate') as string;
   const registrationEndDate = formData.get('registrationEndDate') as string;
   const submissionEndDate = formData.get('submissionEndDate') as string;
+  const resultDate = formData.get('resultDate') as string;
   const entryFee = parseFloat(formData.get('entryFee') as string);
   const firstPrize = formData.get('firstPrize') ? formData.get('firstPrize') as string : null;
   const secondPrize = formData.get('secondPrize') ? formData.get('secondPrize') as string : null;
@@ -336,6 +340,7 @@ export async function createTournament(formData: FormData) {
     registration_start: Timestamp.fromDate(new Date(registrationStartDate)),
     registration_end: Timestamp.fromDate(new Date(registrationEndDate)),
     submission_deadline: Timestamp.fromDate(new Date(submissionEndDate)),
+    result_date: Timestamp.fromDate(new Date(resultDate)),
     entry_fee: entryFee,
     first_prize: firstPrize,
     second_prize: secondPrize,
@@ -387,6 +392,7 @@ export async function editTournament(tournamentId: string, formData: FormData) {
     const registrationStartDate = formData.get('registrationStartDate') as string;
     const registrationEndDate = formData.get('registrationEndDate') as string;
     const submissionEndDate = formData.get('submissionEndDate') as string;
+    const resultDate = formData.get('resultDate') as string;
     const entryFee = parseFloat(formData.get('entryFee') as string);
     const firstPrize = formData.get('firstPrize') ? formData.get('firstPrize') as string : null;
     const secondPrize = formData.get('secondPrize') ? formData.get('secondPrize') as string : null;
@@ -408,6 +414,7 @@ export async function editTournament(tournamentId: string, formData: FormData) {
       registration_start: Timestamp.fromDate(new Date(registrationStartDate)),
       registration_end: Timestamp.fromDate(new Date(registrationEndDate)),
       submission_deadline: Timestamp.fromDate(new Date(submissionEndDate)),
+      result_date: Timestamp.fromDate(new Date(resultDate)),
       entry_fee: entryFee,
       first_prize: firstPrize,
       second_prize: secondPrize,
