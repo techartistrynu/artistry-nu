@@ -172,7 +172,7 @@ export default function SubmissionDetailPage() {
           <div className="section-title font-medium text-gray-800">Competition Details:</div>
           <div className="receipt-line">
             <span className="receipt-label">Category:</span>
-            <span>First Category</span>
+            <span>{tournament.title}</span>
           </div>
           <div className="receipt-line">
             <span className="receipt-label">Title:</span>

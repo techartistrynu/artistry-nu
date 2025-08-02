@@ -150,7 +150,7 @@ export default function TournamentPage() {
                     <li>All submissions come under these categories: {getCategoryLabels(tournament.categories)} are only accepted.</li>
                     <li>All submissions must be original work created by the participant</li>
                     <li>Age verification will be conducted after the competition and submissions may be rejected if verification fails</li>
-                    <li>Submissions must adhere to the competition theme</li>
+                    <li>Submissions must adhere to the competition concept</li>
                     <li>File formats: JPG, PNG (max 5MB per file)</li>
                     <li>Maximum of 5 entries per participant</li>
                   </ul>
@@ -160,8 +160,8 @@ export default function TournamentPage() {
                   <ul className="list-disc pl-5 text-muted-foreground">
                     <li>Creativity and originality (50%)</li>
                     <li>Technical skill and execution (30%)</li>
-                    <li>Adherence to theme (10%)</li>
-                    <li>Overall presentation (10%)</li>
+                    <li>Adherence to concept (10%)</li>
+                    <li>Overall composition (10%)</li>
                   </ul>
                 </div>
               </div>

@@ -318,7 +318,7 @@ export async function createTournament(formData: FormData) {
   const registrationStartDate = formData.get('registrationStartDate') as string;
   const registrationEndDate = formData.get('registrationEndDate') as string;
   const submissionEndDate = formData.get('submissionEndDate') as string;
-  const resultDate = formData.get('resultDate') as string;
+  const resultDate = formData.get('resultDate') as string || null;
   const entryFee = parseFloat(formData.get('entryFee') as string);
   const firstPrize = formData.get('firstPrize') ? formData.get('firstPrize') as string : null;
   const secondPrize = formData.get('secondPrize') ? formData.get('secondPrize') as string : null;
@@ -340,7 +340,7 @@ export async function createTournament(formData: FormData) {
     registration_start: Timestamp.fromDate(new Date(registrationStartDate)),
     registration_end: Timestamp.fromDate(new Date(registrationEndDate)),
     submission_deadline: Timestamp.fromDate(new Date(submissionEndDate)),
-    result_date: Timestamp.fromDate(new Date(resultDate)),
+    result_date: resultDate ? Timestamp.fromDate(new Date(resultDate)) : null,
     entry_fee: entryFee,
     first_prize: firstPrize,
     second_prize: secondPrize,
@@ -392,7 +392,7 @@ export async function editTournament(tournamentId: string, formData: FormData) {
     const registrationStartDate = formData.get('registrationStartDate') as string;
     const registrationEndDate = formData.get('registrationEndDate') as string;
     const submissionEndDate = formData.get('submissionEndDate') as string;
-    const resultDate = formData.get('resultDate') as string;
+    const resultDate = formData.get('resultDate') as string || null;
     const entryFee = parseFloat(formData.get('entryFee') as string);
     const firstPrize = formData.get('firstPrize') ? formData.get('firstPrize') as string : null;
     const secondPrize = formData.get('secondPrize') ? formData.get('secondPrize') as string : null;
@@ -414,7 +414,7 @@ export async function editTournament(tournamentId: string, formData: FormData) {
       registration_start: Timestamp.fromDate(new Date(registrationStartDate)),
       registration_end: Timestamp.fromDate(new Date(registrationEndDate)),
       submission_deadline: Timestamp.fromDate(new Date(submissionEndDate)),
-      result_date: Timestamp.fromDate(new Date(resultDate)),
+      result_date: resultDate ? Timestamp.fromDate(new Date(resultDate)) : null,
       entry_fee: entryFee,
       first_prize: firstPrize,
       second_prize: secondPrize,

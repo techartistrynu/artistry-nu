@@ -201,7 +201,7 @@ function NewTournamentForm() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="resultDate">Result Date</Label>
-                <Input id="resultDate" name="resultDate" type="date" defaultValue={defaultValues?.result_date?.slice(0, 10)} required />
+                <Input id="resultDate" name="resultDate" type="date" defaultValue={defaultValues?.result_date?.slice(0, 10)} />
               </div>
             </div>
             
