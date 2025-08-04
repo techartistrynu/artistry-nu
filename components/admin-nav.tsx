@@ -9,7 +9,7 @@ import {
   FileText,
   Award,
   CreditCard,
-  // Settings,
+  Settings,
   Users,
   ChevronsRight,
 } from "lucide-react"
@@ -30,7 +30,7 @@ const adminNavItems = [
   { title: "Certificates", href: "/admin/dashboard/certificates", icon: Award },
   { title: "Payments", href: "/admin/dashboard/payments", icon: CreditCard },
   { title: "Users", href: "/admin/dashboard/users", icon: Users },
-  // { title: "Settings", href: "/admin/dashboard/settings", icon: Settings },
+  { title: "Settings", href: "/admin/dashboard/settings", icon: Settings },
 ]
 
 export function AdminNav() {

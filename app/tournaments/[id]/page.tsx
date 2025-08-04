@@ -8,7 +8,7 @@ import Link from "next/link"
 import { useSession, signIn } from "next-auth/react"
 import { toast } from "@/components/ui/use-toast"
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { getTournamentById } from "@/app/actions/tournaments"
 import { getAgeRangeFromCategory, getCategoryLabels, getTournamentStatusText } from "@/lib/utils"
 
@@ -18,7 +18,7 @@ export default function TournamentPage() {
   const { data: session } = useSession()
   const [tournament, setTournament] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-
+  const router = useRouter()
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -61,6 +61,8 @@ export default function TournamentPage() {
         callbackUrl: `/dashboard/tournaments/${tournamentId}/submit`
       })
       return
+    }else{
+      router.push(`/dashboard/tournaments/${tournamentId}/submit`)
     }
   }
 

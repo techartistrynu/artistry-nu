@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "init-admin": "node scripts/init-admin.js",
+    "init-admin-simple": "node scripts/init-admin-simple.js",
+    "test-admin": "node scripts/test-admin.js"
   },
   "dependencies": {
     "@auth/core": "latest",
@@ -43,12 +46,15 @@
     "@react-pdf/renderer": "^4.3.0",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
+    "@types/bcryptjs": "^2.4.6",
     "autoprefixer": "^10.4.20",
+    "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "csv-parser": "^3.2.0",
     "date-fns": "latest",
+    "dotenv": "^17.2.1",
     "embla-carousel-react": "8.5.1",
     "firebase": "^11.7.3",
     "firebase-admin": "^13.4.0",

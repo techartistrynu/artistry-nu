@@ -15,19 +15,20 @@ export async function middleware(request: NextRequest) {
   if (pathname === '/login' || pathname === '/admin/login' || pathname === '/register') {
     if (token) {
       // If already logged in, redirect to appropriate dashboard
-      const redirectPath = token.role === 'admin' ? '/admin/dashboard' : '/dashboard'
+      const redirectPath = (token.role === 'admin' || token.role === 'super-admin') ? '/admin/dashboard' : '/dashboard'
       return NextResponse.redirect(new URL(redirectPath, request.url))
     }
     return response
   }
 
   // Protect dashboard routes
-  if (pathname.startsWith("/dashboard")) {
+  if (pathname.startsWith("/dashboard") && !pathname.startsWith("/admin/dashboard")) {
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.url))
     }
 
-    if (token.role == "admin") {
+    // If admin tries to access regular dashboard, redirect to admin dashboard
+    if (token.role === "admin" || token.role === "super-admin") {
       return NextResponse.redirect(new URL("/admin/dashboard", request.url))
     }
 
@@ -41,7 +42,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Check admin role
-    if (token.role !== "admin") {
+    if (token.role !== "admin" && token.role !== "super-admin") {
       return NextResponse.redirect(new URL("/dashboard", request.url))
     }
     

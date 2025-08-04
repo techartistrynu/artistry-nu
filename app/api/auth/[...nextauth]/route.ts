@@ -3,6 +3,7 @@ import NextAuth, { AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { findOrCreateUser } from "@/lib/firebase/api/accounts";
+import { verifyAdminCredentials } from "@/lib/firebase/api/admin";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth as firebaseAuth } from "@/lib/firebase/client";
 
@@ -19,24 +20,33 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const ADMIN_CREDENTIALS = {
-          email: process.env.ADMIN_EMAIL || "admin@example.com",
-          password: process.env.ADMIN_PASSWORD || "admin123",
-        };
-
-        if (
-          credentials?.email === ADMIN_CREDENTIALS.email &&
-          credentials?.password === ADMIN_CREDENTIALS.password
-        ) {
-         
-          return {
-            id: "admin-1",
-            name: "Admin",
-            email: ADMIN_CREDENTIALS.email,
-            role: "admin",
-          };
+        console.log("Authorize called with credentials:", { email: credentials?.email, password: "***" })
+        
+        if (!credentials?.email || !credentials?.password) {
+          console.log("Missing credentials")
+          return null;
         }
 
+        try {
+          console.log("Verifying admin credentials...")
+          const admin = await verifyAdminCredentials(credentials.email, credentials.password);
+          
+          if (admin) {
+            console.log("Admin verified successfully:", { id: admin.id, email: admin.email, role: admin.role })
+            return {
+              id: admin.id,
+              name: admin.name,
+              email: admin.email,
+              role: admin.role,
+            };
+          } else {
+            console.log("Admin verification failed - no admin found")
+          }
+        } catch (error) {
+          console.error("Admin authentication error:", error);
+        }
+
+        console.log("Returning null - authentication failed")
         return null;
       },
     }),
@@ -54,7 +64,7 @@ export const authOptions: AuthOptions = {
         }
       }
 
-      return account?.provider === "google" || user.id === "admin-1";
+      return account?.provider === "google" || user.role === "admin" || user.role === "super-admin";
     },
 
     async jwt({ token, user, account }) {
@@ -72,12 +82,28 @@ export const authOptions: AuthOptions = {
       }
       return session;
     },
+
+    async redirect({ url, baseUrl }) {
+      // Handle admin redirects
+      if (url.startsWith('/admin/')) {
+        return url;
+      }
+      // Handle relative URLs
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      // Handle external URLs
+      if (new URL(url).origin === baseUrl) {
+        return url;
+      }
+      return baseUrl;
+    },
   },
 
   pages: {
-    signIn: "/login",
+    signIn: "/admin/login",
     signOut: "/",
-    error: "/login",
+    error: "/admin/login",
   },
 
   session: {

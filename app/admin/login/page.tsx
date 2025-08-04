@@ -21,17 +21,23 @@ export default function AdminLoginPage() {
     setIsLoading(true)
     setError(null)
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-      callbackUrl: "/admin/dashboard"
-    })
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+        callbackUrl: "/admin/dashboard"
+      })
 
-    if (result?.error) {
-      setError(result.error)
-    } else if (result?.ok) {
-      router.push("/admin/dashboard")
+      if (result?.error) {
+        setError("Invalid email or password")
+      } else if (result?.ok) {
+        // Redirect to admin dashboard
+        router.push("/admin/dashboard")
+      }
+    } catch (error) {
+      console.error("Login error:", error)
+      setError("An error occurred during login")
     }
 
     setIsLoading(false)
