@@ -43,7 +43,7 @@ export default async function DashboardSubmissionsPage({
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h2 className="text-2xl font-bold tracking-tight md:text-3xl">My Submissions</h2>
-        <div className="relative w-full md:w-64">
+        {/* <div className="relative w-full md:w-64">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
           <Input
             type="search"
@@ -52,18 +52,18 @@ export default async function DashboardSubmissionsPage({
             defaultValue={query}
             name="query"
           />
-        </div>
+        </div> */}
       </div>
 
       <Tabs defaultValue={activeTab} className="space-y-4">
-        <div className="overflow-x-auto">
+        {/* <div className="overflow-x-auto">
           <TabsList className="w-full">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="draft">Drafts</TabsTrigger>
             <TabsTrigger value="pending">Pending</TabsTrigger>
             <TabsTrigger value="completed">Completed</TabsTrigger>
           </TabsList>
-        </div>
+        </div> */}
         
         {/* All Submissions Tab */}
         <TabsContent value="all" className="space-y-4">
@@ -191,7 +191,7 @@ export default async function DashboardSubmissionsPage({
         </TabsContent>
 
         {/* Pending Submissions Tab */}
-        <TabsContent value="pending" className="space-y-4">
+        {/* <TabsContent value="pending" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Pending Review</CardTitle>
@@ -243,7 +243,7 @@ export default async function DashboardSubmissionsPage({
               )}
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
 
         {/* Completed Submissions Tab */}
         <TabsContent value="completed" className="space-y-4">

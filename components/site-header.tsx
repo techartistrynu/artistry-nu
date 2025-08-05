@@ -53,7 +53,7 @@ export function SiteHeader() {
 
   const isLoading = status === "loading";
   const user = session?.user;
-  const isAdmin = user?.role === "admin" || "super-admin";
+  const isAdmin = user?.role === "admin" ||  user?.role === "super-admin";
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white pt-4 pb-2 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]">
