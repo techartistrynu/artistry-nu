@@ -274,7 +274,13 @@ export function SiteHeader() {
                     </div>
                   )}
                 </div>
-
+                <Link
+                  href="https://www.artistrynu.com/artistrynucomabout-artistrynu-artists-empowerment-and-networking"
+                  onClick={() => setIsOpen(false)}
+                  className="text-[15px] font-semibold"
+                >
+                  Blogs/Videos
+                </Link>
                 <Link
                   href="https://www.artistrynu.com/artistrynucomabout-artistrynu-artists-empowerment-and-networking"
                   onClick={() => setIsOpen(false)}

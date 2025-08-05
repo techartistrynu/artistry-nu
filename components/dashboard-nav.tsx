@@ -9,10 +9,10 @@ import {
   ImageIcon,
   CreditCard,
   Award,
-  // Settings,
   ChevronsRight,
   type LucideIcon,
 } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -32,9 +32,10 @@ interface NavItem {
 
 interface DashboardNavProps {
   items: NavItem[]
+  className?: string
 }
 
-export function DashboardNav({ items }: DashboardNavProps) {
+export function DashboardNav({ items, className }: DashboardNavProps) {
   const pathname = usePathname()
   const [isClient, setIsClient] = useState(false)
   const [open, setOpen] = useState(false)
@@ -44,40 +45,50 @@ export function DashboardNav({ items }: DashboardNavProps) {
   }, [])
 
   const getIcon = (icon: string): LucideIcon | null => {
-    switch (icon) {
-      case "layout-dashboard":
-        return LayoutDashboard
-      case "trophy":
-        return Trophy
-      case "image":
-        return ImageIcon
-      case "credit-card":
-        return CreditCard
-      case "award":
-        return Award
-      // case "settings":
-      //   return Settings
-      default:
-        return null
+    const iconMap: Record<string, LucideIcon> = {
+      "layout-dashboard": LayoutDashboard,
+      "trophy": Trophy,
+      "image": ImageIcon,
+      "credit-card": CreditCard,
+      "award": Award,
     }
+    return iconMap[icon] || null
   }
 
   const navLinks = (
-    <nav className="grid gap-2 py-2">
-      {items.map((item) => {
+    <nav className="grid gap-1">
+      {items.map((item, index) => {
         const Icon = getIcon(item.icon)
+        const isActive = pathname === item.href
+        
         return (
-          <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
-            <span
-              className={cn(
-                "group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                pathname === item.href ? "bg-muted" : ""
-              )}
-            >
-              {Icon && <Icon className="mr-2 h-4 w-4" />}
-              {item.title}
-            </span>
-          </Link>
+          <motion.div
+            key={item.href}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 * index }}
+          >
+            <Link href={item.href} onClick={() => setOpen(false)}>
+              <motion.span
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={cn(
+                  "group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  isActive 
+                    ? "bg-[#A9446B]/10 text-[#A9446B] font-semibold"
+                    : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
+                )}
+              >
+                {Icon && (
+                  <Icon className={cn(
+                    "mr-3 h-4 w-4 transition-colors",
+                    isActive ? "text-[#A9446B]" : "text-muted-foreground group-hover:text-foreground"
+                  )} />
+                )}
+                <span>{item.title}</span>
+              </motion.span>
+            </Link>
+          </motion.div>
         )
       })}
     </nav>
@@ -85,27 +96,72 @@ export function DashboardNav({ items }: DashboardNavProps) {
 
   return (
     <>
-      {/* Mobile trigger */}
+      {/* Mobile Navigation */}
       {isClient && (
-        <div className="md:hidden fixed z-50 left-2 top-1/2 -translate-y-1/2 transform">
+        <div className={cn("md:hidden fixed z-50 left-2 top-1/2 -translate-y-1/2", className)}>
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="rounded-full shadow-md">
-                <ChevronsRight className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64 pt-10">
-              <SheetHeader>
-                <SheetTitle className="text-lg">Dashboard Menu</SheetTitle>
-              </SheetHeader>
-              <div className="mt-4">{navLinks}</div>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <SheetTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-full shadow-lg bg-[#A9446B] hover:bg-[#8a3a5a] transition-colors"
+                >
+                  <ChevronsRight className="h-5 w-5 text-white" />
+                </Button>
+              </SheetTrigger>
+            </motion.div>
+
+            <SheetContent 
+              side="left" 
+              className="w-64 pt-10 bg-background/95 backdrop-blur-sm"
+              onInteractOutside={(e) => e.preventDefault()}
+            >
+              <AnimatePresence>
+                {open && (
+                  <>
+                    <motion.div
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <SheetHeader>
+                        <SheetTitle className="text-lg font-bold text-[#A9446B]">
+                          Dashboard Menu
+                        </SheetTitle>
+                      </SheetHeader>
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="mt-6"
+                    >
+                      {navLinks}
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
             </SheetContent>
           </Sheet>
         </div>
       )}
 
-      {/* Desktop sidebar */}
-      <div className="hidden md:block">{navLinks}</div>
+      {/* Desktop Navigation */}
+      <div className={cn("hidden md:block h-full border-r pr-4", className)}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="h-full"
+        >
+          {navLinks}
+        </motion.div>
+      </div>
     </>
   )
 }

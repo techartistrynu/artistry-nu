@@ -4,8 +4,7 @@
 import { db, storage } from "@/lib/firebase/server"
 import { revalidatePath } from "next/cache"
 import { Timestamp } from "firebase-admin/firestore"
-import { getDownloadURL } from "firebase/storage"
-import { ref } from "firebase/storage"
+
 
 export interface Submission {
   id: string
