@@ -26,7 +26,7 @@ export default function AdminLoginPage() {
         email,
         password,
         redirect: false,
-        callbackUrl: "/admin/dashboard"
+        callbackUrl: `${window.location.origin}/admin/dashboard` 
       })
 
       if (result?.error) {

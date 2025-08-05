@@ -306,7 +306,7 @@ export async function getSubmissionsByTournament(
   searchQuery: string = ""
 ) {
   try {
-    let query = db.collection("submissions").where("tournament_id", "==", tournamentId);
+    let query = db.collection("submissions").where("tournament_id", "==", tournamentId).where("payment_status", "==", "paid");
 
     if (searchQuery) {
       query = query.where("applicant_name", ">=", searchQuery)

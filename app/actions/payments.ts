@@ -122,6 +122,7 @@ export async function getAllPayments() {
   try {
     const paymentsSnap = await db.collection("payments")
       .where("payment_status", "==", "paid")
+      .orderBy("payment_date", "desc")
       .get()
 
     const payments = await Promise.all(

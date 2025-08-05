@@ -149,16 +149,16 @@ export default function AboutPage() {
               </p>
             </CardContent>
           </Card>
-          <div className="text-center p-6 justify-center items-center">
+        </div>
+        <div className="text-center p-6 justify-center items-center">
             <CardContent className="p-6">
                 <p className="text-muted-foreground">
                     This site is developed by <a href="https://www.linkedin.com/in/mdozairq/" className="text-primary">Ozair Tech</a>
-                    <br />
+                    . 
                     you can reach out to me on <a href="mailto:workwithozair@gmail.com" className="text-primary">E-Mail</a>
                 </p>
             </CardContent>
           </div>
-        </div>
       </div>
     </div>
   )
