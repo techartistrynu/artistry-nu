@@ -53,7 +53,7 @@ export function SiteHeader() {
 
   const isLoading = status === "loading";
   const user = session?.user;
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "admin" || "super-admin";
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white pt-4 pb-2 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]">
@@ -337,6 +337,50 @@ export function SiteHeader() {
                     )}
                   </>
                 )}
+                {/* Mobile Social Icons - Added horizontal row */}
+                <div className="flex items-center justify-left gap-4 pt-4">
+                  <Link
+                    href="https://www.facebook.com/profile.php?id=61575928265606"
+                    target="_blank"
+                    onClick={() => setIsOpen(false)}
+                    className="text-black hover:text-[#A9446B] transition-colors"
+                  >
+                    <SocialIcons.Facebook />
+                  </Link>
+                  <Link
+                    href="https://www.instagram.com/artistrynu.official/"
+                    target="_blank"
+                    onClick={() => setIsOpen(false)}
+                    className="text-black hover:text-[#A9446B] transition-colors"
+                  >
+                    <SocialIcons.Instagram />
+                  </Link>
+                  <Link 
+                    href="https://x.com/artistrynu" 
+                    target="_blank"
+                    onClick={() => setIsOpen(false)}
+                    className="text-black hover:text-[#A9446B] transition-colors"
+                  >
+                    <SocialIcons.X />
+                  </Link>
+                  <Link
+                    href="https://www.youtube.com/@ArtistrynuPvtLtd"
+                    target="_blank"
+                    onClick={() => setIsOpen(false)}
+                    className="text-black hover:text-[#A9446B] transition-colors"
+                  >
+                    <SocialIcons.Youtube />
+                  </Link>
+                  <Link
+                    href="https://www.linkedin.com/company/artistrynu-pvt-ltd/about/?viewAsMember=true"
+                    target="_blank"
+                    onClick={() => setIsOpen(false)}
+                    className="text-black hover:text-[#A9446B] transition-colors"
+                  >
+                    <SocialIcons.Linkedin />
+                  </Link>
+                </div>
+
               </div>
             </SheetContent>
           </Sheet>
