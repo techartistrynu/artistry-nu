@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  other: {
+    "google-site-verification": "mfEjX5MmRoaPknlGu-rcXF0KFfN38_YUhqvf-fp80z4",
+  },
 }
 
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID
