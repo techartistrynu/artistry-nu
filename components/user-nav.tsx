@@ -52,7 +52,7 @@ export function UserNav({ user }: UserNavProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          {user.role === "admin" ? (
+          {user.role === "admin" || user.role === "super-admin" ? (
             <Link href="/admin/dashboard">
               <DropdownMenuItem>Admin Dashboard</DropdownMenuItem>
             </Link>
