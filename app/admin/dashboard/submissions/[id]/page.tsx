@@ -433,7 +433,8 @@ export default function SubmissionDetailPage() {
             <CardContent>
               <SubmissionReviewForm 
                 submissionId={params.id as string} 
-                initialScore={submission.score} 
+                initialScore={submission.score}
+                paid={submission.payment_status === 'paid'} 
                 onUpdate={handleSubmissionUpdate}
               />
             </CardContent>

@@ -9,11 +9,13 @@ import { updateSubmissionScore } from "@/app/actions/submissions"
 
 export function SubmissionReviewForm({ 
   submissionId, 
-  initialScore, 
+  initialScore,
+  paid, 
   onUpdate 
 }: { 
   submissionId: string, 
   initialScore?: number,
+  paid?: boolean,
   onUpdate?: (score: number, status: string) => void
 }) {
   async function handleSubmit(formData: FormData) {
@@ -65,7 +67,7 @@ export function SubmissionReviewForm({
           defaultValue={initialScore || ""}
           placeholder="Enter score"
           required
-          disabled={!!initialScore}
+          disabled={!!initialScore || !paid}
         />
       </div>
       
@@ -76,7 +78,7 @@ export function SubmissionReviewForm({
           value="rejected"
           variant="destructive"
           className="flex-1 gap-2"
-          disabled={!!initialScore}
+          disabled={!!initialScore || !paid}
         >
           <XCircle className="h-4 w-4" />
           Reject
@@ -86,7 +88,7 @@ export function SubmissionReviewForm({
           name="status"
           value="approved"
           className="flex-1 gap-2"
-          disabled={!!initialScore}
+          disabled={!!initialScore || !paid}
         >
           <CheckCircle2 className="h-4 w-4" />
           Approve

@@ -169,7 +169,8 @@ export default function AdminCertificatesPage() {
           selectedTournament,
           currentPage,
           itemsPerPage,
-          searchQuery
+          searchQuery,
+          true
         );
         setSubmissions(submissions);
         setFilteredSubmissions(submissions);

@@ -274,38 +274,37 @@ export default function AdminSubmissionsPage() {
             </div>
           ) : selectedTournament && submissions.length > 0 ? (
             <div className="space-y-4">
-              <div className="rounded-md border overflow-x-auto">
-                <div className="min-w-[1000px]">
-                  {/* Header row */}
-                  <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted/50 text-center">
-                    <div className="col-span-2">User</div>
-                    <div className="col-span-2">Email</div>
-                    <div className="col-span-2">Submission Title</div>
-                    <div className="col-span-2">Files</div>
-                    <div className="col-span-2">Date</div>
-                    <div className="col-span-1">Score</div>
-                    <div className="col-span-1">Actions</div>
-                  </div>
-
-                  {/* Data rows */}
-                  <div className="divide-y">
-                    {submissions.map((submission) => (
-                      <div
-                        key={submission.id}
-                        className="grid grid-cols-12 items-center p-4 hover:bg-muted/50 text-center"
-                      >
-                        <div className="col-span-2 font-medium">
-                          {submission.applicant_name || "N/A"}
-                        </div>
-                        <div className="col-span-2 truncate text-sm">
-                          {submission.user?.email || "N/A"}
-                        </div>
-                        <div className="col-span-2 truncate">
-                          {submission.title || "N/A"}
-                        </div>
-                        <div className="col-span-2">
-                          {submission.files?.length > 0 ? (
-                            <div className="flex gap-2 justify-center">
+              <div className="rounded-md border">
+                <div className="relative overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs bg-muted/50">
+                      <tr>
+                        <th scope="col" className="px-6 py-3">User</th>
+                        <th scope="col" className="px-6 py-3 hidden md:table-cell">Email</th>
+                        <th scope="col" className="px-6 py-3">Title</th>
+                        <th scope="col" className="px-6 py-3">Files</th>
+                        <th scope="col" className="px-6 py-3 hidden sm:table-cell">Date</th>
+                        <th scope="col" className="px-6 py-3">Score</th>
+                        <th scope="col" className="px-6 py-3">Payment</th>
+                        <th scope="col" className="px-6 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {submissions.map((submission) => (
+                        <tr key={submission.id} className="hover:bg-muted/50">
+                          <td className="px-6 py-4 font-medium whitespace-nowrap">
+                            {submission.applicant_name || "N/A"}
+                          </td>
+                          <td className="px-6 py-4 hidden md:table-cell">
+                            <div className="max-w-[200px] truncate">
+                              {submission.user?.email || "N/A"}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 max-w-[150px] truncate">
+                            {submission.title || "N/A"}
+                          </td>
+                          <td className="px-6 py-4">
+                            {submission.files?.length > 0 ? (
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -317,32 +316,40 @@ export default function AdminSubmissionsPage() {
                               >
                                 <ImageIcon className="h-4 w-4" />
                               </Button>
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground">No files</span>
-                          )}
-                        </div>
-                        <div className="col-span-2 text-sm">
-                          {submission.created_at
-                            ? new Date(submission.created_at).toLocaleDateString()
-                            : "N/A"}
-                        </div>
-                        <div className="col-span-1 text-sm">
-                          {submission.score ? submission.score.toFixed(2) : "N/A"}
-                        </div>
-                        <div className="col-span-1 flex justify-center">
-                          <Link
-                            href={`/admin/dashboard/submissions/${submission.id}`}
-                          >
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4 mr-1" />
-                              View
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                            ) : (
+                              <span className="text-muted-foreground">No files</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 hidden sm:table-cell">
+                            {submission.created_at
+                              ? new Date(submission.created_at).toLocaleDateString()
+                              : "N/A"}
+                          </td>
+                          <td className="px-6 py-4">
+                            {submission.score ? submission.score.toFixed(2) : "N/A"}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${submission.payment_status === 'paid'
+                                ? 'bg-green-100 text-green-800'
+                                : submission.payment_status === 'pending'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                              {submission.payment_status || 'unpaid'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <Link href={`/admin/dashboard/submissions/${submission.id}`}>
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-4 w-4" />
+                                <span className="sr-only md:not-sr-only md:ml-1">View</span>
+                              </Button>
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

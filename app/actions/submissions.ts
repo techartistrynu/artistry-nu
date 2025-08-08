@@ -302,10 +302,15 @@ export async function getSubmissionsByTournament(
   tournamentId: string,
   page: number = 1,
   limit: number = 10,
-  searchQuery: string = ""
+  searchQuery: string = "",
+  isPaid?: boolean
 ) {
   try {
-    let query = db.collection("submissions").where("tournament_id", "==", tournamentId).where("payment_status", "==", "paid");
+    let query = db.collection("submissions").where("tournament_id", "==", tournamentId)
+
+    if(isPaid){
+      query =query.where("payment_status", "==", "paid");
+    }
 
     if (searchQuery) {
       query = query.where("applicant_name", ">=", searchQuery)
@@ -385,6 +390,7 @@ export async function getSubmissionsByTournament(
           date_of_birth: submissionData.date_of_birth || null,
           certificate_url: submissionData.certificate_url || null,
           submission_number: submissionData.submission_number || null,
+          payment_status: submissionData.payment_status || null,
           reviewed_at: submissionData.reviewed_at?.toDate?.().toISOString() || null,
           created_at: submissionData.created_at?.toDate?.().toISOString() || null,
           updated_at: submissionData.updated_at?.toDate?.().toISOString() || null,
