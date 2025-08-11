@@ -4,6 +4,8 @@ import { Trophy, Upload, CreditCard, Award } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getTournamentStatusText } from "@/lib/utils"
+import { formatPriceWithDiscount } from "@/lib/utils"
+import { DiscountPopup } from "@/components/ui/discount-popup"
 
 // Static fallback data
 const staticData = {
@@ -15,6 +17,7 @@ const staticData = {
       status: "open",
       submission_deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
       entry_fee: 25,
+      discount_percent: 0,
     },
     {
       id: "2",
@@ -23,6 +26,7 @@ const staticData = {
       status: "open",
       submission_deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       entry_fee: 15,
+      discount_percent: 0,
     },
     {
       id: "3",
@@ -31,6 +35,7 @@ const staticData = {
       status: "coming_soon",
       submission_deadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(),
       entry_fee: 20,
+      discount_percent: 0,
     },
   ],
 }
@@ -155,7 +160,21 @@ export default function StaticDashboardPage() {
                       <div className="rounded-full bg-muted px-3 py-1 text-xs">
                         Deadline: {new Date(tournament.submission_deadline).toLocaleDateString()}
                       </div>
-                      <div className="rounded-full bg-muted px-3 py-1 text-xs">Entry Fee: ₹{tournament.entry_fee}</div>
+                      <div className="rounded-full bg-muted px-3 py-1 text-xs">
+                        Entry Fee: {(() => {
+                          const priceInfo = formatPriceWithDiscount(tournament.entry_fee, tournament.discount_percent);
+                          if (priceInfo.hasDiscount) {
+                            return (
+                              <>
+                                <span className="line-through">{priceInfo.originalPrice}</span>
+                                <span className="ml-1 text-green-600 font-medium">{priceInfo.discountedPrice}</span>
+                                <span className="ml-1 text-xs text-green-600">({tournament.discount_percent}% off)</span>
+                              </>
+                            );
+                          }
+                          return priceInfo.originalPrice;
+                        })()}
+                      </div>
                     </div>
                     {tournament.status === "open" && (
                       <div className="mt-2">
@@ -171,6 +190,19 @@ export default function StaticDashboardPage() {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Discount Popup for tournaments with >30% discount */}
+      {staticData.tournaments.map((tournament) => 
+        tournament.discount_percent && tournament.discount_percent > 30 ? (
+          <DiscountPopup
+            key={`popup-${tournament.id}`}
+            discountPercent={tournament.discount_percent}
+            originalPrice={tournament.entry_fee}
+            discountedPrice={Math.round((tournament.entry_fee * (100 - tournament.discount_percent)) / 100)}
+            tournamentTitle={tournament.title}
+          />
+        ) : null
+      )}
     </div>
   )
 }

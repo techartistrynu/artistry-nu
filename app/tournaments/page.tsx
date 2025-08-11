@@ -16,7 +16,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getAllTournaments } from "../actions/tournaments";
 import { toast } from "sonner";
-import { getCategoryLabels, getTournamentStatusText } from "@/lib/utils";
+import { getCategoryLabels, getTournamentStatusText, formatPriceWithDiscount } from "@/lib/utils";
+import { TournamentsHomePopup } from "@/components/ui/tournaments-home-popup";
 
 export default function TournamentsPage() {
   const { data: session } = useSession()
@@ -33,7 +34,8 @@ export default function TournamentsPage() {
            new Error("Tournament not found")
         }
 
-        setTournaments(tournamentData.filter((tournament: any) => tournament.status !== "closed"))
+        const filteredTournaments = tournamentData.filter((tournament: any) => tournament.status !== "closed")
+        setTournaments(filteredTournaments)
       } catch (error) {
         console.error("Error fetching data:", error)
         toast.error("Failed to load tournament details")
@@ -82,6 +84,11 @@ export default function TournamentsPage() {
                       </CardDescription>
                   </div>
                   <Badge className={`capitalize ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>{getTournamentStatusText(tournament.status)}</Badge>
+                  {tournament.discount_percent > 0 && (
+                    <Badge className="bg-orange-500 hover:bg-orange-600 ml-2">
+                      {tournament.discount_percent}% OFF
+                    </Badge>
+                  )}
                 </div>
               </CardHeader>
               <CardContent className="flex-1">
@@ -111,7 +118,21 @@ export default function TournamentsPage() {
                   </div>
                   <div className="flex items-center text-sm">
                     <BadgeIndianRupee className="mr-2 h-4 w-4 text-muted-foreground" />
-                    <span>Entry Fee: ₹{tournament.entry_fee}</span>
+                    <span>
+                      Entry Fee: {(() => {
+                        const priceInfo = formatPriceWithDiscount(tournament.entry_fee, tournament.discount_percent);
+                        if (priceInfo.hasDiscount) {
+                          return (
+                            <>
+                              <span className="line-through text-muted-foreground">{priceInfo.originalPrice}</span>
+                              <span className="ml-2 text-green-600 font-medium">{priceInfo.discountedPrice}</span>
+                              <span className="ml-2 text-xs text-green-600">({tournament.discount_percent}% off)</span>
+                            </>
+                          );
+                        }
+                        return priceInfo.originalPrice;
+                      })()}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -128,6 +149,9 @@ export default function TournamentsPage() {
           </div>
         )}
       </div>
+      
+      {/* Discount Popup for tournaments with maximum discount */}
+      <TournamentsHomePopup tournaments={tournaments} />
     </div>
   );
 }

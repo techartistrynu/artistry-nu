@@ -25,6 +25,7 @@ import {
   getTournamentById,
   getUserSubmissionForTournament,
 } from "@/app/actions/tournaments";
+import { getTournamentStatusText, formatPriceWithDiscount } from "@/lib/utils";
 import {
   Select,
   SelectValue,
@@ -32,6 +33,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 export default function SubmitToTournamentPage() {
   const router = useRouter();
@@ -156,10 +158,14 @@ export default function SubmitToTournamentPage() {
   const triggerPayment = async (submissionId: string) => {
     try {
       setIsPaymentLoading(true);
+      const discountedAmount = tournament?.discount_percent 
+        ? Math.round((tournament.entry_fee * (100 - tournament.discount_percent))/100)
+        : tournament?.entry_fee || 1000;
+      
       const res = await fetch("/api/payment/order", {
         method: "POST",
         body: JSON.stringify({
-          amount: tournament?.entry_fee || 1000,
+          amount: discountedAmount,
           submissionId,
         }),
       });
@@ -305,6 +311,7 @@ export default function SubmitToTournamentPage() {
                   value={applicantName}
                   onChange={(e) => setApplicantName(e.target.value)}
                   required
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
@@ -315,9 +322,10 @@ export default function SubmitToTournamentPage() {
                   type="date"
                   onChange={(e) => setDateOfBirth(new Date(e.target.value))}
                   required
+                  className="w-full"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="phoneNumber">Phone Number</Label>
                 <Input
                   id="phoneNumber"
@@ -326,6 +334,7 @@ export default function SubmitToTournamentPage() {
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   pattern="[0-9]{10}"
                   placeholder="10-digit number"
+                  className="w-full"
                 />
               </div>
             </div>
@@ -337,6 +346,7 @@ export default function SubmitToTournamentPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
+                className="w-full"
               />
             </div>
 
@@ -348,20 +358,19 @@ export default function SubmitToTournamentPage() {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={5}
                 required
+                className="w-full"
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="source">Where you heard about us</Label>
               <Select
                 name="source"
                 value={source}
-                onValueChange={(value) => {
-                  setSource(value); 
-                  console.log("Selected source:", value);
-                }}
+                onValueChange={(value) => setSource(value)}
                 required
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select source" />
                 </SelectTrigger>
                 <SelectContent>
@@ -373,11 +382,12 @@ export default function SubmitToTournamentPage() {
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="files">Upload Files*</Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center">
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center w-full">
                 <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                <p className="text-sm text-gray-500 mb-2">
+                <p className="text-sm text-gray-500 mb-2 text-center">
                   Drag and drop or click to upload
                 </p>
                 <Input
@@ -393,6 +403,7 @@ export default function SubmitToTournamentPage() {
                   type="button"
                   variant="outline"
                   onClick={() => document.getElementById("files")?.click()}
+                  className="w-full mt-2"
                 >
                   Select Files
                 </Button>
@@ -408,7 +419,34 @@ export default function SubmitToTournamentPage() {
               )}
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col space-y-4 ">
+            {tournament?.discount_percent && tournament.discount_percent > 0 && (
+              <div className="w-full mb-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-green-800">Discount Applied</h3>
+                  <Badge className="bg-green-500 text-white">
+                    {tournament.discount_percent}% OFF
+                  </Badge>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Original Entry Fee:</span>
+                    <span className="line-through">₹{tournament.entry_fee}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Discount Amount:</span>
+                    <span className="text-green-600">-₹{Math.round((tournament.entry_fee * tournament.discount_percent) / 100)}</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-2">
+                    <span className="font-semibold">Final Amount:</span>
+                    <span className="font-bold text-green-600 text-lg">
+                      ₹{Math.round((tournament.entry_fee * (100 - tournament.discount_percent)) / 100)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <Button
               type="submit"
               disabled={isSubmitting || isUploading || isPaymentLoading}
@@ -424,7 +462,18 @@ export default function SubmitToTournamentPage() {
                     : "Submitting..."}
                 </>
               ) : (
-                `Submit and Pay ₹${tournament?.entry_fee}`
+                (() => {
+                  const priceInfo = formatPriceWithDiscount(tournament?.entry_fee || 0, tournament?.discount_percent);
+                  if (priceInfo.hasDiscount) {
+                    return (
+                      <>
+                        Submit and Pay {priceInfo.discountedPrice}
+                        <span className="ml-1 text-xs text-muted-foreground line-through">{priceInfo.originalPrice}</span>
+                      </>
+                    );
+                  }
+                  return `Submit and Pay ${priceInfo.originalPrice}`;
+                })()
               )}
             </Button>
           </CardFooter>

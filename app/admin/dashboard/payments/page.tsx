@@ -20,6 +20,8 @@ interface Payment {
   userId: string
   userName: string
   userEmail: string
+  discount_percent?: number
+  original_amount?: number
 }
 
 export default function AdminPaymentsPage() {
@@ -108,9 +110,10 @@ export default function AdminPaymentsPage() {
                     <div className="col-span-2">Tournament</div>
                     <div className="col-span-2">Payment ID</div>
                     <div className="col-span-1">Amount</div>
+                    <div className="col-span-1">Discount</div>
                     <div className="col-span-2">User</div>
                     <div className="col-span-2">Email</div>
-                    <div className="col-span-2">Submission ID</div>
+                    <div className="col-span-1">Submission ID</div>
                     <div className="col-span-1">Date</div>
                   </div>
 
@@ -124,9 +127,23 @@ export default function AdminPaymentsPage() {
                         <div className="col-span-2 truncate">{payment.tournamentTitle}</div>
                         <div className="col-span-2 truncate text-muted-foreground">{payment.id}</div>
                         <div className="col-span-1 font-semibold">₹{payment.amount}</div>
+                        <div className="col-span-1">
+                          {payment.discount_percent && payment.discount_percent > 0 && payment.original_amount ? (
+                            <div className="flex flex-col">
+                              <span className="text-green-600 font-medium text-xs">
+                                -{payment.discount_percent}%
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                Saved ₹{Math.round((payment.original_amount * payment.discount_percent) / 100)}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">No discount</span>
+                          )}
+                        </div>
                         <div className="col-span-2 truncate">{payment.userName}</div>
                         <div className="col-span-2 truncate text-muted-foreground">{payment.userEmail}</div>
-                        <div className="col-span-2 truncate">{payment.submissionId}</div>
+                        <div className="col-span-1 truncate">{payment.submissionId}</div>
                         <div className="col-span-1">
                           {new Date(payment.date).toLocaleDateString("en-IN")}
                         </div>

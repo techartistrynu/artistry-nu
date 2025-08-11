@@ -213,18 +213,31 @@ export default function PaymentSuccessPage() {
         <div>
           <div className="section-title font-medium text-gray-800">Payment Details:</div>
           <div className="payment-details bg-gray-50 p-4 rounded">
-            <div className="receipt-line">
-              <span className="receipt-label">Base Amount:</span>
-              <span>₹{baseAmount.toFixed(2)}</span>
-            </div>
-            {/* <div className="receipt-line">
-              <span className="receipt-label">GST (18%):</span>
-              <span>₹{gstAmount}</span>
-            </div> */}
-            <div className="receipt-line total-amount">
-              <span className="receipt-label">Total Paid:</span>
-              <span>₹{totalAmount}</span>
-            </div>
+            {tournament?.discount_percent && tournament.discount_percent > 0 ? (
+              <>
+                <div className="receipt-line">
+                  <span className="receipt-label">Original Entry Fee:</span>
+                  <span>₹{tournament.entry_fee}</span>
+                </div>
+                <div className="receipt-line">
+                  <span className="receipt-label">Discount Applied:</span>
+                  <span className="text-green-600">-{tournament.discount_percent}%</span>
+                </div>
+                <div className="receipt-line">
+                  <span className="receipt-label">Discount Amount:</span>
+                  <span className="text-green-600">-₹{Math.round((tournament.entry_fee * tournament.discount_percent) / 100)}</span>
+                </div>
+                <div className="receipt-line total-amount">
+                  <span className="receipt-label">Final Amount:</span>
+                  <span>₹{baseAmount.toFixed(2)}</span>
+                </div>
+              </>
+            ) : (
+              <div className="receipt-line">
+                <span className="receipt-label">Entry Fee:</span>
+                <span>₹{baseAmount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="receipt-line">
               <span className="receipt-label">Payment Date:</span>
               <span>{submission.created_at ? new Date(submission.created_at).toLocaleDateString('en-GB') : "N/A"}</span>

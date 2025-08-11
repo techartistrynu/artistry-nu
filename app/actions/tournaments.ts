@@ -36,6 +36,7 @@ export async function getAllTournaments() {
         rank_generated_at: toISOString(data.rank_generated_at),
         certificates_generated: data.certificates_generated || false,
         certificates_generated_at: toISOString(data.certificates_generated_at),
+        discount_percent: data.discount_percent || 0, // Explicitly include discount_percent
         status: (() => {
           const now = new Date();
           const registrationStart = data.registration_start?.toDate?.() || new Date(data.registration_start);
@@ -170,6 +171,7 @@ export async function fetchTournamentById(tournamentId: string) {
       rank_generated_at: toISOString(data?.rank_generated_at),
       certificates_generated: data?.certificates_generated || false,
       certificates_generated_at: toISOString(data?.certificates_generated_at),
+      discount_percent: data?.discount_percent || 0, // Explicitly include discount_percent
       status: (() => {
           const now = new Date();
           const registrationStart = data?.registration_start?.toDate?.() || new Date(data?.registration_start);
@@ -197,9 +199,16 @@ export async function fetchTournamentById(tournamentId: string) {
 export async function getAllTournamentForUser() {
   try {
     const snapshot = await db.collection("tournaments").where("status", "==", "open").orderBy("registration_start", "desc").get()
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    return snapshot.docs.map(doc => {
+      const data = doc.data()
+      return {
+        id: doc.id,
+        ...data,
+        discount_percent: data.discount_percent || 0 // Ensure discount_percent is included
+      }
+    })
   } catch (error) {
-    console.error("Error in getTournamentById:", error)
+    console.error("Error in getAllTournamentForUser:", error)
     return null
   }
 }
@@ -320,6 +329,7 @@ export async function createTournament(formData: FormData) {
   const submissionEndDate = formData.get('submissionEndDate') as string;
   const resultDate = formData.get('resultDate') as string || null;
   const entryFee = parseFloat(formData.get('entryFee') as string);
+  const discountPercent = formData.get('discountPercent') ? parseFloat(formData.get('discountPercent') as string) : 0;
   const firstPrize = formData.get('firstPrize') ? formData.get('firstPrize') as string : null;
   const secondPrize = formData.get('secondPrize') ? formData.get('secondPrize') as string : null;
   const thirdPrize = formData.get('thirdPrize') ? formData.get('thirdPrize') as string : null;
@@ -342,6 +352,7 @@ export async function createTournament(formData: FormData) {
     submission_deadline: Timestamp.fromDate(new Date(submissionEndDate)),
     result_date: resultDate ? Timestamp.fromDate(new Date(resultDate)) : null,
     entry_fee: entryFee,
+    discount_percent: discountPercent,
     first_prize: firstPrize,
     second_prize: secondPrize,
     third_prize: thirdPrize,
@@ -394,6 +405,7 @@ export async function editTournament(tournamentId: string, formData: FormData) {
     const submissionEndDate = formData.get('submissionEndDate') as string;
     const resultDate = formData.get('resultDate') as string || null;
     const entryFee = parseFloat(formData.get('entryFee') as string);
+    const discountPercent = formData.get('discountPercent') ? parseFloat(formData.get('discountPercent') as string) : 0;
     const firstPrize = formData.get('firstPrize') ? formData.get('firstPrize') as string : null;
     const secondPrize = formData.get('secondPrize') ? formData.get('secondPrize') as string : null;
     const thirdPrize = formData.get('thirdPrize') ? formData.get('thirdPrize') as string : null;
@@ -416,6 +428,7 @@ export async function editTournament(tournamentId: string, formData: FormData) {
       submission_deadline: Timestamp.fromDate(new Date(submissionEndDate)),
       result_date: resultDate ? Timestamp.fromDate(new Date(resultDate)) : null,
       entry_fee: entryFee,
+      discount_percent: discountPercent,
       first_prize: firstPrize,
       second_prize: secondPrize,
       third_prize: thirdPrize,

@@ -10,7 +10,8 @@ import { toast } from "@/components/ui/use-toast"
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { getTournamentById } from "@/app/actions/tournaments"
-import { getAgeRangeFromCategory, getCategoryLabels, getTournamentStatusText } from "@/lib/utils"
+import { getAgeRangeFromCategory, getCategoryLabels, getTournamentStatusText, formatPriceWithDiscount } from "@/lib/utils"
+import { DiscountPopup } from "@/components/ui/discount-popup"
 
 export default function TournamentPage() {
   const params = useParams()
@@ -221,7 +222,21 @@ export default function TournamentPage() {
                       <BadgeIndianRupee className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium">Entry Fee:</span>
                     </div>
-                    <span className="text-sm font-medium">₹{tournament.entry_fee}</span>
+                    <div className="text-right">
+                      {(() => {
+                        const priceInfo = formatPriceWithDiscount(tournament.entry_fee, tournament.discount_percent);
+                        if (priceInfo.hasDiscount) {
+                          return (
+                            <div className="flex flex-col items-end">
+                              <span className="line-through text-muted-foreground text-xs">{priceInfo.originalPrice}</span>
+                              <span className="text-green-600 font-medium">{priceInfo.discountedPrice}</span>
+                              <span className="text-xs text-green-600">({tournament.discount_percent}% off)</span>
+                            </div>
+                          );
+                        }
+                        return <span className="text-sm font-medium">{priceInfo.originalPrice}</span>;
+                      })()}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -309,6 +324,17 @@ export default function TournamentPage() {
           </Card>
         </div>
       </div>
+      
+      {/* Discount Popup for tournaments with >30% discount */}
+      {tournament?.discount_percent && tournament.discount_percent > 30 && (
+        <DiscountPopup
+          discountPercent={tournament.discount_percent}
+          originalPrice={tournament.entry_fee}
+          discountedPrice={Math.round((tournament.entry_fee * (100 - tournament.discount_percent)) / 100)}
+          tournamentTitle={tournament.title}
+          tournamentId={tournament.id}
+        />
+      )}
     </div>
   )
 }

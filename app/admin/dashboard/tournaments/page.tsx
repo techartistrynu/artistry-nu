@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { format } from "date-fns"
 import { closeTournament, deleteTournament, getAllTournaments } from "@/app/actions/tournaments"
-import { getTournamentStatusText } from "@/lib/utils"
+import { getTournamentStatusText, formatPriceWithDiscount } from "@/lib/utils"
+import { DiscountPopup } from "@/components/ui/discount-popup"
 import {
   Table,
   TableBody,
@@ -182,6 +183,11 @@ export default function AdminTournamentsPage() {
                       <div className="text-sm text-muted-foreground line-clamp-1">
                         {tournament.description}
                       </div>
+                      {tournament.discount_percent > 0 && (
+                        <Badge className="bg-orange-500 hover:bg-orange-600 mt-1 text-xs">
+                          {tournament.discount_percent}% OFF
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell>{getStatusBadge(tournament)}</TableCell>
                     <TableCell className="hidden md:table-cell">
@@ -191,7 +197,19 @@ export default function AdminTournamentsPage() {
                       {formatDate(tournament.submission_deadline)}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      ₹{tournament.entry_fee}
+                      {(() => {
+                        const priceInfo = formatPriceWithDiscount(tournament.entry_fee, tournament.discount_percent);
+                        if (priceInfo.hasDiscount) {
+                          return (
+                            <div className="flex flex-col">
+                              <span className="line-through text-muted-foreground text-xs">{priceInfo.originalPrice}</span>
+                              <span className="text-green-600 font-medium">{priceInfo.discountedPrice}</span>
+                              <span className="text-xs text-green-600">({tournament.discount_percent}% off)</span>
+                            </div>
+                          );
+                        }
+                        return priceInfo.originalPrice;
+                      })()}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>

@@ -36,8 +36,8 @@ export default async function DashboardPaymentsPage() {
                 <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted/50">
                   <div className="col-span-3">Tournament</div>
                   <div className="col-span-2">Amount</div>
+                  <div className="col-span-2">Discount</div>
                   <div className="col-span-2">Date</div>
-                  <div className="col-span-2">Payment Method</div>
                   <div className="col-span-1">Status</div>
                   <div className="col-span-2">Actions</div>
                 </div>
@@ -47,12 +47,41 @@ export default async function DashboardPaymentsPage() {
                   {payments.map((payment) => (
                     <div key={payment.id} className="grid grid-cols-12 items-center p-4 hover:bg-muted/50">
                       <div className="col-span-3 truncate font-medium">{payment.tournament?.title}</div>
-                      <div className="col-span-2">₹{(payment.paid_amount / 100).toFixed(2)}</div>
+                      <div className="col-span-2">
+                        <div className="flex flex-col">
+                          {payment.tournament?.discount_percent && payment.tournament.discount_percent > 0 ? (
+                            <>
+                              <span className="line-through text-muted-foreground text-xs">
+                                ₹{payment.tournament.entry_fee}
+                              </span>
+                              <span className="text-green-600 font-medium">
+                                ₹{(payment.paid_amount / 100).toFixed(2)}
+                              </span>
+                              <span className="text-xs text-green-600">
+                                {payment.tournament.discount_percent}% OFF
+                              </span>
+                            </>
+                          ) : (
+                            <span>₹{(payment.paid_amount / 100).toFixed(2)}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="col-span-2">
+                        {payment.tournament?.discount_percent && payment.tournament.discount_percent > 0 ? (
+                          <div className="flex flex-col">
+                            <span className="text-green-600 font-medium">
+                              -{payment.tournament.discount_percent}%
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              Saved ₹{Math.round((payment.tournament.entry_fee * payment.tournament.discount_percent) / 100)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">No discount</span>
+                        )}
+                      </div>
                       <div className="col-span-2 truncate text-sm">
                         {new Date(payment.payment_date._seconds * 1000).toLocaleString()}
-                      </div>
-                      <div className="col-span-2 capitalize truncate">
-                        {payment.payment_method.replace("_", " ")}
                       </div>
                       <div className="col-span-1">
                         <Badge

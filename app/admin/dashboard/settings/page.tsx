@@ -172,11 +172,11 @@ export default function AdminSettingsPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Environment</Label>
+                  <Label>Environment: </Label>
                   <span className="text-sm">{process.env.NODE_ENV || "development"}</span>
                 </div>
                 <div className="space-y-2">
-                  <Label>Version</Label>
+                  <Label>Version: </Label>
                   <span className="text-sm">1.0.0</span>
                 </div>
               </div>

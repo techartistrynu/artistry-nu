@@ -56,3 +56,38 @@ export function getCategoryLabels(categories: string[]): string {
     .map((cat) => categoryOptions.find((o) => o.value === cat)?.label || cat)
     .join(", ");
 }
+
+// Function to calculate discounted price
+export function calculateDiscountedPrice(originalPrice: number, discountPercent: number): number {
+  if (!discountPercent || discountPercent <= 0) return originalPrice;
+  const discount = (originalPrice * discountPercent) / 100;
+  const discountedPrice = Math.max(0, originalPrice - discount);
+  return Math.round(discountedPrice); // Round to nearest integer
+}
+
+// Function to format price with discount display
+export function formatPriceWithDiscount(originalPrice: number, discountPercent?: number): {
+  originalPrice: string;
+  discountedPrice: string;
+  hasDiscount: boolean;
+  discountAmount: string;
+} {
+  if (!discountPercent || discountPercent <= 0) {
+    return {
+      originalPrice: `₹${originalPrice}`,
+      discountedPrice: `₹${originalPrice}`,
+      hasDiscount: false,
+      discountAmount: "₹0"
+    };
+  }
+
+  const discountedPrice = calculateDiscountedPrice(originalPrice, discountPercent);
+  const discountAmount = originalPrice - discountedPrice;
+
+  return {
+    originalPrice: `₹${originalPrice}`,
+    discountedPrice: `₹${discountedPrice}`,
+    hasDiscount: true,
+    discountAmount: `₹${discountAmount}`
+  };
+}

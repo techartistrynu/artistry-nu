@@ -8,7 +8,8 @@ import Link from "next/link"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
-import { getTournamentStatusText } from "@/lib/utils"
+import { getTournamentStatusText, formatPriceWithDiscount } from "@/lib/utils"
+import { DiscountPopup } from "@/components/ui/discount-popup"
 
 export default async function TournamentDetailPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
@@ -71,7 +72,21 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
             </div>
             <div className="space-y-2">
               <h3 className="font-medium">Entry Fee</h3>
-              <p className="text-sm text-muted-foreground">₹{tournament.entry_fee}</p>
+              <div className="text-sm text-muted-foreground">
+                {(() => {
+                  const priceInfo = formatPriceWithDiscount(tournament.entry_fee, tournament.discount_percent);
+                  if (priceInfo.hasDiscount) {
+                    return (
+                      <div>
+                        <span className="line-through">{priceInfo.originalPrice}</span>
+                        <span className="ml-2 text-green-600 font-medium">{priceInfo.discountedPrice}</span>
+                        <span className="ml-2 text-xs text-green-600">({tournament.discount_percent}% off)</span>
+                      </div>
+                    );
+                  }
+                  return priceInfo.originalPrice;
+                })()}
+              </div>
             </div>
             
             {/* Prize Section */}
@@ -146,6 +161,17 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
           )}
         </CardFooter>
       </Card>
+      
+      {/* Discount Popup for tournaments with >30% discount */}
+      {tournament?.discount_percent && tournament.discount_percent > 30 && (
+        <DiscountPopup
+          discountPercent={tournament.discount_percent}
+          originalPrice={tournament.entry_fee}
+          discountedPrice={Math.round((tournament.entry_fee * (100 - tournament.discount_percent)) / 100)}
+          tournamentTitle={tournament.title}
+          tournamentId={tournament.id}
+        />
+      )}
     </div>
   )
 }

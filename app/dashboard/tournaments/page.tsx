@@ -7,7 +7,8 @@ import { getAllTournamentForUser, getAllTournaments } from "@/app/actions/tourna
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
-import { getCategoryLabels, getTournamentStatusText } from "@/lib/utils"
+import { getCategoryLabels, getTournamentStatusText, formatPriceWithDiscount } from "@/lib/utils"
+import { DiscountPopup } from "@/components/ui/discount-popup"
 
 export default async function DashboardTournamentsPage() {
   const session = await getServerSession(authOptions)
@@ -45,6 +46,11 @@ export default async function DashboardTournamentsPage() {
                     </CardDescription>
                   </div>
                   <Badge className={`justify ${tournament.status === "open" ? "bg-green-500 hover:bg-green-600" : tournament.status === "coming_soon" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-red-500 hover:bg-red-600"}`}>{getTournamentStatusText(tournament.status)}</Badge>
+                  {tournament.discount_percent > 0 && (
+                    <Badge className="bg-orange-500 hover:bg-orange-600 ml-2">
+                      {tournament.discount_percent}% OFF
+                    </Badge>
+                  )}
                 </div>
               </CardHeader>
               <CardContent className="flex-1">
@@ -70,7 +76,21 @@ export default async function DashboardTournamentsPage() {
                   </div>
                   <div className="flex items-center text-sm">
                     <BadgeIndianRupee className="mr-2 h-4 w-4 text-muted-foreground" />
-                    <span>Entry Fee: ₹{tournament.entry_fee}</span>
+                    <span>
+                      Entry Fee: {(() => {
+                        const priceInfo = formatPriceWithDiscount(tournament.entry_fee, tournament.discount_percent);
+                        if (priceInfo.hasDiscount) {
+                          return (
+                            <>
+                              <span className="line-through text-muted-foreground">{priceInfo.originalPrice}</span>
+                              <span className="ml-2 text-green-600 font-medium">{priceInfo.discountedPrice}</span>
+                              <span className="ml-2 text-xs text-green-600">({tournament.discount_percent}% off)</span>
+                            </>
+                          );
+                        }
+                        return priceInfo.originalPrice;
+                      })()}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -87,6 +107,20 @@ export default async function DashboardTournamentsPage() {
           </div>
         )}
       </div>
+      
+      {/* Discount Popup for tournaments with >30% discount */}
+      {tournaments.map((tournament: any) => 
+        tournament.discount_percent && tournament.discount_percent > 30 ? (
+          <DiscountPopup
+            key={`popup-${tournament.id}`}
+            discountPercent={tournament.discount_percent}
+            originalPrice={tournament.entry_fee}
+            discountedPrice={Math.round((tournament.entry_fee * (100 - tournament.discount_percent)) / 100)}
+            tournamentTitle={tournament.title}
+            tournamentId={tournament.id}
+          />
+        ) : null
+      )}
     </div>
   )
 }
