@@ -220,9 +220,8 @@ function NewTournamentForm() {
                   type="number" 
                   min="0" 
                   max="100" 
-                  step="0.01" 
-                  placeholder="0" 
-                  defaultValue={defaultValues?.discount_percent || 0}
+                  step="0.01"
+                  defaultValue={Number(defaultValues?.discount_percent) || 0}
                 />
                 <p className="text-sm text-muted-foreground">Enter discount percentage (0-100)</p>
               </div>
