@@ -31,6 +31,8 @@ export function getAgeRangeFromCategory(ageCategory: string): string {
       return "between 21-34 years of age";
     case "35+":
       return "35 years of age or older";
+    case "21+":
+      return "21 years of age or older";
     default:
       return "at least 16 years of age"; // fallback for unknown categories
   }

@@ -55,6 +55,7 @@ function NewTournamentForm() {
     { value: "5-12", label: "5-12" },
     { value: "13-20", label: "13-20" },
     { value: "21-34", label: "21-34" },
+    { value: "21+", label: "21+" },
     { value: "35+", label: "35+" },
   ];
   const [selectedAgeCategory, setSelectedAgeCategory] = useState<string>("18-25");
