@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { getSubmissionById, updateSubmissionScore } from "@/app/actions/submissions"
-import { notFound, useParams } from "next/navigation"
+import { notFound, useParams, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { toast } from "@/components/ui/use-toast"
 import { ArrowLeft, Star, User, Mail, Award, FileText, Calendar, CheckCircle2, XCircle, Phone, Cake, Ear, Download } from "lucide-react"
@@ -19,6 +19,7 @@ import { getAgeRangeFromCategory, getCategoryLabels } from "@/lib/utils"
 
 export default function SubmissionDetailPage() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const [submission, setSubmission] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const receiptRef = useRef<HTMLDivElement>(null)
@@ -262,7 +263,12 @@ export default function SubmissionDetailPage() {
     <div className="container px-4 sm:px-6 md:px-8 py-10 md:py-12" ref={receiptRef}>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-          <Link href="/admin/dashboard/submissions">
+          <Link 
+            href={submission?.tournament_id 
+              ? `/admin/dashboard/submissions?tournamentId=${submission.tournament_id}&${searchParams.toString()}`
+              : `/admin/dashboard/submissions?${searchParams.toString()}`
+            }
+          >
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>

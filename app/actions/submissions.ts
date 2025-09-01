@@ -303,108 +303,247 @@ export async function getSubmissionsByTournament(
   page: number = 1,
   limit: number = 10,
   searchQuery: string = "",
-  isPaid?: boolean
+  filters: {
+    paymentStatus?: string;
+    submissionStatus?: string;
+    scoreRange?: { min?: number; max?: number };
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}
 ) {
   try {
-    let query = db.collection("submissions").where("tournament_id", "==", tournamentId)
+    // APPROACH: Client-side filtering to avoid Firestore index issues
+    // 
+    // PROBLEM: Firestore requires composite indexes when combining:
+    // - Multiple where clauses with different fields
+    // - Range queries (>, <, >=, <=) with other filters
+    // - Text search with other filters
+    // - orderBy with multiple where clauses
+    //
+    // SOLUTION: Fetch base data and filter in memory
+    // 
+    // PROS:
+    // - No index creation required
+    // - Works immediately without configuration
+    // - Flexible filtering logic
+    //
+    // CONS:
+    // - Fetches all data for tournament (memory usage)
+    // - Slower for large datasets
+    // - Network bandwidth usage
+    //
+    // ALTERNATIVES for production:
+    // 1. Create composite indexes in Firestore console
+    // 2. Use Algolia/Elasticsearch for search
+    // 3. Implement server-side pagination with cursor-based approach
+    // 4. Use Firestore subcollections for better organization
+    
+    // Start with basic query - only filter by tournament_id to avoid index issues
+    let query = db.collection("submissions").where("tournament_id", "==", tournamentId);
 
-    if(isPaid){
-      query =query.where("payment_status", "==", "paid");
+    // Apply filters that can be combined with the base query
+    if (filters.paymentStatus && filters.paymentStatus !== 'all') {
+      query = query.where("payment_status", "==", filters.paymentStatus);
     }
 
-    if (searchQuery) {
-      query = query.where("applicant_name", ">=", searchQuery)
-        .where("applicant_name", "<=", searchQuery + "\uf8ff");
+    if (filters.submissionStatus && filters.submissionStatus !== 'all') {
+      query = query.where("status", "==", filters.submissionStatus);
     }
 
+    // Get all submissions for the tournament with current filters
     const snapshot = await query
       .orderBy("created_at", "desc")
-      .limit(limit)
-      .offset((page - 1) * limit)
       .get();
 
-    const totalSnapshot = await query.count().get();
-    const total = totalSnapshot.data().count;
-
-    const submissions = await Promise.all(
+    let submissions = await Promise.all(
       snapshot.docs.map(async (doc) => {
-        const submissionData = doc.data()
-        const submissionId = doc.id
-
-        const userId = submissionData.user_id
-        const tournamentId = submissionData.tournament_id
-
-        let user = null
-        let tournament = null
-
-        // Sanitize user
-        if (userId && typeof userId === "string") {
-          const userSnap = await db.collection("users").doc(userId).get()
-          if (userSnap.exists) {
-            const rawUser = userSnap.data()
-            user = {
-              id: userSnap.id,
-              name: rawUser?.name || null,
-              email: rawUser?.email || null,
-              image: rawUser?.image || null,
-              createdAt: rawUser?.createdAt?.toDate?.().toISOString() || null,
-            }
-          }
-        }
-
-        // Sanitize tournament
-        if (tournamentId && typeof tournamentId === "string") {
-          const tournamentSnap = await db.collection("tournaments").doc(tournamentId).get()
-          if (tournamentSnap.exists) {
-            const rawTournament = tournamentSnap.data()
-            tournament = {
-              id: tournamentSnap.id,
-              title: rawTournament?.title || null,
-              registration_start: rawTournament?.registration_start?.toDate?.().toISOString() || null,
-              registration_end: rawTournament?.registration_end?.toDate?.().toISOString() || null,
-              submission_deadline: rawTournament?.submission_deadline?.toDate?.().toISOString() || null,
-              updated_at: rawTournament?.updated_at?.toDate?.().toISOString() || null,
-            }
-          }
-        }
-
-        // Get submission files
-        const submissionFilesSnap = await db.collection("submission_files")
-          .where("submission_id", "==", submissionId)
-          .get()
-        
-        const files = submissionFilesSnap.docs.map(d => ({
-          id: d.id,
-          ...d.data(),
-          uploaded_at: d.data().uploaded_at?.toDate?.().toISOString() || null
-        }))
-
-        return {
-          id: submissionId,
-          title: submissionData.title || null,
-          description: submissionData.description || null,
-          status: submissionData.status || null,
-          rank: submissionData.rank || null,
-          score: submissionData.score || null,
-          applicant_name: submissionData.applicant_name || null,
-          date_of_birth: submissionData.date_of_birth || null,
-          certificate_url: submissionData.certificate_url || null,
-          submission_number: submissionData.submission_number || null,
-          payment_status: submissionData.payment_status || null,
-          reviewed_at: submissionData.reviewed_at?.toDate?.().toISOString() || null,
-          created_at: submissionData.created_at?.toDate?.().toISOString() || null,
-          updated_at: submissionData.updated_at?.toDate?.().toISOString() || null,
-          user,
-          tournaments: tournament,
-          files
-        }
+        return await processSubmissionDoc(doc);
       })
-    )
+    );
 
-    return { submissions, total };
+    // Apply score range filter in memory (since we can't combine multiple range queries)
+    if (filters.scoreRange?.min !== undefined || filters.scoreRange?.max !== undefined) {
+      submissions = submissions.filter(submission => {
+        if (!submission.score) return false;
+        const score = submission.score;
+        
+        if (filters.scoreRange?.min !== undefined && score < filters.scoreRange.min) {
+          return false;
+        }
+        if (filters.scoreRange?.max !== undefined && score > filters.scoreRange.max) {
+          return false;
+        }
+        return true;
+      });
+    }
+
+    // Apply search filter in memory (since we can't combine multiple text queries)
+    if (searchQuery.trim()) {
+      const searchLower = searchQuery.toLowerCase().trim();
+      submissions = submissions.filter(submission => {
+        const name = (submission.applicant_name || "").toLowerCase();
+        const title = (submission.title || "").toLowerCase();
+        const description = (submission.description || "").toLowerCase();
+        
+        return name.includes(searchLower) || 
+               title.includes(searchLower) || 
+               description.includes(searchLower);
+      });
+    }
+
+    // Apply sorting based on selected column
+    if (filters.sortBy && filters.sortOrder) {
+      submissions.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        switch (filters.sortBy) {
+          case 'applicant_name':
+            aValue = (a.applicant_name || "").toLowerCase();
+            bValue = (b.applicant_name || "").toLowerCase();
+            break;
+          case 'title':
+            aValue = (a.title || "").toLowerCase();
+            bValue = (b.title || "").toLowerCase();
+            break;
+          case 'score':
+            aValue = a.score || 0;
+            bValue = b.score || 0;
+            break;
+          case 'payment_status':
+            aValue = a.payment_status || "";
+            bValue = b.payment_status || "";
+            break;
+          case 'status':
+            aValue = a.status || "";
+            bValue = b.status || "";
+            break;
+          case 'created_at':
+          default:
+            aValue = a.created_at || "";
+            bValue = b.created_at || "";
+            break;
+        }
+
+        // Handle string comparison
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          if (filters.sortOrder === 'asc') {
+            return aValue.localeCompare(bValue);
+          } else {
+            return bValue.localeCompare(aValue);
+          }
+        }
+
+        // Handle number comparison
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          if (filters.sortOrder === 'asc') {
+            return aValue - bValue;
+          } else {
+            return bValue - aValue;
+          }
+        }
+
+        // Handle date comparison
+        if (aValue && bValue) {
+          const aDate = new Date(aValue);
+          const bDate = new Date(bValue);
+          if (filters.sortOrder === 'asc') {
+            return aDate.getTime() - bDate.getTime();
+          } else {
+            return bDate.getTime() - aDate.getTime();
+          }
+        }
+
+        return 0;
+      });
+    }
+
+    // Calculate total count
+    const total = submissions.length;
+
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedSubmissions = submissions.slice(startIndex, endIndex);
+
+    return { submissions: paginatedSubmissions, total };
   } catch (error) {
     console.error("Error in getSubmissionsByTournament:", error);
     return { submissions: [], total: 0 };
+  }
+}
+
+// Helper function to process submission documents
+async function processSubmissionDoc(doc: any) {
+  const submissionData = doc.data()
+  const submissionId = doc.id
+
+  const userId = submissionData.user_id
+  const tournamentId = submissionData.tournament_id
+
+  let user = null
+  let tournament = null
+
+  // Sanitize user
+  if (userId && typeof userId === "string") {
+    const userSnap = await db.collection("users").doc(userId).get()
+    if (userSnap.exists) {
+      const rawUser = userSnap.data()
+      user = {
+        id: userSnap.id,
+        name: rawUser?.name || null,
+        email: rawUser?.email || null,
+        image: rawUser?.image || null,
+        createdAt: rawUser?.createdAt?.toDate?.().toISOString() || null,
+      }
+    }
+  }
+
+  // Sanitize tournament
+  if (tournamentId && typeof tournamentId === "string") {
+    const tournamentSnap = await db.collection("tournaments").doc(tournamentId).get()
+    if (tournamentSnap.exists) {
+      const rawTournament = tournamentSnap.data()
+      tournament = {
+        id: tournamentSnap.id,
+        title: rawTournament?.title || null,
+        registration_start: rawTournament?.registration_start?.toDate?.().toISOString() || null,
+        registration_end: rawTournament?.registration_end?.toDate?.().toISOString() || null,
+        submission_deadline: rawTournament?.submission_deadline?.toDate?.().toISOString() || null,
+        updated_at: rawTournament?.updated_at?.toDate?.().toISOString() || null,
+      }
+    }
+  }
+
+  // Get submission files
+  const submissionFilesSnap = await db.collection("submission_files")
+    .where("submission_id", "==", submissionId)
+    .get()
+  
+  const files = submissionFilesSnap.docs.map(d => ({
+    id: d.id,
+    ...d.data(),
+    uploaded_at: d.data().uploaded_at?.toDate?.().toISOString() || null
+  }))
+
+  return {
+    id: submissionId,
+    title: submissionData.title || null,
+    description: submissionData.description || null,
+    status: submissionData.status || null,
+    rank: submissionData.rank || null,
+    score: submissionData.score || null,
+    applicant_name: submissionData.applicant_name || null,
+    date_of_birth: submissionData.date_of_birth || null,
+    certificate_url: submissionData.certificate_url || null,
+    submission_number: submissionData.submission_number || null,
+    payment_status: submissionData.payment_status || null,
+    reviewed_at: submissionData.reviewed_at?.toDate?.().toISOString() || null,
+    created_at: submissionData.created_at?.toDate?.().toISOString() || null,
+    updated_at: submissionData.updated_at?.toDate?.().toISOString() || null,
+    user,
+    tournaments: tournament,
+    files
   }
 }
 
