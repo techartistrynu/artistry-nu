@@ -73,7 +73,7 @@ export function SiteHeader() {
         <nav className="hidden md:flex items-center gap-6">
           <Link
             href="https://www.artistrynu.com/"
-            className="text-[15px] font-semibold border-b-2 border-black pb-1"
+            className="text-[15px] font-semibold"
           >
             Home
           </Link>
@@ -84,7 +84,7 @@ export function SiteHeader() {
                 variant="ghost"
                 className="text-[15px] font-semibold p-0 h-auto"
               >
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 border-b-2 border-black pb-1">
                   Services
                   <ChevronDown
                     className={`h-4 w-4 transition-transform ${
