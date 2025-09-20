@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getSubmissionById, updateSubmissionScore } from "@/app/actions/submissions"
+import { createPaymentRecord } from "@/app/actions/payments"
 import { notFound, useParams, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { toast } from "@/components/ui/use-toast"
-import { ArrowLeft, Star, User, Mail, Award, FileText, Calendar, CheckCircle2, XCircle, Phone, Cake, Ear, Download } from "lucide-react"
+import { ArrowLeft, Star, User, Mail, Award, FileText, Calendar, CheckCircle2, XCircle, Phone, Cake, Ear, Download, CreditCard } from "lucide-react"
 import Link from "next/link"
 import { DownloadButton } from "../../../../../components/download-button"
 import { SubmissionReviewForm } from "./components/submission-review-form"
@@ -22,6 +25,20 @@ export default function SubmissionDetailPage() {
   const searchParams = useSearchParams()
   const [submission, setSubmission] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
+  const [isSubmittingPayment, setIsSubmittingPayment] = useState(false)
+  const [paymentForm, setPaymentForm] = useState({
+    submission_id: '',
+    paid_amount: 0,
+    payment_date: new Date().toISOString().slice(0, 16),
+    payment_method: 'razorpay',
+    payment_status: 'paid',
+    razorpay_order_id: '',
+    razorpay_payment_id: '',
+    razorpay_signature: '',
+    tournament_id: '',
+    user_id: ''
+  })
   const receiptRef = useRef<HTMLDivElement>(null)
 
   const fetchSubmission = useCallback(async () => {
@@ -44,6 +61,59 @@ export default function SubmissionDetailPage() {
       reviewed_at: new Date().toISOString()
     } : null)
   }, [])
+
+  const openPaymentDialog = useCallback(() => {
+    alert('Are you sure, you want to create a payment record?');
+    if (!submission) return
+    
+    setPaymentForm({
+      submission_id: submission.id,
+      paid_amount: 0,
+      payment_date: new Date().toISOString().slice(0, 16),
+      payment_method: 'razorpay',
+      payment_status: 'paid',
+      razorpay_order_id: '',
+      razorpay_payment_id: '',
+      razorpay_signature: 'manual',
+      tournament_id: submission.tournament_id,
+      user_id: submission.user_id
+    })
+    setPaymentDialogOpen(true)
+  }, [submission])
+
+  const handlePaymentSubmit = async () => {
+    if (!submission) return
+
+    setIsSubmittingPayment(true)
+    try {
+      const result = await createPaymentRecord(paymentForm)
+      
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: result.message,
+        })
+        setPaymentDialogOpen(false)
+        // Refresh submission data
+        fetchSubmission()
+      } else {
+        toast({
+          title: "Error",
+          description: result.message,
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error('Error creating payment:', error)
+      toast({
+        title: "Error",
+        description: "Failed to create payment record",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmittingPayment(false)
+    }
+  }
 
   useEffect(() => {
     fetchSubmission()
@@ -465,13 +535,23 @@ export default function SubmissionDetailPage() {
                 
                 <div>
                   <Label className="text-muted-foreground">Payment Status</Label>
-                  <div className="mt-1">
+                  <div className="mt-1 flex items-center gap-2">
                     <Badge 
                       variant={submission.payment_status === "paid" ? "default" : "destructive"}
                       className="capitalize"
                     >
                       {submission.payment_status || "N/A"}
                     </Badge>
+                    {submission.payment_status !== "paid" && (
+                      <Button
+                        size="sm"
+                        onClick={openPaymentDialog}
+                        className="h-6 px-2 text-xs"
+                      >
+                        <CreditCard className="h-3 w-3 mr-1" />
+                        Update Payment
+                      </Button>
+                    )}
                   </div>
                 </div>
                 
@@ -537,6 +617,144 @@ export default function SubmissionDetailPage() {
           </Card>
         </div>
       </div>
+
+      {/* Payment Dialog */}
+      <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Create Payment Record</DialogTitle>
+            <DialogDescription>
+              Create a payment record for {submission?.applicant_name} - {submission?.title}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="paid_amount">Paid Amount (₹)</Label>
+                <Input
+                  id="paid_amount"
+                  type="number"
+                  value={paymentForm.paid_amount}
+                  onChange={(e) => setPaymentForm({
+                    ...paymentForm,
+                    paid_amount: parseFloat(e.target.value) || 0
+                  })}
+                  placeholder="1299.00"
+                />
+              </div>
+              <div>
+                <Label htmlFor="payment_date">Payment Date</Label>
+                <Input
+                  id="payment_date"
+                  type="datetime-local"
+                  value={paymentForm.payment_date}
+                  onChange={(e) => setPaymentForm({
+                    ...paymentForm,
+                    payment_date: e.target.value
+                  })}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="payment_method">Payment Method</Label>
+              <Select
+                value={paymentForm.payment_method}
+                onValueChange={(value) => setPaymentForm({
+                  ...paymentForm,
+                  payment_method: value
+                })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="razorpay">Razorpay</SelectItem>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="payment_status">Payment Status</Label>
+              <Select
+                value={paymentForm.payment_status}
+                onValueChange={(value) => setPaymentForm({
+                  ...paymentForm,
+                  payment_status: value
+                })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="razorpay_order_id">Razorpay Order ID</Label>
+              <Input
+                id="razorpay_order_id"
+                value={paymentForm.razorpay_order_id}
+                onChange={(e) => setPaymentForm({
+                  ...paymentForm,
+                  razorpay_order_id: e.target.value
+                })}
+                placeholder="order_xyz123"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="razorpay_payment_id">Razorpay Payment ID</Label>
+              <Input
+                id="razorpay_payment_id"
+                value={paymentForm.razorpay_payment_id}
+                onChange={(e) => setPaymentForm({
+                  ...paymentForm,
+                  razorpay_payment_id: e.target.value
+                })}
+                placeholder="pay_xyz123"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="razorpay_signature">Razorpay Signature</Label>
+              <Input
+                id="razorpay_signature"
+                value={paymentForm.razorpay_signature}
+                onChange={(e) => setPaymentForm({
+                  ...paymentForm,
+                  razorpay_signature: e.target.value
+                })}
+                placeholder="signature_xyz123"
+              />
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setPaymentDialogOpen(false)}
+                disabled={isSubmittingPayment}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handlePaymentSubmit}
+                disabled={isSubmittingPayment || !paymentForm.paid_amount || !paymentForm.razorpay_payment_id}
+              >
+                {isSubmittingPayment ? 'Creating...' : 'Create Payment Record'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

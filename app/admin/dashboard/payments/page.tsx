@@ -24,6 +24,7 @@ interface Payment {
   original_amount?: number
 }
 
+
 export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([])
   const [filteredPayments, setFilteredPayments] = useState<Payment[]>([])
@@ -46,6 +47,7 @@ export default function AdminPaymentsPage() {
     }
     fetchPayments()
   }, [])
+
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -73,6 +75,7 @@ export default function AdminPaymentsPage() {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
 
+
   if (loading) {
     return <div className="flex-1 flex items-center justify-center">Loading...</div>
   }
@@ -80,119 +83,124 @@ export default function AdminPaymentsPage() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="text-3xl font-bold tracking-tight">Payments</h2>
-        
-        <div className="relative w-full md:w-auto">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search payments..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 w-full md:w-[300px]"
-          />
-        </div>
+        <h2 className="text-3xl font-bold tracking-tight">Payment Records</h2>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Successful Payments</CardTitle>
-          <CardDescription>
-            {filteredPayments.length} payments found. Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredPayments.length)}.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {currentItems.length > 0 ? (
-            <div className="space-y-4">
-              <div className="rounded-md border overflow-x-auto">
-                <div className="min-w-[900px]">
-                  {/* Header row */}
-                  <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted/50">
-                    <div className="col-span-2">Tournament</div>
-                    <div className="col-span-2">Payment ID</div>
-                    <div className="col-span-1">Amount</div>
-                    <div className="col-span-1">Discount</div>
-                    <div className="col-span-2">User</div>
-                    <div className="col-span-2">Email</div>
-                    <div className="col-span-1">Submission ID</div>
-                    <div className="col-span-1">Date</div>
-                  </div>
+      {/* Payment Records */}
+      <div className="space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="relative w-full md:w-auto">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search payments..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-full md:w-[300px]"
+              />
+            </div>
+          </div>
 
-                  {/* Data rows */}
-                  <div className="divide-y">
-                    {currentItems.map((payment) => (
-                      <div
-                        key={payment.id}
-                        className="grid grid-cols-12 items-center p-4 hover:bg-muted/50 text-sm"
-                      >
-                        <div className="col-span-2 truncate">{payment.tournamentTitle}</div>
-                        <div className="col-span-2 truncate text-muted-foreground">{payment.id}</div>
-                        <div className="col-span-1 font-semibold">₹{payment.amount}</div>
-                        <div className="col-span-1">
-                          {payment.discount_percent && payment.discount_percent > 0 && payment.original_amount ? (
-                            <div className="flex flex-col">
-                              <span className="text-green-600 font-medium text-xs">
-                                -{payment.discount_percent}%
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                Saved ₹{Math.round((payment.original_amount * payment.discount_percent) / 100)}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground text-xs">No discount</span>
-                          )}
-                        </div>
-                        <div className="col-span-2 truncate">{payment.userName}</div>
-                        <div className="col-span-2 truncate text-muted-foreground">{payment.userEmail}</div>
-                        <div className="col-span-1 truncate">{payment.submissionId}</div>
-                        <div className="col-span-1">
-                          {new Date(payment.date).toLocaleDateString("en-IN")}
-                        </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Successful Payments</CardTitle>
+              <CardDescription>
+                {filteredPayments.length} payments found. Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredPayments.length)}.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {currentItems.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="rounded-md border overflow-x-auto">
+                    <div className="min-w-[900px]">
+                      {/* Header row */}
+                      <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted/50">
+                        <div className="col-span-2">Tournament</div>
+                        <div className="col-span-2">Payment ID</div>
+                        <div className="col-span-1">Amount</div>
+                        <div className="col-span-1">Discount</div>
+                        <div className="col-span-2">User</div>
+                        <div className="col-span-2">Email</div>
+                        <div className="col-span-1">Submission ID</div>
+                        <div className="col-span-1">Date</div>
                       </div>
-                    ))}
+
+                      {/* Data rows */}
+                      <div className="divide-y">
+                        {currentItems.map((payment) => (
+                          <div
+                            key={payment.id}
+                            className="grid grid-cols-12 items-center p-4 hover:bg-muted/50 text-sm"
+                          >
+                            <div className="col-span-2 truncate">{payment.tournamentTitle}</div>
+                            <div className="col-span-2 truncate text-muted-foreground">{payment.id}</div>
+                            <div className="col-span-1 font-semibold">₹{payment.amount}</div>
+                            <div className="col-span-1">
+                              {payment.discount_percent && payment.discount_percent > 0 && payment.original_amount ? (
+                                <div className="flex flex-col">
+                                  <span className="text-green-600 font-medium text-xs">
+                                    -{payment.discount_percent}%
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    Saved ₹{Math.round((payment.original_amount * payment.discount_percent) / 100)}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">No discount</span>
+                              )}
+                            </div>
+                            <div className="col-span-2 truncate">{payment.userName}</div>
+                            <div className="col-span-2 truncate text-muted-foreground">{payment.userEmail}</div>
+                            <div className="col-span-1 truncate">{payment.submissionId}</div>
+                            <div className="col-span-1">
+                              {new Date(payment.date).toLocaleDateString("en-IN")}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pagination */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      Page {currentPage} of {totalPages}
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        disabled={currentPage <= 1}
+                        onClick={() => paginate(currentPage - 1)}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        disabled={currentPage >= totalPages}
+                        onClick={() => paginate(currentPage + 1)}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Pagination */}
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  Page {currentPage} of {totalPages}
+              ) : (
+                <div className="flex flex-col items-center justify-center h-40 gap-2">
+                  <p className="text-muted-foreground">
+                    {searchQuery ? "No matching payments found." : "No payments found."}
+                  </p>
+                  {searchQuery && (
+                    <Button
+                      variant="ghost"
+                      onClick={() => setSearchQuery('')}
+                    >
+                      Clear search
+                    </Button>
+                  )}
                 </div>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    disabled={currentPage <= 1}
-                    onClick={() => paginate(currentPage - 1)}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    disabled={currentPage >= totalPages}
-                    onClick={() => paginate(currentPage + 1)}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-40 gap-2">
-              <p className="text-muted-foreground">
-                {searchQuery ? "No matching payments found." : "No payments found."}
-              </p>
-              {searchQuery && (
-                <Button
-                  variant="ghost"
-                  onClick={() => setSearchQuery('')}
-                >
-                  Clear search
-                </Button>
               )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+      </div>
     </div>
   )
 }
